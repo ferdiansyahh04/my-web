@@ -60,23 +60,22 @@
 }
 
 .product-item {
-    transition: all 0.3s ease-in-out;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.5s ease;
+}
+
+.product-item:hover {
+    transform: translateY(-4px);
 }
 
 .add-to-cart-btn {
-    background: #1f2937;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 6px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s;
-    font-size: 14px;
-    font-weight: 500;
+    transition: background-color 0.25s, color 0.25s, box-shadow 0.25s;
 }
 
 .add-to-cart-btn:hover {
-    background: #374151;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 .notification {
@@ -187,8 +186,79 @@
 }
 
 .hero-showcase {
-    background-image: url('https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1600&auto=format&fit=crop');
-    min-height: 70vh;
+    background-image: url('https://images.unsplash.com/photo-1714359177644-dc07d4c562b8?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-overlay {
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.15) 40%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+.hero-thumb-strip {
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+
+.hero-thumb {
+    transition: transform 0.3s ease;
+}
+
+.hero-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Editorial product grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+
+    /* Feature item: first and every 7th get editorial treatment */
+    .product-grid .product-item:nth-child(7n + 1) {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+}
+
+@media (min-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+
+    .product-grid .product-item:nth-child(7n + 1) {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+}
+
+/* Product card images */
+.product-img {
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+}
+
+.product-item:hover .product-img {
+    transform: scale(1.05);
 }
 
 @keyframes marquee-scroll {

@@ -312,7 +312,6 @@ allProducts.forEach(product => {
 });
 
 let filteredProducts = [...allProducts];
-let isSearching = false;
 
 function createProductHTML(product) {
     const escapedName = product.name.replace(/'/g, "\\'");
@@ -322,45 +321,44 @@ function createProductHTML(product) {
 
     const priceBlock = product.hasDiscount
         ? `<div class="flex items-baseline gap-2">
-                <span class="text-red-600 font-bold">${product.salePrice}</span>
-                <span class="text-sm line-through text-gray-400">${product.originalPrice || ''}</span>
+                <span class="text-base font-bold text-gray-900">${product.salePrice}</span>
+                <span class="text-xs line-through text-gray-400">${product.originalPrice || ''}</span>
             </div>`
-        : `<div class="text-lg font-semibold">${product.salePrice}</div>`;
+        : `<div class="text-base font-bold text-gray-900">${product.salePrice}</div>`;
 
-    // Priority: show out-of-stock badge when not available; otherwise show discount badge
     const badge = !available
-        ? `<span class="absolute top-3 left-3 bg-gray-100 text-gray-700 text-xs font-semibold px-2 py-1 rounded">Out of stock</span>`
+        ? `<span class="absolute top-3 left-3 z-10 bg-gray-900 text-white text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full">Sold out</span>`
         : (product.hasDiscount && product.discountPercentage
-            ? `<span class="absolute top-3 left-3 bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded">${product.discountPercentage}</span>`
+            ? `<span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full">${product.discountPercentage}</span>`
             : '');
+
+    const categoryTag = product.category
+        ? `<span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">${product.category}</span>`
+        : '';
 
     const productHref = available ? product.url : 'javascript:void(0)';
     const productAnchorAttrs = available ? '' : 'onclick="return false;"';
 
     return `
-        <div class="product-item bg-white rounded-lg overflow-hidden shadow hover:shadow-lg transform transition hover:-translate-y-1 opacity-0 translate-y-4">
-            <a href="${productHref}" ${productAnchorAttrs} class="block group ${available ? '' : 'cursor-not-allowed opacity-90'}">
-                <div class="relative overflow-hidden">
+        <div class="product-item group opacity-0 translate-y-6">
+            <a href="${productHref}" ${productAnchorAttrs} class="block ${available ? '' : 'cursor-not-allowed opacity-70'}">
+                <div class="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]">
                     ${badge}
-                    <img src="${product.image1}" alt="${escapedName}" class="w-full h-56 object-cover block group-hover:opacity-0 transition-opacity duration-300" onerror="this.src='https://via.placeholder.com/400x300?text=Product+Image'">
-                    <img src="${product.image2}" alt="${escapedName} alt2" class="absolute top-0 left-0 w-full h-56 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="pointer-events:none;">
-                </div>
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-medium text-gray-900">${product.name}</h3>
-                        <button class="text-gray-400 hover:text-gray-700" title="Save">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        </button>
-                    </div>
-                    <div class="mt-2">
-                        ${priceBlock}
-                    </div>
-                    <div class="mt-4 flex items-center justify-between">
-                        <a href="${productHref}" ${productAnchorAttrs} class="text-xs ${available ? 'text-gray-600 hover:text-black' : 'text-gray-400 cursor-not-allowed'}">Show more</a>
+                    <img src="${product.image1}" alt="${escapedName}" class="product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500" onerror="this.src='https://via.placeholder.com/400x500?text=Product'">
+                    <img src="${product.image2}" alt="${escapedName}" class="product-img absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="pointer-events:none;">
+                    <!-- Quick add overlay -->
+                    <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                         ${available
-                            ? `<button type="button" data-product-id="${product.id}" data-product-name="${escapedName}" data-product-saleprice="${product.salePrice}" data-product-image="${product.image1}" class="add-to-cart-btn bg-black text-white px-3 py-1 rounded text-sm">Add</button>`
-                            : `<button type="button" disabled class="bg-gray-300 text-gray-600 px-3 py-1 rounded text-sm cursor-not-allowed">Unavailable</button>`
+                            ? `<button type="button" data-product-id="${product.id}" data-product-name="${escapedName}" data-product-saleprice="${product.salePrice}" data-product-image="${product.image1}" class="add-to-cart-btn w-full text-center bg-white text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl shadow-lg hover:bg-gray-900 hover:text-white transition-colors duration-200">Add to cart</button>`
+                            : `<button type="button" disabled class="w-full text-center bg-gray-200 text-gray-400 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl cursor-not-allowed">Unavailable</button>`
                         }
+                    </div>
+                </div>
+                <div class="mt-4 space-y-1">
+                    ${categoryTag}
+                    <h3 class="text-sm font-medium text-gray-900 leading-snug line-clamp-2">${product.name}</h3>
+                    <div class="pt-0.5">
+                        ${priceBlock}
                     </div>
                 </div>
             </a>
@@ -386,16 +384,16 @@ function loadProducts() {
         container.appendChild(productElement.firstElementChild);
     });
 
-    // Animate new products
+    // Animate new products with stagger
     setTimeout(() => {
         const newProducts = container.querySelectorAll('.product-item.opacity-0');
         newProducts.forEach((product, index) => {
             setTimeout(() => {
-                product.classList.remove('opacity-0', 'translate-y-4');
+                product.classList.remove('opacity-0', 'translate-y-6');
                 product.classList.add('opacity-100', 'translate-y-0');
-            }, index * 100);
+            }, index * 80);
         });
-    }, 100);
+    }, 50);
 
 }
 
@@ -404,12 +402,10 @@ function searchProducts(query) {
 
     if (searchTerm === '') {
         filteredProducts = [...allProducts];
-        isSearching = false;
     } else {
         filteredProducts = allProducts.filter(product =>
             product.name.toLowerCase().includes(searchTerm)
         );
-        isSearching = true;
     }
 
     clearProducts();

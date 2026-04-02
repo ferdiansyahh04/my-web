@@ -120,7 +120,6 @@
 
         users.push(admin);
         saveUsers(users);
-        console.info('Default admin created:', admin.email, 'password:', 'admin123');
     }
 
     function createAuthModal() {

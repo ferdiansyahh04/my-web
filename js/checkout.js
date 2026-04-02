@@ -419,7 +419,6 @@
     }
 
     function nextStep() {
-        window.validateStep1 = validateStep1;
         if (window.currentStep === 1 && !validateStep1()) {
             return;
         }
@@ -591,15 +590,6 @@
         promoDiscount.style.display = 'flex';
         discountAmount.textContent = '-' + formatRupiah(discount);
     }
-
-    window.nextStep = nextStep;
-    window.previousStep = prevStep;
-    window.prevStep = prevStep;
-    window.showStep = showStep;
-    window.validateStep1 = validateStep1;
-    window.submitOrder = submitOrder;
-    window.goBack = goBack;
-    window.applyPromoCode = applyPromoCode;
 
     document.addEventListener('DOMContentLoaded', function() {
         var isLoggedIn = window.auth && typeof window.auth.isLoggedIn === 'function' ? window.auth.isLoggedIn() : false;
