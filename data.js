@@ -20,7 +20,8 @@ let allProducts = [
         url: "https://tk.tokopedia.com/ZShWGTTsD/",
         image1: "https://images.tokopedia.net/img/cache/900/o3syd0/1997/1/1/aed31d6e7bd54b449fb735aaca5c4c97~.jpeg",
         image2: "https://images.tokopedia.net/img/cache/900/o3syd0/1997/1/1/4b105c9e7bc844568c723fc0cebb652f~.jpeg",
-        hasDiscount: true
+        hasDiscount: true,
+        isBestSeller: true
     },
     {
         name: "VOYAGER68 v2 Lite 65%",
@@ -47,7 +48,8 @@ let allProducts = [
         url: "https://tk.tokopedia.com/ZShWsxUav/",
         image1: "https://pressplayid.com/cdn/shop/products/d3b1898b-8c95-4953-9beb-4498b39edf24-copy-of-photo-31-10-23-141634.jpg?v=1705915017",
         image2: "https://pressplayid.com/cdn/shop/products/a767ea16-9b8d-4960-a5d1-b17970dc30ba-copy-of-photo-31-10-23-141826.jpg?v=1705915017",
-        hasDiscount: true
+        hasDiscount: true,
+        isBestSeller: true
     },
     {
         name: "Noir Timeless1800 96% Wireless",
@@ -56,7 +58,8 @@ let allProducts = [
         url: "https://tokopedia.link/xB3JWXc1MTb",
         image1: "https://images.tokopedia.net/img/cache/900/VqbcmM/2025/2/20/1fe34343-5928-4c5c-b3cd-b0ac88669b5c.jpg",
         image2: "https://images.tokopedia.net/img/cache/900/VqbcmM/2025/2/20/bde9baa6-4b00-418f-9c85-067cf2b6cd96.jpg",
-        hasDiscount: true
+        hasDiscount: true,
+        isBestSeller: true
     },
     {
         name: "Noir Timeless82 v2 Classic Edition",
@@ -74,7 +77,8 @@ let allProducts = [
         url: "https://tokopedia.link/3LN4KbI1MTb",
         image1: "https://images.tokopedia.net/img/cache/900/VqbcmM/2024/8/22/ecfcbb01-c1c1-4295-a523-efcbfd1325b0.jpg",
         image2: "https://images.tokopedia.net/img/cache/900/VqbcmM/2024/8/23/3b201e07-2028-4b12-8ae8-925ea3716924.jpg",
-        hasDiscount: true
+        hasDiscount: true,
+        isNew: true
     },
     {
         name: "Noir Timeless82 v2 Special Edition",
@@ -83,7 +87,8 @@ let allProducts = [
         url: "https://tokopedia.link/l4K0KRX1MTb",
         image1: "https://images.tokopedia.net/img/cache/900/VqbcmM/2024/10/17/d2c92cf0-9b6b-4377-8efa-d96347709fa5.jpg",
         image2: "https://images.tokopedia.net/img/cache/900/VqbcmM/2024/10/17/3b2a4d25-8178-4b4e-817d-4e5d929fa1b1.jpg",
-        hasDiscount: true
+        hasDiscount: true,
+        isNew: true
     },
     {
         name: "IRIS Ultralight Ergonomic",
@@ -101,7 +106,8 @@ let allProducts = [
         url: "https://tk.tokopedia.com/ZSh7eS8CY/",
         image1: "https://images.tokopedia.net/img/cache/900/VqbcmM/2024/11/14/5516e144-b832-42cf-b339-f829e9da89ad.jpg",
         image2: "https://images.tokopedia.net/img/cache/900/VqbcmM/2024/11/14/8dd57a06-3791-46d1-bbed-34819832ccc7.jpg",
-        hasDiscount: false
+        hasDiscount: false,
+        isNew: true
     },
     {
         name: "Rexus RIVA RX-120",
@@ -245,11 +251,22 @@ function normalizeProduct(product) {
     return product;
 }
 
+// Default product flags that should always be synced from the hardcoded list.
+const DEFAULT_FLAGS = ['isNew', 'isBestSeller'];
+
 function seedProductStoreIfEmpty() {
     const stored = loadProductStore();
     if (stored && stored.length > 0) {
-        // Normalize and replace in-memory list
+        // Merge default flags from the hardcoded list into stored products
+        const defaults = new Map(allProducts.map(p => [p.name, p]));
+        stored.forEach(p => {
+            const def = defaults.get(p.name);
+            if (def) {
+                DEFAULT_FLAGS.forEach(flag => { p[flag] = def[flag] || false; });
+            }
+        });
         allProducts = stored.map(p => normalizeProduct(p));
+        saveProductStore(allProducts);
         return;
     }
     // nothing stored yet: persist the current default list
@@ -326,11 +343,29 @@ function createProductHTML(product) {
             </div>`
         : `<div class="text-base font-bold text-gray-900">${product.salePrice}</div>`;
 
-    const badge = !available
-        ? `<span class="absolute top-3 left-3 z-10 bg-gray-900 text-white text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full">Sold out</span>`
-        : (product.hasDiscount && product.discountPercentage
-            ? `<span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full">${product.discountPercentage}</span>`
-            : '');
+    // Build badges array (supports multiple badges)
+    let badges = '';
+    if (!available) {
+        badges = `<span class="badge-soldout absolute top-3 left-3 z-10">Sold out</span>`;
+    } else {
+        const leftBadges = [];
+        const rightBadges = [];
+
+        if (product.isNew) {
+            leftBadges.push(`<span class="badge-new"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.09 6.26L20.18 9l-5.09 3.74L16.18 19 12 15.27 7.82 19l1.09-6.26L3.82 9l6.09-.74z"/></svg> New</span>`);
+        }
+        if (product.isBestSeller) {
+            rightBadges.push(`<span class="badge-bestseller"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Best seller</span>`);
+        }
+        if (product.hasDiscount && product.discountPercentage) {
+            const side = leftBadges.length === 0 ? leftBadges : rightBadges;
+            side.push(`<span class="badge-discount">${product.discountPercentage}</span>`);
+        }
+
+        const left = leftBadges.length ? `<div class="absolute top-3 left-3 z-10 flex flex-col gap-2">${leftBadges.join('')}</div>` : '';
+        const right = rightBadges.length ? `<div class="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">${rightBadges.join('')}</div>` : '';
+        badges = left + right;
+    }
 
     const categoryTag = product.category
         ? `<span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">${product.category}</span>`
@@ -343,7 +378,7 @@ function createProductHTML(product) {
         <div class="product-item group opacity-0 translate-y-6">
             <a href="${productHref}" ${productAnchorAttrs} class="block ${available ? '' : 'cursor-not-allowed opacity-70'}">
                 <div class="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]">
-                    ${badge}
+                    ${badges}
                     <img src="${product.image1}" alt="${escapedName}" class="product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500" onerror="this.src='https://via.placeholder.com/400x500?text=Product'">
                     <img src="${product.image2}" alt="${escapedName}" class="product-img absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="pointer-events:none;">
                     <!-- Quick add overlay -->

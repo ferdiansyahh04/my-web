@@ -82,6 +82,8 @@
                 <div class="flex items-center gap-2">
                     <label class="text-sm"><input id="p-hasDiscount" type="checkbox" /> Has discount</label>
                     <label class="text-sm"><input id="p-available" type="checkbox" checked /> Available</label>
+                    <label class="text-sm"><input id="p-isNew" type="checkbox" /> New</label>
+                    <label class="text-sm"><input id="p-isBestSeller" type="checkbox" /> Best seller</label>
                 </div>
                 <div class="flex gap-2">
                     <button type="submit" class="bg-black text-white px-3 py-1 rounded">Save</button>
@@ -156,8 +158,12 @@
 
         const hasDiscount = qs('p-hasDiscount');
         const available = qs('p-available');
+        const isNewField = qs('p-isNew');
+        const isBestSellerField = qs('p-isBestSeller');
         if (hasDiscount) hasDiscount.checked = false;
         if (available) available.checked = true;
+        if (isNewField) isNewField.checked = false;
+        if (isBestSellerField) isBestSellerField.checked = false;
 
         const form = qs('admin-form');
         if (form) {
@@ -185,6 +191,8 @@
         const image2Field = qs('p-image2');
         const hasDiscountField = qs('p-hasDiscount');
         const availableField = qs('p-available');
+        const isNewField = qs('p-isNew');
+        const isBestSellerField = qs('p-isBestSeller');
         const form = qs('admin-form');
 
         const product = {
@@ -195,7 +203,9 @@
             image1: image1Field ? image1Field.value.trim() : '',
             image2: image2Field ? image2Field.value.trim() : '',
             hasDiscount: hasDiscountField ? !!hasDiscountField.checked : false,
-            available: availableField ? !!availableField.checked : true
+            available: availableField ? !!availableField.checked : true,
+            isNew: isNewField ? !!isNewField.checked : false,
+            isBestSeller: isBestSellerField ? !!isBestSellerField.checked : false
         };
 
         const editId = form ? form.getAttribute('data-edit-id') : null;
@@ -226,6 +236,8 @@
         qs('p-image2').value = product.image2 || '';
         qs('p-hasDiscount').checked = !!product.hasDiscount;
         qs('p-available').checked = product.available !== false;
+        qs('p-isNew').checked = !!product.isNew;
+        qs('p-isBestSeller').checked = !!product.isBestSeller;
         qs('admin-form').setAttribute('data-edit-id', productId);
         openAdminPanel();
     }
