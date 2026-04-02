@@ -50,6 +50,11 @@
         orders.push(order);
         saveOrders(orders);
 
+        // Also save to Supabase (non-blocking, won't break checkout if it fails)
+        if (window.supabaseAPI && typeof window.supabaseAPI.saveOrder === 'function') {
+            window.supabaseAPI.saveOrder(order);
+        }
+
         try{ sessionStorage.setItem('lastOrderId', id); } catch(e){}
 
         // emit event

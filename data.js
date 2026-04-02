@@ -328,6 +328,21 @@ allProducts.forEach(product => {
     product.quantity = product.quantity || 0;
 });
 
+// Try loading products from Supabase in the background.
+// If successful, replaces local data and re-renders.
+function tryLoadFromSupabase() {
+    if (!window.supabaseAPI || typeof window.supabaseAPI.fetchProducts !== 'function') return;
+    window.supabaseAPI.fetchProducts().then(function (remoteProducts) {
+        if (!remoteProducts || remoteProducts.length === 0) return;
+        allProducts = remoteProducts.map(function (p) { return normalizeProduct(p); });
+        filteredProducts = allProducts.slice();
+        saveProductStore(allProducts);
+        if (typeof loadProducts === 'function') loadProducts();
+    });
+}
+// Fire after DOM ready so the initial render uses local data, then Supabase overwrites.
+document.addEventListener('DOMContentLoaded', tryLoadFromSupabase);
+
 let filteredProducts = [...allProducts];
 
 function createProductHTML(product) {
