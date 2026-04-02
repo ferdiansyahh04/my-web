@@ -2,7 +2,7 @@
 // All data (products, orders, auth) goes through Supabase.
 (function () {
     const SUPABASE_URL = 'https://tayigsgwasmovkjngshh.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_U7-OLpfeZW2nNza4g_plSg_e6IEwFa_';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRheWlnc2d3YXNtb3Zram5nc2hoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTAyOTUsImV4cCI6MjA5MDcyNjI5NX0.75ejfnDjUkj_A_kUxvkQ1MALxU6foQiRgP8XaRi_ccs';
 
     let sb = null;
 
