@@ -1,4 +1,4 @@
-// Product data and localStorage-backed product store.
+// Product data and Supabase-backed product store.
 // Cart logic lives in js/cart.js; carousel in js/carousel.js.
 function parsePrice(priceString) {
     if (!priceString) return 0;
@@ -213,25 +213,7 @@ allProducts.forEach(product => {
     }
 });
 
-// ---------- Product persistence (localStorage) ----------
-const PRODUCTS_KEY = 'voltx_products';
-
-function loadProductStore() {
-    try {
-        const raw = localStorage.getItem(PRODUCTS_KEY);
-        return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-        return [];
-    }
-}
-
-function saveProductStore(products) {
-    try {
-        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-    } catch (e) {
-        console.warn('Failed to save product store', e);
-    }
-}
+// ---------- Product helper functions ----------
 
 function normalizeProduct(product) {
     if (!product) return product;
@@ -251,26 +233,19 @@ function normalizeProduct(product) {
     return product;
 }
 
-// Default product flags that should always be synced from the hardcoded list.
-const DEFAULT_FLAGS = ['isNew', 'isBestSeller'];
-
-function seedProductStoreIfEmpty() {
-    const stored = loadProductStore();
-    if (stored && stored.length > 0) {
-        // Merge default flags from the hardcoded list into stored products
-        const defaults = new Map(allProducts.map(p => [p.name, p]));
-        stored.forEach(p => {
-            const def = defaults.get(p.name);
-            if (def) {
-                DEFAULT_FLAGS.forEach(flag => { p[flag] = def[flag] || false; });
-            }
-        });
-        allProducts = stored.map(p => normalizeProduct(p));
-        saveProductStore(allProducts);
-        return;
+// Load products from Supabase. Falls back to hardcoded allProducts on failure.
+async function loadProductsFromSupabase() {
+    if (!window.supabaseAPI || typeof window.supabaseAPI.fetchProducts !== 'function') return;
+    try {
+        var remote = await window.supabaseAPI.fetchProducts();
+        if (remote && remote.length > 0) {
+            allProducts = remote.map(function (p) { return normalizeProduct(p); });
+            filteredProducts = allProducts.slice();
+            if (typeof loadProducts === 'function') loadProducts();
+        }
+    } catch (e) {
+        console.warn('Failed to load products from Supabase, using defaults', e);
     }
-    // nothing stored yet: persist the current default list
-    saveProductStore(allProducts);
 }
 
 function emitProductsChanged() {
@@ -279,69 +254,59 @@ function emitProductsChanged() {
     } catch (e) { /* ignore */ }
 }
 
-// Public API for other modules (admin UI)
+// Public API for other modules (admin UI) — backed by Supabase
 window.productStore = {
-    load: loadProductStore,
-    save: saveProductStore,
     getAll: () => allProducts,
-    addProduct: function (prod) {
-        const p = normalizeProduct(Object.assign({}, prod));
-        // add to beginning
+    addProduct: async function (prod) {
+        var p = normalizeProduct(Object.assign({}, prod));
+        try {
+            var saved = await window.supabaseAPI.addProduct(p);
+            if (saved) p = normalizeProduct(saved);
+        } catch (e) {
+            console.warn('Supabase addProduct failed', e);
+        }
         allProducts.unshift(p);
-        saveProductStore(allProducts);
         emitProductsChanged();
         return p;
     },
-    updateProduct: function (id, updates) {
-        const idx = allProducts.findIndex(x => x.id === id);
+    updateProduct: async function (id, updates) {
+        var idx = allProducts.findIndex(x => x.id === id);
         if (idx === -1) return null;
+        try {
+            await window.supabaseAPI.updateProduct(id, updates);
+        } catch (e) {
+            console.warn('Supabase updateProduct failed', e);
+        }
         allProducts[idx] = normalizeProduct(Object.assign({}, allProducts[idx], updates));
-        saveProductStore(allProducts);
         emitProductsChanged();
         return allProducts[idx];
     },
-    deleteProduct: function (id) {
-        const before = allProducts.length;
+    deleteProduct: async function (id) {
+        var before = allProducts.length;
+        try {
+            await window.supabaseAPI.deleteProduct(id);
+        } catch (e) {
+            console.warn('Supabase deleteProduct failed', e);
+        }
         allProducts = allProducts.filter(x => x.id !== id);
         if (allProducts.length === before) return false;
-        saveProductStore(allProducts);
         emitProductsChanged();
         return true;
     }
 };
 
-// Populate in-memory products from store if available
-seedProductStoreIfEmpty();
-
-// Normalize products: ensure consistent shape {id, name, price, salePrice, image1, quantity}
+// Normalize all hardcoded products on initial load
 allProducts.forEach(product => {
-    // id
     if (!product.id) product.id = slugify(product.name || (product.url || ''));
-    // numeric price (in cents/units)
     product.price = parsePrice(product.salePrice || product.originalPrice || '') || 0;
-    // ensure salePrice string
     if (!product.salePrice) product.salePrice = product.price ? `Rp${product.price.toLocaleString('id-ID')}` : 'Rp0';
-    // ensure image1 exists
     product.image1 = product.image1 || product.image || '';
     product.image2 = product.image2 || '';
-    // default quantity when added to cart
     product.quantity = product.quantity || 0;
 });
 
-// Try loading products from Supabase in the background.
-// If successful, replaces local data and re-renders.
-function tryLoadFromSupabase() {
-    if (!window.supabaseAPI || typeof window.supabaseAPI.fetchProducts !== 'function') return;
-    window.supabaseAPI.fetchProducts().then(function (remoteProducts) {
-        if (!remoteProducts || remoteProducts.length === 0) return;
-        allProducts = remoteProducts.map(function (p) { return normalizeProduct(p); });
-        filteredProducts = allProducts.slice();
-        saveProductStore(allProducts);
-        if (typeof loadProducts === 'function') loadProducts();
-    });
-}
-// Fire after DOM ready so the initial render uses local data, then Supabase overwrites.
-document.addEventListener('DOMContentLoaded', tryLoadFromSupabase);
+// Load from Supabase on DOM ready — replaces hardcoded data if available
+document.addEventListener('DOMContentLoaded', loadProductsFromSupabase);
 
 let filteredProducts = [...allProducts];
 

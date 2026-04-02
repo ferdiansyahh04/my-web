@@ -1,5 +1,5 @@
-// Supabase integration — product fetching & order saving.
-// Falls back to localStorage gracefully if Supabase is unreachable.
+// Supabase integration — full database backend for VOLTX store.
+// All data (products, orders, auth) goes through Supabase.
 (function () {
     const SUPABASE_URL = 'https://tayigsgwasmovkjngshh.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_U7-OLpfeZW2nNza4g_plSg_e6IEwFa_';
@@ -12,12 +12,77 @@
         }
     }
 
+    // ---------- Auth ----------
+
+    async function signUp(email, password, name) {
+        if (!sb) throw new Error('Supabase not initialized');
+        const { data, error } = await sb.auth.signUp({
+            email: email,
+            password: password,
+            options: { data: { name: name, role: 'user' } }
+        });
+        if (error) throw error;
+        // Insert profile row
+        if (data.user) {
+            await sb.from('profiles').upsert({
+                id: data.user.id,
+                name: name,
+                role: 'user'
+            });
+        }
+        return data;
+    }
+
+    async function signIn(email, password) {
+        if (!sb) throw new Error('Supabase not initialized');
+        const { data, error } = await sb.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        if (error) throw error;
+        return data;
+    }
+
+    async function signOut() {
+        if (!sb) return;
+        await sb.auth.signOut();
+    }
+
+    async function getSession() {
+        if (!sb) return null;
+        const { data } = await sb.auth.getSession();
+        return data.session;
+    }
+
+    async function getUser() {
+        if (!sb) return null;
+        const { data } = await sb.auth.getUser();
+        return data.user;
+    }
+
+    async function isAdmin() {
+        if (!sb) return false;
+        try {
+            const session = await getSession();
+            if (!session) return false;
+            const { data, error } = await sb.from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+            if (error || !data) return false;
+            return data.role === 'admin';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function onAuthStateChange(callback) {
+        if (!sb) return { data: { subscription: { unsubscribe: function () {} } } };
+        return sb.auth.onAuthStateChange(callback);
+    }
+
     // ---------- Products ----------
 
-    /**
-     * Fetch products from Supabase `products` table.
-     * Returns array of product objects or null on failure.
-     */
     async function fetchProducts() {
         if (!sb) return null;
         try {
@@ -25,37 +90,72 @@
             if (error) throw error;
             return data;
         } catch (e) {
-            console.warn('Supabase fetchProducts failed, using local data', e);
+            console.warn('Supabase fetchProducts failed', e);
             return null;
         }
     }
 
+    async function addProduct(product) {
+        if (!sb) throw new Error('Supabase not initialized');
+        const { data, error } = await sb.from('products').insert([product]).select();
+        if (error) throw error;
+        return data[0];
+    }
+
+    async function updateProduct(id, updates) {
+        if (!sb) throw new Error('Supabase not initialized');
+        const { data, error } = await sb.from('products').update(updates).eq('id', id).select();
+        if (error) throw error;
+        return data[0];
+    }
+
+    async function deleteProduct(id) {
+        if (!sb) throw new Error('Supabase not initialized');
+        const { error } = await sb.from('products').delete().eq('id', id);
+        if (error) throw error;
+        return true;
+    }
+
     // ---------- Orders ----------
 
-    /**
-     * Save an order to Supabase `orders` table.
-     * Does not throw — silently logs on failure so checkout flow is never blocked.
-     */
     async function saveOrder(order) {
-        if (!sb) return null;
+        if (!sb) throw new Error('Supabase not initialized');
+        var row = {
+            order_id: order.id,
+            items: order.items,
+            total: order.total,
+            total_display: order.totalDisplay,
+            user_email: order.user ? order.user.email : null,
+            user_name: order.user ? order.user.name : null,
+            shipping: order.shipping,
+            status: order.status || 'pending',
+            created_at: order.createdAt || new Date().toISOString()
+        };
+        var { data, error } = await sb.from('orders').insert([row]).select();
+        if (error) throw error;
+        return data[0];
+    }
+
+    async function fetchOrders() {
+        if (!sb) return [];
         try {
-            const row = {
-                order_id: order.id,
-                items: order.items,
-                total: order.total,
-                total_display: order.totalDisplay,
-                user_email: order.user ? order.user.email : null,
-                user_name: order.user ? order.user.name : null,
-                shipping: order.shipping,
-                status: order.status || 'pending',
-                created_at: order.createdAt || new Date().toISOString()
-            };
-            const { data, error } = await sb.from('orders').insert([row]);
+            var { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
             if (error) throw error;
-            return data;
+            return (data || []).map(function (row) {
+                return {
+                    id: row.order_id || row.id,
+                    items: row.items || [],
+                    total: row.total || 0,
+                    totalDisplay: row.total_display || '',
+                    user: { email: row.user_email, name: row.user_name },
+                    shipping: row.shipping,
+                    status: row.status,
+                    createdAt: row.created_at
+                };
+            });
         } catch (e) {
-            console.warn('Supabase saveOrder failed, order saved locally only', e);
-            return null;
+            console.warn('Supabase fetchOrders failed', e);
+            return [];
         }
     }
 
@@ -64,8 +164,23 @@
 
     // Public API
     window.supabaseAPI = {
+        // Auth
+        signUp: signUp,
+        signIn: signIn,
+        signOut: signOut,
+        getSession: getSession,
+        getUser: getUser,
+        isAdmin: isAdmin,
+        onAuthStateChange: onAuthStateChange,
+        // Products
         fetchProducts: fetchProducts,
+        addProduct: addProduct,
+        updateProduct: updateProduct,
+        deleteProduct: deleteProduct,
+        // Orders
         saveOrder: saveOrder,
+        fetchOrders: fetchOrders,
+        // Client
         getClient: function () { return sb; }
     };
 })();

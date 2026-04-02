@@ -1,47 +1,13 @@
-// ================= CART STATE =================
-const CART_KEY = 'voltx_cart';
+// ================= CART STATE (in-memory only) =================
 let cart = [];
 
 // ================= STORAGE =================
 function loadCart() {
-    const savedCart = localStorage.getItem(CART_KEY);
-    if (savedCart) {
-        try {
-            const parsed = JSON.parse(savedCart);
-            cart = Array.isArray(parsed) ? parsed : [];
-            // Normalize saved items to ensure numeric price, quantity, and safe image keys
-            cart = cart.map(item => {
-                const normalized = Object.assign({}, item);
-                // ensure id
-                if (!normalized.id) normalized.id = (normalized.name || '').toString().toLowerCase().replace(/[^a-z0-9]+/g, '-') || (Math.random()+1).toString(36).substring(7);
-                // ensure numeric price
-                const p = Number(normalized.price);
-                if (!Number.isFinite(p)) {
-                    if (normalized.salePrice && typeof normalized.salePrice === 'string') {
-                        const parsedPrice = parseInt(normalized.salePrice.replace(/[^\d]/g, ''), 10);
-                        normalized.price = Number.isFinite(parsedPrice) ? parsedPrice : 0;
-                    } else {
-                        normalized.price = 0;
-                    }
-                }
-                // ensure quantity
-                normalized.quantity = Number(normalized.quantity) || 0;
-                // ensure salePrice string
-                if (!normalized.salePrice) normalized.salePrice = normalized.price ? `Rp${normalized.price.toLocaleString('id-ID')}` : 'Rp0';
-                // ensure image field exists
-                normalized.image1 = (normalized.image1 && normalized.image1 !== 'undefined') ? normalized.image1 : '';
-                return normalized;
-            });
-        } catch {
-            cart = [];
-        }
-    } else {
-        cart = [];
-    }
+    // No-op: cart starts empty on each page load (no persistence)
 }
 
 function saveCart() {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    // No-op: cart lives in memory only
 }
 
 // ================= CART ACTIONS =================

@@ -915,7 +915,7 @@
                 updateTotals();
             }
 
-            function submitOrder(){
+            async function submitOrder(){
                 // final submission: validate and create order using checkoutData
                 if(!validateStep1()) return;
                 const shipping = (checkoutData && checkoutData.shipping) ? checkoutData.shipping : loadShippingFromSession();
@@ -924,7 +924,7 @@
                 if(!items || items.length === 0){ alert('Keranjang kosong'); return; }
                 const user = window.auth && typeof window.auth.getCurrentUser === 'function' ? window.auth.getCurrentUser() : null;
                 if(window.ordersAPI && typeof window.ordersAPI.createOrder === 'function'){
-                    const order = window.ordersAPI.createOrder({ items, user, shipping: checkoutData });
+                    const order = await window.ordersAPI.createOrder({ items, user, shipping: checkoutData });
                     try{ sessionStorage.removeItem('pendingCart'); }catch(e){}
                     try{ sessionStorage.removeItem('checkoutShipping'); }catch(e){}
                     try{ sessionStorage.removeItem('checkoutData'); }catch(e){}
@@ -944,7 +944,12 @@
             }
 
             // wire buttons
-            document.addEventListener('DOMContentLoaded', function(){
+            document.addEventListener('DOMContentLoaded', async function(){
+                // Wait for Supabase session restore
+                if(window.auth && typeof window.auth.restoreSession === 'function'){
+                    await window.auth.restoreSession();
+                }
+
                 // auth check
                 var isLoggedIn = window.auth && typeof window.auth.isLoggedIn === 'function' ? window.auth.isLoggedIn() : false;
                 if(!isLoggedIn){ try{ sessionStorage.setItem('openAuth','1'); }catch(e){} window.location.href='index.html'; return; }
