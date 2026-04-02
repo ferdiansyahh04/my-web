@@ -1,34 +1,61 @@
-// Minimal Admin UI for product CRUD (localStorage-backed)
-(function(){
-    function getSessionEmail(){
-        try{ const s = window.auth?.getCurrentUser?.(); return s?.email; }catch(e){return null}
+(function () {
+    function qs(id) {
+        return document.getElementById(id);
     }
 
-    function currentUserIsAdmin(){
-        try{
+    function getCurrentUser() {
+        try {
+            return window.auth && typeof window.auth.getCurrentUser === 'function'
+                ? window.auth.getCurrentUser()
+                : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function getSessionEmail() {
+        const session = getCurrentUser();
+        return session ? session.email : null;
+    }
+
+    function currentUserIsAdmin() {
+        try {
             const email = getSessionEmail();
-            if(!email) return false;
+            if (!email) {
+                return false;
+            }
             const raw = localStorage.getItem('voltx_users') || '[]';
             const users = JSON.parse(raw);
-            const u = users.find(x => x.email === email);
-            return !!(u && u.role === 'admin');
-        }catch(e){return false}
+            const user = users.find(function (item) {
+                return item.email === email;
+            });
+            return !!(user && user.role === 'admin');
+        } catch (error) {
+            return false;
+        }
     }
 
-    function createAdminButton(){
-        if(document.getElementById('admin-btn')) return;
-        const authBtn = document.getElementById('auth-btn');
-        if(!authBtn) return;
-        const btn = document.createElement('button');
-        btn.id = 'admin-btn';
-        btn.textContent = 'Admin';
-        btn.className = 'ml-2 bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-50 hidden';
-        authBtn.insertAdjacentElement('afterend', btn);
-        btn.addEventListener('click', toggleAdminPanel);
+    function createAdminButton() {
+        if (qs('admin-btn')) {
+            return;
+        }
+        const authButton = qs('auth-btn');
+        if (!authButton) {
+            return;
+        }
+        const button = document.createElement('button');
+        button.id = 'admin-btn';
+        button.textContent = 'Admin';
+        button.className = 'ml-2 bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-50 hidden';
+        authButton.insertAdjacentElement('afterend', button);
+        button.addEventListener('click', toggleAdminPanel);
     }
 
-    function createAdminPanel(){
-        if(document.getElementById('admin-panel')) return;
+    function createAdminPanel() {
+        if (qs('admin-panel')) {
+            return;
+        }
+
         const html = `
         <div id="admin-panel" class="fixed right-4 top-28 w-96 bg-white shadow-lg rounded-lg p-4 z-60 hidden">
             <div class="flex items-center justify-between mb-3">
@@ -72,214 +99,346 @@
               </div>
               <div id="admin-order-details" class="hidden mt-3 p-2 border rounded bg-gray-50 text-sm"></div>
             </div>
+        </div>`;
 
-        </div>
-        `;
         document.body.insertAdjacentHTML('beforeend', html);
-        document.getElementById('admin-close')?.addEventListener('click', closeAdminPanel);
-        document.getElementById('admin-clear')?.addEventListener('click', clearAdminForm);
-        document.getElementById('admin-form')?.addEventListener('submit', onAdminFormSubmit);
+
+        const closeButton = qs('admin-close');
+        if (closeButton) closeButton.addEventListener('click', closeAdminPanel);
+        const clearButton = qs('admin-clear');
+        if (clearButton) clearButton.addEventListener('click', clearAdminForm);
+        const form = qs('admin-form');
+        if (form) form.addEventListener('submit', onAdminFormSubmit);
     }
 
-    function toggleAdminPanel(){
-        const p = document.getElementById('admin-panel');
-        if(!p) return;
-        if(p.classList.contains('hidden')) openAdminPanel(); else closeAdminPanel();
-    }
-
-    function openAdminPanel(){
-        const p = document.getElementById('admin-panel');
-        if(!p) return; p.classList.remove('hidden'); renderAdminList(); renderOrdersList(); activateAdminTab('products');
-    }
-    function closeAdminPanel(){ const p = document.getElementById('admin-panel'); if(p) p.classList.add('hidden'); }
-
-    function clearAdminForm(){
-        document.getElementById('admin-msg').textContent='';
-        ['p-name','p-original','p-sale','p-url','p-image1','p-image2'].forEach(id=>document.getElementById(id).value='');
-        document.getElementById('p-hasDiscount').checked = false;
-        document.getElementById('p-available').checked = true;
-        const form = document.getElementById('admin-form'); form.removeAttribute('data-edit-id');
-    }
-
-    function onAdminFormSubmit(e){
-        e.preventDefault();
-        const name = document.getElementById('p-name').value.trim();
-        if(!name){ document.getElementById('admin-msg').textContent='Name is required'; return; }
-        const obj = {
-            name,
-            originalPrice: document.getElementById('p-original').value.trim(),
-            salePrice: document.getElementById('p-sale').value.trim(),
-            url: document.getElementById('p-url').value.trim(),
-            image1: document.getElementById('p-image1').value.trim(),
-            image2: document.getElementById('p-image2').value.trim(),
-            hasDiscount: !!document.getElementById('p-hasDiscount').checked,
-            available: !!document.getElementById('p-available').checked
-        };
-        const editId = document.getElementById('admin-form').getAttribute('data-edit-id');
-        if(editId){
-            window.productStore.updateProduct(editId, obj);
-        } else {
-            window.productStore.addProduct(obj);
+    function toggleAdminPanel() {
+        const panel = qs('admin-panel');
+        if (!panel) {
+            return;
         }
+        if (panel.classList.contains('hidden')) {
+            openAdminPanel();
+        } else {
+            closeAdminPanel();
+        }
+    }
+
+    function openAdminPanel() {
+        const panel = qs('admin-panel');
+        if (!panel) {
+            return;
+        }
+        panel.classList.remove('hidden');
+        renderAdminList();
+        renderOrdersList();
+        activateAdminTab('products');
+    }
+
+    function closeAdminPanel() {
+        const panel = qs('admin-panel');
+        if (panel) {
+            panel.classList.add('hidden');
+        }
+    }
+
+    function clearAdminForm() {
+        const message = qs('admin-msg');
+        if (message) {
+            message.textContent = '';
+        }
+
+        ['p-name', 'p-original', 'p-sale', 'p-url', 'p-image1', 'p-image2'].forEach(function (id) {
+            const field = qs(id);
+            if (field) {
+                field.value = '';
+            }
+        });
+
+        const hasDiscount = qs('p-hasDiscount');
+        const available = qs('p-available');
+        if (hasDiscount) hasDiscount.checked = false;
+        if (available) available.checked = true;
+
+        const form = qs('admin-form');
+        if (form) {
+            form.removeAttribute('data-edit-id');
+        }
+    }
+
+    function onAdminFormSubmit(event) {
+        event.preventDefault();
+        const nameField = qs('p-name');
+        const name = nameField ? nameField.value.trim() : '';
+        const message = qs('admin-msg');
+
+        if (!name) {
+            if (message) {
+                message.textContent = 'Name is required';
+            }
+            return;
+        }
+
+        const originalField = qs('p-original');
+        const saleField = qs('p-sale');
+        const urlField = qs('p-url');
+        const image1Field = qs('p-image1');
+        const image2Field = qs('p-image2');
+        const hasDiscountField = qs('p-hasDiscount');
+        const availableField = qs('p-available');
+        const form = qs('admin-form');
+
+        const product = {
+            name: name,
+            originalPrice: originalField ? originalField.value.trim() : '',
+            salePrice: saleField ? saleField.value.trim() : '',
+            url: urlField ? urlField.value.trim() : '',
+            image1: image1Field ? image1Field.value.trim() : '',
+            image2: image2Field ? image2Field.value.trim() : '',
+            hasDiscount: hasDiscountField ? !!hasDiscountField.checked : false,
+            available: availableField ? !!availableField.checked : true
+        };
+
+        const editId = form ? form.getAttribute('data-edit-id') : null;
+        if (editId) {
+            window.productStore.updateProduct(editId, product);
+        } else {
+            window.productStore.addProduct(product);
+        }
+
         clearAdminForm();
         renderAdminList();
     }
 
-    function renderAdminList(){
-        const list = document.getElementById('admin-products-list');
-        if(!list) return;
+    function getAdminThumbnail(product) {
+        return product.image1 || product.image2 || '';
+    }
+
+    function getImageMarkup(src) {
+        return `<img src="${src}" alt="" class="w-12 h-12 object-cover rounded" onerror="this.style.display='none'">`;
+    }
+
+    function fillAdminForm(product, productId) {
+        qs('p-name').value = product.name || '';
+        qs('p-original').value = product.originalPrice || '';
+        qs('p-sale').value = product.salePrice || '';
+        qs('p-url').value = product.url || '';
+        qs('p-image1').value = product.image1 || '';
+        qs('p-image2').value = product.image2 || '';
+        qs('p-hasDiscount').checked = !!product.hasDiscount;
+        qs('p-available').checked = product.available !== false;
+        qs('admin-form').setAttribute('data-edit-id', productId);
+        openAdminPanel();
+    }
+
+    function renderAdminList() {
+        const list = qs('admin-products-list');
+        if (!list) {
+            return;
+        }
+
         const products = window.productStore.getAll() || [];
         list.innerHTML = '';
-        products.forEach(p => {
-            const el = document.createElement('div');
-            el.className = 'p-2 border rounded flex items-center justify-between gap-2';
-            el.innerHTML = `
+
+        products.forEach(function (product) {
+            const item = document.createElement('div');
+            item.className = 'p-2 border rounded flex items-center justify-between gap-2';
+            item.innerHTML = `
                 <div class="flex items-center gap-3">
-                    <img src="${p.image1 || p.image2 || ''}" alt="" class="w-12 h-12 object-cover rounded" onerror="this.style.display='none'">
+                    ${getImageMarkup(getAdminThumbnail(product))}
                     <div class="text-sm">
-                        <div class="font-semibold">${p.name}</div>
-                        <div class="text-xs text-gray-500">${p.salePrice || ''}</div>
+                        <div class="font-semibold">${product.name}</div>
+                        <div class="text-xs text-gray-500">${product.salePrice || ''}</div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button data-id="${p.id}" class="admin-edit text-sm px-2 py-1 border rounded">Edit</button>
-                    <button data-id="${p.id}" class="admin-delete text-sm px-2 py-1 bg-red-500 text-white rounded">Delete</button>
-                </div>
-            `;
-            list.appendChild(el);
+                    <button data-id="${product.id}" class="admin-edit text-sm px-2 py-1 border rounded">Edit</button>
+                    <button data-id="${product.id}" class="admin-delete text-sm px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                </div>`;
+            list.appendChild(item);
         });
 
-        // bind edit/delete
-        list.querySelectorAll('.admin-edit').forEach(btn=>btn.addEventListener('click', ()=>{
-            const id = btn.getAttribute('data-id');
-            const prod = (window.productStore.getAll()||[]).find(x=>x.id===id);
-            if(!prod) return;
-            document.getElementById('p-name').value = prod.name || '';
-            document.getElementById('p-original').value = prod.originalPrice || '';
-            document.getElementById('p-sale').value = prod.salePrice || '';
-            document.getElementById('p-url').value = prod.url || '';
-            document.getElementById('p-image1').value = prod.image1 || '';
-            document.getElementById('p-image2').value = prod.image2 || '';
-            document.getElementById('p-hasDiscount').checked = !!prod.hasDiscount;
-            document.getElementById('p-available').checked = prod.available !== false;
-            document.getElementById('admin-form').setAttribute('data-edit-id', id);
-            openAdminPanel();
-        }));
+        list.querySelectorAll('.admin-edit').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const productId = button.getAttribute('data-id');
+                const product = (window.productStore.getAll() || []).find(function (item) {
+                    return item.id === productId;
+                });
+                if (!product) {
+                    return;
+                }
+                fillAdminForm(product, productId);
+            });
+        });
 
-        list.querySelectorAll('.admin-delete').forEach(btn=>btn.addEventListener('click', ()=>{
-            const id = btn.getAttribute('data-id');
-            if(!confirm('Delete this product?')) return;
-            window.productStore.deleteProduct(id);
-            renderAdminList();
-        }));
+        list.querySelectorAll('.admin-delete').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const productId = button.getAttribute('data-id');
+                if (!confirm('Delete this product?')) {
+                    return;
+                }
+                window.productStore.deleteProduct(productId);
+                renderAdminList();
+            });
+        });
     }
 
-    // ---------- Orders UI ----------
-    function loadOrders(){
-        try{
-            if(window.ordersAPI && typeof window.ordersAPI.loadOrders === 'function') return window.ordersAPI.loadOrders();
+    function loadOrders() {
+        try {
+            if (window.ordersAPI && typeof window.ordersAPI.loadOrders === 'function') {
+                return window.ordersAPI.loadOrders();
+            }
             const raw = localStorage.getItem('voltx_orders') || '[]';
             return JSON.parse(raw);
-        }catch(e){ return []; }
+        } catch (error) {
+            return [];
+        }
     }
 
-    function renderOrdersList(){
-        const list = document.getElementById('admin-orders-list');
-        if(!list) return;
+    function renderOrdersList() {
+        const list = qs('admin-orders-list');
+        if (!list) {
+            return;
+        }
+
         const orders = loadOrders() || [];
         list.innerHTML = '';
-        if(orders.length === 0){
+
+        if (orders.length === 0) {
             list.innerHTML = '<div class="text-sm text-gray-500">No orders yet</div>';
             return;
         }
 
-        orders.slice().reverse().forEach(o => {
-            const el = document.createElement('div');
-            el.className = 'p-2 border rounded flex items-center justify-between gap-2';
-            const date = o.createdAt ? new Date(o.createdAt).toLocaleString('id-ID') : '';
-            el.innerHTML = `
+        orders.slice().reverse().forEach(function (order) {
+            const item = document.createElement('div');
+            item.className = 'p-2 border rounded flex items-center justify-between gap-2';
+            const date = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
+            item.innerHTML = `
                 <div class="text-sm">
-                    <div class="font-semibold">${o.id}</div>
-                    <div class="text-xs text-gray-500">${(o.user && (o.user.name || o.user.email)) || 'Guest'} — ${date}</div>
+                    <div class="font-semibold">${order.id}</div>
+                    <div class="text-xs text-gray-500">${(order.user && (order.user.name || order.user.email)) || 'Guest'} — ${date}</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="text-sm font-medium">Rp${(o.total||0).toLocaleString('id-ID')}</div>
-                    <button data-id="${o.id}" class="admin-view-order text-sm px-2 py-1 border rounded">View Details</button>
-                </div>
-            `;
-            list.appendChild(el);
+                    <div class="text-sm font-medium">Rp${(order.total || 0).toLocaleString('id-ID')}</div>
+                    <button data-id="${order.id}" class="admin-view-order text-sm px-2 py-1 border rounded">View Details</button>
+                </div>`;
+            list.appendChild(item);
         });
 
-        list.querySelectorAll('.admin-view-order').forEach(btn=>btn.addEventListener('click', ()=>{
-            const id = btn.getAttribute('data-id');
-            showOrderDetails(id);
-        }));
+        list.querySelectorAll('.admin-view-order').forEach(function (button) {
+            button.addEventListener('click', function () {
+                showOrderDetails(button.getAttribute('data-id'));
+            });
+        });
     }
 
-    function showOrderDetails(id){
-        const details = document.getElementById('admin-order-details');
-        if(!details) return;
+    function showOrderDetails(orderId) {
+        const details = qs('admin-order-details');
+        if (!details) {
+            return;
+        }
+
         const orders = loadOrders();
-        const o = (orders||[]).find(x=>x.id===id);
-        if(!o){ details.classList.remove('hidden'); details.innerHTML = '<div class="text-sm text-red-600">Order not found</div>'; return; }
-        const d = [];
-        d.push(`<div class="font-semibold mb-2">Order ${o.id}</div>`);
-        d.push(`<div class="text-xs text-gray-600 mb-2">${o.user ? (o.user.name||o.user.email) : 'Guest'} — ${o.createdAt ? new Date(o.createdAt).toLocaleString('id-ID') : ''}</div>`);
-        d.push('<div class="space-y-1">');
-        (o.items||[]).forEach(it=>{
-            d.push(`<div class="flex justify-between"><div>${it.name} × ${it.quantity}</div><div>${it.salePrice || ('Rp'+(Number(it.price)||0).toLocaleString('id-ID'))}</div></div>`);
+        const order = orders.find(function (item) {
+            return item.id === orderId;
         });
-        d.push('</div>');
-        d.push(`<div class="mt-2 font-medium">Total: Rp${(o.total||0).toLocaleString('id-ID')}</div>`);
-        details.innerHTML = d.join('');
+
+        if (!order) {
+            details.classList.remove('hidden');
+            details.innerHTML = '<div class="text-sm text-red-600">Order not found</div>';
+            return;
+        }
+
+        const lines = [];
+        lines.push(`<div class="font-semibold mb-2">Order ${order.id}</div>`);
+        lines.push(`<div class="text-xs text-gray-600 mb-2">${order.user ? (order.user.name || order.user.email) : 'Guest'} — ${order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : ''}</div>`);
+        lines.push('<div class="space-y-1">');
+        (order.items || []).forEach(function (item) {
+            lines.push(`<div class="flex justify-between"><div>${item.name} × ${item.quantity}</div><div>${item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'))}</div></div>`);
+        });
+        lines.push('</div>');
+        lines.push(`<div class="mt-2 font-medium">Total: Rp${(order.total || 0).toLocaleString('id-ID')}</div>`);
+        details.innerHTML = lines.join('');
         details.classList.remove('hidden');
     }
 
-    function activateAdminTab(tab){
-        const prodSec = document.getElementById('admin-products-section');
-        const ordSec = document.getElementById('admin-orders-section');
-        const tabProd = document.getElementById('admin-tab-products');
-        const tabOrd = document.getElementById('admin-tab-orders');
-        if(tab==='orders'){
-            prodSec.classList.add('hidden'); ordSec.classList.remove('hidden'); tabProd.classList.remove('bg-gray-100'); tabOrd.classList.add('bg-gray-100'); renderOrdersList();
+    function activateAdminTab(tab) {
+        const productsSection = qs('admin-products-section');
+        const ordersSection = qs('admin-orders-section');
+        const productsTab = qs('admin-tab-products');
+        const ordersTab = qs('admin-tab-orders');
+
+        if (tab === 'orders') {
+            productsSection.classList.add('hidden');
+            ordersSection.classList.remove('hidden');
+            productsTab.classList.remove('bg-gray-100');
+            ordersTab.classList.add('bg-gray-100');
+            renderOrdersList();
+            return;
+        }
+
+        productsSection.classList.remove('hidden');
+        ordersSection.classList.add('hidden');
+        productsTab.classList.add('bg-gray-100');
+        ordersTab.classList.remove('bg-gray-100');
+    }
+
+    function refreshAdminVisibility() {
+        const adminButton = qs('admin-btn');
+        if (!adminButton) {
+            return;
+        }
+
+        if (currentUserIsAdmin()) {
+            adminButton.classList.remove('hidden');
         } else {
-            prodSec.classList.remove('hidden'); ordSec.classList.add('hidden'); tabProd.classList.add('bg-gray-100'); tabOrd.classList.remove('bg-gray-100');
+            adminButton.classList.add('hidden');
         }
     }
 
-    function refreshAdminVisibility(){
-        const adminBtn = document.getElementById('admin-btn');
-        if(!adminBtn) return;
-        if(currentUserIsAdmin()) adminBtn.classList.remove('hidden'); else adminBtn.classList.add('hidden');
+    function refreshProductViews() {
+        renderAdminList();
+        try {
+            filteredProducts = [].concat(allProducts);
+            clearProducts();
+            loadProducts();
+        } catch (error) {
+            // ignore dependent reload issues
+        }
     }
 
-    function initAdmin(){
+    function initAdmin() {
         createAdminButton();
         createAdminPanel();
         refreshAdminVisibility();
 
-        // re-check visibility when auth button is clicked (login/logout)
-        document.getElementById('auth-btn')?.addEventListener('click', ()=> setTimeout(refreshAdminVisibility, 200));
+        const authButton = qs('auth-btn');
+        if (authButton) {
+            authButton.addEventListener('click', function () {
+                setTimeout(refreshAdminVisibility, 200);
+            });
+        }
 
-        // tab buttons
-        document.getElementById('admin-tab-products')?.addEventListener('click', ()=> activateAdminTab('products'));
-        document.getElementById('admin-tab-orders')?.addEventListener('click', ()=> activateAdminTab('orders'));
+        const productsTab = qs('admin-tab-products');
+        if (productsTab) {
+            productsTab.addEventListener('click', function () {
+                activateAdminTab('products');
+            });
+        }
 
-        // close button
-        document.getElementById('admin-close')?.addEventListener('click', closeAdminPanel);
+        const ordersTab = qs('admin-tab-orders');
+        if (ordersTab) {
+            ordersTab.addEventListener('click', function () {
+                activateAdminTab('orders');
+            });
+        }
 
-        // refresh when products changed
-        document.addEventListener('products:changed', ()=>{
-            // ensure product listing visible reflects changes
-            renderAdminList();
-            try{
-                filteredProducts = [...allProducts];
-                clearProducts();
-                loadProducts();
-            }catch(e){/* ignore */}
-        });
+        const closeButton = qs('admin-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', closeAdminPanel);
+        }
+
+        document.addEventListener('products:changed', refreshProductViews);
     }
 
     document.addEventListener('DOMContentLoaded', initAdmin);
-
 })();
