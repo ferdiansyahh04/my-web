@@ -275,6 +275,8 @@
         // Restore session from Supabase, then bind UI
         restoreSession().then(function () {
             bindAuthUI();
+            // Notify other modules (admin) that auth is ready
+            document.dispatchEvent(new CustomEvent('auth:changed'));
 
             try {
                 if (sessionStorage.getItem('openAuth')) {
