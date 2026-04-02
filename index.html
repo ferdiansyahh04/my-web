@@ -12,88 +12,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 
-    <style>
-    /* Top marquee banner: seamless infinite scroll, CSS-only */
-    .marquee-bar{
-        background:#000;
-        color:#fff;
-        overflow:hidden;
-        position:sticky;
-        top:0;
-        z-index:70;
-        height:40px;
-        display:flex;
-        align-items:center;
-        isolation:isolate;
-    }
-
-    .marquee-bar::before,
-    .marquee-bar::after{
-        content:"";
-        position:absolute;
-        top:0;
-        bottom:0;
-        width:72px;
-        z-index:1;
-        pointer-events:none;
-    }
-
-    .marquee-bar::before{
-        left:0;
-        background:linear-gradient(to right, #000 0%, rgba(0,0,0,0) 100%);
-    }
-
-    .marquee-bar::after{
-        right:0;
-        background:linear-gradient(to left, #000 0%, rgba(0,0,0,0) 100%);
-    }
-
-    .marquee-inner{
-        display:flex;
-        align-items:center;
-        flex:0 0 auto;
-        width:max-content;
-        will-change:transform;
-        animation:marquee-scroll 24s linear infinite;
-    }
-
-    .marquee-group{
-        display:flex;
-        align-items:center;
-        justify-content:flex-start;
-        gap:clamp(1.75rem, 3vw, 3rem);
-        flex:0 0 auto;
-        min-width:max-content;
-        padding-inline:1rem;
-    }
-
-    .marquee-group span{
-        flex:0 0 auto;
-        white-space:nowrap;
-        font-size:0.82rem;
-        letter-spacing:0;
-        line-height:1;
-    }
-
-    .marquee-inner:hover{animation-play-state:paused}
-
-    @media (max-width: 640px){
-        .marquee-bar{height:36px}
-        .marquee-bar::before,
-        .marquee-bar::after{width:40px}
-        .marquee-group{gap:1.25rem;padding-inline:0.75rem}
-        .marquee-group span{font-size:0.73rem}
-    }
-
-    /* push header below the sticky marquee */
-    #header{top:40px}
-
-    @keyframes marquee-scroll{
-        0%{transform:translateX(0)}
-        100%{transform:translateX(-50%)}
-    }
-    </style>
-
 </head>
 
 <body class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal">
@@ -224,7 +142,7 @@
     <!-- 'Fresh fits' header removed as requested -->
 
     <!-- Full-bleed hero showcase -->
-    <section class="relative bg-center bg-cover" style="background-image:url('https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1600&auto=format&fit=crop'); min-height:70vh;">
+    <section class="hero-showcase relative bg-center bg-cover">
         <div class="absolute inset-0 bg-black opacity-40"></div>
         <div class="relative container mx-auto px-6 py-32 lg:py-40">
             <div class="max-w-3xl text-center mx-auto text-white">
