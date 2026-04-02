@@ -1,59 +1,5 @@
-// Cart and carousel behavior have been moved to `js/cart.js` and `js/carousel.js`.
-// Keep product data, helpers, and UI-specific product rendering in this file.
-
-function showAddToCartNotification(productName) {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-
-    const notification = document.createElement('div');
-    notification.className = 'notification fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
-    notification.textContent = `${productName} berhasil ditambahkan ke keranjang!`;
-    document.body.appendChild(notification);
-
-    // Show notification
-    setTimeout(() => {
-        notification.classList.remove('translate-x-full');
-    }, 100);
-
-    // Hide and remove notification
-    setTimeout(() => {
-        notification.classList.add('translate-x-full');
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
-
-// Clear cart function (optional utility)
-function clearCart() {
-    cart = [];
-    updateCartUI();
-}
-
-// Get cart total count
-function getCartTotal() {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
-}
-
-// Get cart total price
-function getCartTotalPrice() {
-    return cart.reduce((sum, item) => {
-        try {
-            const cleanPrice = item.salePrice.toString().replace(/[^\d]/g, '');
-            const price = parseInt(cleanPrice) || 0;
-            return sum + (price * item.quantity);
-        } catch (error) {
-            return sum;
-        }
-    }, 0);
-}
-
-// Carousel behavior is managed in `js/carousel.js`.
-
-// Product data array
+// Product data and localStorage-backed product store.
+// Cart logic lives in js/cart.js; carousel in js/carousel.js.
 function parsePrice(priceString) {
     if (!priceString) return 0;
     return parseInt(priceString.replace(/[^\d]/g, ''), 10) || 0;
@@ -365,38 +311,8 @@ allProducts.forEach(product => {
     product.quantity = product.quantity || 0;
 });
 
-let currentPage = 0;
 let filteredProducts = [...allProducts];
 let isSearching = false;
-const itemsPerPage = 4;
-
-// When true, render all products at once and hide the Load More control.
-window.LOAD_ALL = true;
-
-function saveCurrentPage() {
-    try {
-        sessionStorage.setItem('currentPage', currentPage);
-    } catch (e) {
-        // ignore (e.g., private mode)
-    }
-}
-
-function restoreCurrentPage() {
-    try {
-        const value = parseInt(sessionStorage.getItem('currentPage'), 10);
-        return Number.isInteger(value) && value > 0 ? value : 0;
-    } catch (e) {
-        return 0;
-    }
-}
-
-function clearSavedPage() {
-    try {
-        sessionStorage.removeItem('currentPage');
-    } catch (e) {
-        // ignore
-    }
-}
 
 function createProductHTML(product) {
     const escapedName = product.name.replace(/'/g, "\\'");
@@ -463,28 +379,12 @@ function loadProducts() {
     const container = document.getElementById('products-container');
     if (!container) return;
 
-    console.log('loadProducts called — filteredProducts length:', filteredProducts.length, 'LOAD_ALL:', !!window.LOAD_ALL);
-
-    if (window.LOAD_ALL) {
-        // Render all filtered products (replace existing content)
-        container.innerHTML = '';
-        filteredProducts.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.innerHTML = createProductHTML(product);
-            container.appendChild(productElement.firstElementChild);
-        });
-        console.log('Rendered', filteredProducts.length, 'products into #products-container');
-    } else {
-        const startIndex = currentPage * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const productsToLoad = filteredProducts.slice(startIndex, endIndex);
-
-        productsToLoad.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.innerHTML = createProductHTML(product);
-            container.appendChild(productElement.firstElementChild);
-        });
-    }
+    container.innerHTML = '';
+    filteredProducts.forEach(product => {
+        const productElement = document.createElement('div');
+        productElement.innerHTML = createProductHTML(product);
+        container.appendChild(productElement.firstElementChild);
+    });
 
     // Animate new products
     setTimeout(() => {
@@ -497,31 +397,6 @@ function loadProducts() {
         });
     }, 100);
 
-    // Update pagination state only when not in load-all mode
-    if (!window.LOAD_ALL) {
-        currentPage++;
-        saveCurrentPage();
-    }
-    updateLoadMoreButton();
-}
-
-function updateLoadMoreButton() {
-    if (window.LOAD_ALL) {
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
-        return;
-    }
-
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    if (!loadMoreBtn) return;
-
-    const totalLoaded = currentPage * itemsPerPage;
-
-    if (totalLoaded >= filteredProducts.length || isSearching) {
-        loadMoreBtn.style.display = 'none';
-    } else {
-        loadMoreBtn.style.display = 'block';
-    }
 }
 
 function searchProducts(query) {
@@ -530,16 +405,13 @@ function searchProducts(query) {
     if (searchTerm === '') {
         filteredProducts = [...allProducts];
         isSearching = false;
-        clearSavedPage();
     } else {
         filteredProducts = allProducts.filter(product =>
             product.name.toLowerCase().includes(searchTerm)
         );
         isSearching = true;
-        clearSavedPage();
     }
 
-    currentPage = 0;
     clearProducts();
 
     const noResults = document.getElementById('no-results');
@@ -548,28 +420,6 @@ function searchProducts(query) {
     } else {
         if (noResults) noResults.classList.add('hidden');
         loadProducts();
-    }
-
-    updateLoadMoreButton();
-}
-
-function showLoading(show) {
-    const btnText = document.getElementById('btn-text');
-    const spinner = document.getElementById('loading-spinner');
-    const button = document.getElementById('load-more-btn');
-
-    if (!btnText || !button) return;
-
-    if (show) {
-        btnText.textContent = 'Loading...';
-        if (spinner) spinner.classList.remove('hidden');
-        button.disabled = true;
-        button.classList.add('opacity-75');
-    } else {
-        btnText.textContent = 'Load More Products';
-        if (spinner) spinner.classList.add('hidden');
-        button.disabled = false;
-        button.classList.remove('opacity-75');
     }
 }
 
@@ -603,10 +453,5 @@ function clearSearch() {
     if (clearBtn) clearBtn.classList.add('opacity-0');
 
     searchProducts('');
-}
-
-// Get Checkout System
-function goToCheckout() {
-    window.location.href = 'checkout_system.html';
 }
 

@@ -5,14 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
 
     // ================= LOAD PRODUCTS =================
-    const savedPage = typeof restoreCurrentPage === 'function' ? restoreCurrentPage() : 0;
-    if (savedPage > 0) {
-        for (let i = 0; i < savedPage; i++) {
-            loadProducts();
-        }
-    } else {
-        loadProducts();
-    }
+    loadProducts();
 
     // ================= SEARCH =================
     const searchBtn = document.getElementById('search-btn');
@@ -29,18 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput?.addEventListener('keydown', e => {
         if (e.key === 'Escape') clearSearch();
     });
-
-    // ================= LOAD MORE (skipped in load-all mode) =================
-    if (!window.LOAD_ALL) {
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        loadMoreBtn?.addEventListener('click', () => {
-            showLoading(true);
-            setTimeout(() => {
-                loadProducts();
-                showLoading(false);
-            }, 800);
-        });
-    }
 
     // ================= OPEN CART =================
     document.getElementById('cart-btn')

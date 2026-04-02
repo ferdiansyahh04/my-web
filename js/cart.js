@@ -98,16 +98,6 @@ function addToCart(product) {
     if (typeof showAddToCartNotification === 'function') showAddToCartNotification(product.name || 'Product');
 }
 
-function addToCartFromCarousel(name, price, image) {
-    addToCart({
-        id: name.toLowerCase().replace(/\s+/g, '-'),
-        name: name,
-        price: price,
-        salePrice: `Rp${price.toLocaleString('id-ID')}`,
-        image: image
-    });
-}
-
 function removeFromCart(id) {
     cart = cart.filter(item => item.id !== id);
     saveCart();
@@ -148,7 +138,6 @@ function getCartTotalPrice() {
 
 // ===== EXPOSE CART FUNCTIONS TO GLOBAL =====
 window.addToCart = addToCart;
-window.addToCartFromCarousel = addToCartFromCarousel;
 window.removeFromCart = removeFromCart;
 window.updateQuantity = updateQuantity;
 window.clearCart = clearCart;

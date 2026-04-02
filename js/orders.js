@@ -15,11 +15,6 @@
         }catch(e){ console.warn('Failed to save orders', e); }
     }
 
-    function getOrderById(id){
-        const orders = loadOrders();
-        return orders.find(o=>o.id===id) || null;
-    }
-
     function createOrder({items, user, shipping} = {}){
         const id = 'order-' + Date.now();
         const sanitizedItems = Array.isArray(items) ? items.map(i=>({
@@ -66,8 +61,7 @@
     window.ordersAPI = {
         loadOrders,
         saveOrders,
-        createOrder,
-        getOrderById
+        createOrder
     };
 
 })();
