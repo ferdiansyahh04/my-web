@@ -68,7 +68,7 @@
             const { data, error } = await sb.from('profiles')
                 .select('role')
                 .eq('id', session.user.id)
-                .single();
+                .maybeSingle();
             if (error || !data) return false;
             return data.role === 'admin';
         } catch (e) {
