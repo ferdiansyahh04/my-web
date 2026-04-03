@@ -52,6 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     productsContainer?.addEventListener('click', (e) => {
         const btn = e.target.closest('.add-to-cart-btn');
         if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
         const id = btn.dataset.productId;
         const name = btn.dataset.productName;
         const salePrice = btn.dataset.productSaleprice || 'Rp0';

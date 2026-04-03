@@ -352,29 +352,30 @@ function createProductHTML(product) {
         : '';
 
     const productHref = available ? product.url : 'javascript:void(0)';
+    const productTarget = available ? ' target="_blank" rel="noopener noreferrer"' : '';
     const productAnchorAttrs = available ? '' : 'onclick="return false;"';
 
     return `
         <div class="product-item group opacity-0 translate-y-6">
-            <a href="${productHref}" ${productAnchorAttrs} class="block ${available ? '' : 'cursor-not-allowed opacity-70'}">
-                <div class="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]">
+            <div class="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]">
+                <a href="${productHref}"${productTarget} ${productAnchorAttrs} class="block w-full h-full ${available ? '' : 'cursor-not-allowed opacity-70'}">
                     ${badges}
                     <img src="${product.image1}" alt="${escapedName}" class="product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500" onerror="this.src='https://via.placeholder.com/400x500?text=Product'">
                     <img src="${product.image2}" alt="${escapedName}" class="product-img absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="pointer-events:none;">
-                    <!-- Quick add overlay -->
-                    <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
-                        ${available
-                            ? `<button type="button" data-product-id="${product.id}" data-product-name="${escapedName}" data-product-saleprice="${product.salePrice}" data-product-image="${product.image1}" class="add-to-cart-btn w-full text-center bg-white text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl shadow-lg hover:bg-gray-900 hover:text-white transition-colors duration-200">Add to cart</button>`
-                            : `<button type="button" disabled class="w-full text-center bg-gray-200 text-gray-400 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl cursor-not-allowed">Unavailable</button>`
-                        }
-                    </div>
+                </a>
+                <!-- Quick add overlay -->
+                <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20">
+                    ${available
+                        ? `<button type="button" data-product-id="${product.id}" data-product-name="${escapedName}" data-product-saleprice="${product.salePrice}" data-product-image="${product.image1}" class="add-to-cart-btn w-full text-center bg-white text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl shadow-lg hover:bg-gray-900 hover:text-white transition-colors duration-200">Add to cart</button>`
+                        : `<button type="button" disabled class="w-full text-center bg-gray-200 text-gray-400 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl cursor-not-allowed">Unavailable</button>`
+                    }
                 </div>
-                <div class="mt-4 space-y-1">
-                    ${categoryTag}
-                    <h3 class="text-sm font-medium text-gray-900 leading-snug line-clamp-2">${product.name}</h3>
-                    <div class="pt-0.5">
-                        ${priceBlock}
-                    </div>
+            </div>
+            <a href="${productHref}"${productTarget} ${productAnchorAttrs} class="block mt-4 space-y-1 ${available ? '' : 'cursor-not-allowed opacity-70'}">
+                ${categoryTag}
+                <h3 class="text-sm font-medium text-gray-900 leading-snug line-clamp-2">${product.name}</h3>
+                <div class="pt-0.5">
+                    ${priceBlock}
                 </div>
             </a>
         </div>
