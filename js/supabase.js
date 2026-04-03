@@ -83,12 +83,48 @@
 
     // ---------- Products ----------
 
+    // Map JS camelCase to DB snake_case
+    function toDbProduct(p) {
+        var row = {};
+        if (p.name !== undefined) row.name = p.name;
+        if (p.originalPrice !== undefined) row.original_price = p.originalPrice;
+        if (p.salePrice !== undefined) row.sale_price = p.salePrice;
+        if (p.url !== undefined) row.url = p.url;
+        if (p.image1 !== undefined) row.image1 = p.image1;
+        if (p.image2 !== undefined) row.image2 = p.image2;
+        if (p.hasDiscount !== undefined) row.has_discount = p.hasDiscount;
+        if (p.isNew !== undefined) row.is_new = p.isNew;
+        if (p.isBestSeller !== undefined) row.is_best_seller = p.isBestSeller;
+        if (p.available !== undefined) row.available = p.available;
+        if (p.category !== undefined) row.category = p.category;
+        return row;
+    }
+
+    // Map DB snake_case to JS camelCase
+    function fromDbProduct(row) {
+        return {
+            id: row.id,
+            name: row.name || '',
+            originalPrice: row.original_price || '',
+            salePrice: row.sale_price || '',
+            url: row.url || '',
+            image1: row.image1 || '',
+            image2: row.image2 || '',
+            hasDiscount: !!row.has_discount,
+            isNew: !!row.is_new,
+            isBestSeller: !!row.is_best_seller,
+            available: row.available !== false,
+            category: row.category || '',
+            created_at: row.created_at
+        };
+    }
+
     async function fetchProducts() {
         if (!sb) return null;
         try {
             const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
             if (error) throw error;
-            return data;
+            return data ? data.map(fromDbProduct) : null;
         } catch (e) {
             console.warn('Supabase fetchProducts failed', e);
             return null;
@@ -97,16 +133,18 @@
 
     async function addProduct(product) {
         if (!sb) throw new Error('Supabase not initialized');
-        const { data, error } = await sb.from('products').insert([product]).select();
+        var row = toDbProduct(product);
+        const { data, error } = await sb.from('products').insert([row]).select();
         if (error) throw error;
-        return data[0];
+        return data[0] ? fromDbProduct(data[0]) : null;
     }
 
     async function updateProduct(id, updates) {
         if (!sb) throw new Error('Supabase not initialized');
-        const { data, error } = await sb.from('products').update(updates).eq('id', id).select();
+        var row = toDbProduct(updates);
+        const { data, error } = await sb.from('products').update(row).eq('id', id).select();
         if (error) throw error;
-        return data[0];
+        return data[0] ? fromDbProduct(data[0]) : null;
     }
 
     async function deleteProduct(id) {
