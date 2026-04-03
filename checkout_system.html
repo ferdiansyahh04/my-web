@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - My Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS untuk checkout */
+        .checkout-step {
+            transition: all 0.3s ease;
+        }
+        
+        .checkout-step.active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .checkout-step.completed {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .step-number.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .step-number.completed {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .step-number.inactive {
+            background-color: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .form-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .payment-method {
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .payment-method:hover {
+            border-color: #d1d5db;
+        }
+        
+        .payment-method.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        /* Tidy payment/shipping method layout */
+        .payment-method {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .payment-method input[type="radio"]{
+            margin: 0 0.5rem 0 0;
+            flex: 0 0 auto;
+        }
+        .payment-method > label{
+            display: block;
+            flex: 1 1 auto;
+            cursor: pointer;
+        }
+        .payment-method .text-right{ white-space:nowrap; }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .error-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Form styling */
+        .form-input {
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+        
+        .form-input.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .form-input.success {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .checkout-container {
+                margin: 0;
+                border-radius: 0;
+            }
+        }
+        
+        /* Order summary layout: default static (mobile); sticky on desktop */
+        .order-summary {
+            position: static;
+            overflow: visible;
+            max-height: none;
+        }
+
+        .order-summary .promo-row{ display:flex; gap:0.5rem; align-items:center; }
+        .order-summary input#promo-code{ flex:1 1 auto; }
+
+        @media (min-width: 1024px){
+            .order-summary {
+                position: sticky;
+                top: 6rem; /* aligns below header + progress */
+                max-height: calc(100vh - 7rem);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <button onclick="goBack()" class="mr-4 p-2 text-gray-500 hover:text-gray-700 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-900">Checkout</h1>
+                </div>
+                <div class="text-sm text-gray-500">
+                    Langkah <span id="current-step-display">1</span> dari 4
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 25%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="lg:flex lg:gap-8 lg:items-start">
+            <!-- Left Column - Forms -->
+            <div class="lg:flex-1">
+                <!-- Steps Indicator -->
+                <div class="mb-8">
+                    <nav aria-label="Progress">
+                        <ol class="flex items-center justify-between">
+                            <li class="relative pr-8 sm:pr-20">
+                                <div class="checkout-step active border-2 rounded-lg p-4" id="step-indicator-1">
+                                    <div class="flex items-center">
+                                        <div class="step-number active" id="step-number-1">1</div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Informasi Pengiriman</p>
+                                            <p class="text-sm text-gray-500">Alamat dan kontak</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative pr-8 sm:pr-20">
+                                <div class="checkout-step border-2 rounded-lg p-4" id="step-indicator-2">
+                                    <div class="flex items-center">
+                                        <div class="step-number inactive" id="step-number-2">2</div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Metode Pengiriman</p>
+                                            <p class="text-sm text-gray-500">Pilih kurir</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative pr-8 sm:pr-20">
+                                <div class="checkout-step border-2 rounded-lg p-4" id="step-indicator-3">
+                                    <div class="flex items-center">
+                                        <div class="step-number inactive" id="step-number-3">3</div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Pembayaran</p>
+                                            <p class="text-sm text-gray-500">Metode bayar</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative">
+                                <div class="checkout-step border-2 rounded-lg p-4" id="step-indicator-4">
+                                    <div class="flex items-center">
+                                        <div class="step-number inactive" id="step-number-4">4</div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">Konfirmasi</p>
+                                            <p class="text-sm text-gray-500">Review pesanan</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <!-- Step 1: Informasi Pengiriman -->
+                <div class="form-section active" id="step-1">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-6">Informasi Pengiriman</h2>
+                        <form id="shipping-form">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">Nama Depan *</label>
+                                    <input type="text" id="firstName" name="firstName" required 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="firstName-error"></div>
+                                </div>
+                                <div>
+                                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Nama Belakang *</label>
+                                    <input type="text" id="lastName" name="lastName" required 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="lastName-error"></div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                    <input type="email" id="email" name="email" required 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="email-error"></div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon *</label>
+                                    <input type="tel" id="phone" name="phone" required placeholder="08xxxxxxxxxx"
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="phone-error"></div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap *</label>
+                                    <textarea id="address" name="address" required rows="3" placeholder="Jalan, Nomor Rumah, RT/RW"
+                                              class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="address-error"></div>
+                                </div>
+                                <div>
+                                    <label for="city" class="block text-sm font-medium text-gray-700 mb-2">Kota *</label>
+                                    <select id="city" name="city" required 
+                                            class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Pilih Kota</option>
+                                        <option value="jakarta">Jakarta</option>
+                                        <option value="surabaya">Surabaya</option>
+                                        <option value="bandung">Bandung</option>
+                                        <option value="medan">Medan</option>
+                                        <option value="bekasi">Bekasi</option>
+                                        <option value="depok">Depok</option>
+                                        <option value="tangerang">Tangerang</option>
+                                        <option value="semarang">Semarang</option>
+                                    </select>
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="city-error"></div>
+                                </div>
+                                <div>
+                                    <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-2">Kode Pos *</label>
+                                    <input type="text" id="postalCode" name="postalCode" required maxlength="5" placeholder="12345"
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="error-message text-red-500 text-sm mt-1 hidden" id="postalCode-error"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Step 2: Metode Pengiriman -->
+                <div class="form-section" id="step-2">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-6">Metode Pengiriman</h2>
+                        <div class="space-y-4" id="shipping-methods">
+                            <!-- Shipping methods will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Metode Pembayaran -->
+                <div class="form-section" id="step-3">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-6">Metode Pembayaran</h2>
+                        <div class="space-y-4">
+                            <div class="payment-method rounded-lg p-4" data-method="bank_transfer">
+                                <div class="flex items-center">
+                                    <input type="radio" id="bank_transfer" name="payment_method" value="bank_transfer" class="h-4 w-4 text-blue-600">
+                                    <label for="bank_transfer" class="ml-3 flex-1 cursor-pointer">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Transfer Bank</p>
+                                                <p class="text-sm text-gray-500">BCA, Mandiri, BNI, BRI</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-xs text-green-600 font-medium">Gratis</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="payment-method rounded-lg p-4" data-method="e_wallet">
+                                <div class="flex items-center">
+                                    <input type="radio" id="e_wallet" name="payment_method" value="e_wallet" class="h-4 w-4 text-blue-600">
+                                    <label for="e_wallet" class="ml-3 flex-1 cursor-pointer">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">E-Wallet</p>
+                                                <p class="text-sm text-gray-500">OVO, GoPay, Dana, LinkAja</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-xs text-green-600 font-medium">Gratis</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="payment-method rounded-lg p-4" data-method="credit_card">
+                                <div class="flex items-center">
+                                    <input type="radio" id="credit_card" name="payment_method" value="credit_card" class="h-4 w-4 text-blue-600">
+                                    <label for="credit_card" class="ml-3 flex-1 cursor-pointer">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Kartu Kredit</p>
+                                                <p class="text-sm text-gray-500">Visa, Mastercard, JCB</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-xs text-yellow-600 font-medium">+2.9%</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="payment-method rounded-lg p-4" data-method="cod">
+                                <div class="flex items-center">
+                                    <input type="radio" id="cod" name="payment_method" value="cod" class="h-4 w-4 text-blue-600">
+                                    <label for="cod" class="ml-3 flex-1 cursor-pointer">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Bayar di Tempat (COD)</p>
+                                                <p class="text-sm text-gray-500">Bayar saat barang tiba</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-xs text-blue-600 font-medium">+Rp5.000</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Credit Card Form (hidden by default) -->
+                        <div id="credit-card-form" class="hidden mt-6 p-4 bg-gray-50 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-900 mb-4">Detail Kartu Kredit</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-2">Nomor Kartu</label>
+                                    <input type="text" id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456"
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Kadaluarsa</label>
+                                    <input type="text" id="expiryDate" maxlength="5" placeholder="MM/YY"
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="cvv" class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                                    <input type="text" id="cvv" maxlength="4" placeholder="123"
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="cardName" class="block text-sm font-medium text-gray-700 mb-2">Nama pada Kartu</label>
+                                    <input type="text" id="cardName" placeholder="JOHN DOE"
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Konfirmasi -->
+                <div class="form-section" id="step-4">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-6">Konfirmasi Pesanan</h2>
+                        
+                        <!-- Order Summary -->
+                        <div class="border-b pb-6 mb-6">
+                            <h3 class="text-md font-medium text-gray-900 mb-4">Detail Pesanan</h3>
+                            <div id="confirmation-items" class="space-y-3">
+                                <!-- Items will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Shipping Info -->
+                        <div class="border-b pb-6 mb-6">
+                            <h3 class="text-md font-medium text-gray-900 mb-4">Informasi Pengiriman</h3>
+                            <div id="confirmation-shipping" class="text-sm text-gray-600">
+                                <!-- Shipping info will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Payment Info -->
+                        <div class="border-b pb-6 mb-6">
+                            <h3 class="text-md font-medium text-gray-900 mb-4">Metode Pembayaran</h3>
+                            <div id="confirmation-payment" class="text-sm text-gray-600">
+                                <!-- Payment info will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="mb-6">
+                            <label class="flex items-start">
+                                <input type="checkbox" id="terms-checkbox" class="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-600">
+                                    Saya setuju dengan <a href="#" class="text-blue-600 hover:underline">syarat dan ketentuan</a> 
+                                    serta <a href="#" class="text-blue-600 hover:underline">kebijakan privasi</a>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8">
+                        <button type="button" id="prev-btn" 
+                            class="hidden px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Sebelumnya
+                    </button>
+                    <div class="flex-1"></div>
+                        <button type="button" id="next-btn" 
+                            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Selanjutnya
+                        <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                        <button type="button" id="submit-btn" 
+                            class="hidden px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Selesaikan Pesanan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="w-full lg:w-96 mt-8 lg:mt-0">
+                <div class="order-summary bg-white rounded-xl shadow p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-6">Ringkasan Pesanan</h2>
+                    
+                    <!-- Cart Items -->
+                    <div id="checkout-cart-items" class="space-y-4 mb-6">
+                        <!-- Items will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Promo Code -->
+                    <div class="border-t pt-6 mb-6">
+                        <div class="flex">
+                            <input type="text" id="promo-code" placeholder="Kode promo" 
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <button type="button" onclick="applyPromoCode()" 
+                                    class="px-4 py-2 bg-gray-500 text-white rounded-r-md hover:bg-gray-600 transition-colors">
+                                Gunakan
+                            </button>
+                        </div>
+                        <div id="promo-message" class="mt-2 text-sm hidden"></div>
+                    </div>
+                    
+                    <!-- Price Breakdown -->
+                    <div class="border-t pt-6 space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span id="subtotal-amount">Rp0</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Ongkos Kirim</span>
+                            <span id="shipping-cost">Rp0</span>
+                        </div>
+                        <div class="flex justify-between text-sm" id="promo-discount" style="display: none;">
+                            <span class="text-gray-600">Diskon</span>
+                            <span class="text-green-600" id="discount-amount">-Rp0</span>
+                        </div>
+                        <div class="flex justify-between text-sm" id="payment-fee" style="display: none;">
+                            <span class="text-gray-600">Biaya Admin</span>
+                            <span id="admin-fee">Rp0</span>
+                        </div>
+                        <div class="border-t pt-3">
+                            <div class="flex justify-between text-lg font-semibold">
+                                <span>Total</span>
+                                <span id="total-amount">Rp0</span>
+                            </div>
+
+                            </div>
+                        </div>
+
+                    <!-- Order result (populated after checkout) -->
+                    <div id="order-result" class="mt-6">
+                        <div id="order-success" class="hidden p-4 bg-green-50 border border-green-200 rounded">
+                            <div class="flex items-start gap-3">
+                                <div class="text-green-600">✓</div>
+                                <div>
+                                    <div class="font-semibold">Pesanan berhasil dibuat</div>
+                                    <div class="text-sm text-gray-600">Terima kasih! Pesanan Anda telah disimpan.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="order-notfound" class="hidden p-4 bg-yellow-50 border border-yellow-200 rounded">
+                            <div class="font-semibold">Order tidak ditemukan</div>
+                        </div>
+
+                        <div id="order-summary" class="hidden mt-4 bg-white border rounded p-4">
+                            <div class="mb-3 text-sm text-gray-600">Order ID: <span id="order-id" class="font-mono text-sm"></span></div>
+                            <div class="mb-3 text-sm text-gray-600">Nama Pemesan: <span id="order-user" class="font-medium"></span></div>
+
+                            <div class="mb-3">
+                                <h4 class="font-semibold">Items</h4>
+                                <div id="order-items" class="mt-2 space-y-2 text-sm text-gray-700"></div>
+                            </div>
+
+                            <div class="flex justify-between mt-4 pt-3 border-t">
+                                <div class="text-sm font-medium">Total</div>
+                                <div id="order-total" class="text-sm font-semibold">Rp0</div>
+                            </div>
+
+                            <div class="mt-2 text-xs text-gray-500">Tanggal: <span id="order-date"></span></div>
+
+                            <div class="mt-4">
+                                <button id="back-to-shop" class="w-full px-4 py-2 bg-black text-white rounded">Back to Shop</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Multi-step checkout logic
+        (function(){
+            // global state
+            window.currentStep = 1; // expose as global
+            const maxStep = 4;
+            // checkoutData holds all step data
+            let checkoutData = null;
+
+            const shippingMethods = [
+                {id: 'jne', name: 'JNE', cost: 15000},
+                {id: 'jnt', name: 'J&T', cost: 14000},
+                {id: 'sicepat', name: 'SiCepat', cost: 12000}
+            ];
+            const paymentMethods = [
+                {id: 'transfer', name: 'Transfer Bank', fee: 0},
+                {id: 'ewallet', name: 'E-Wallet', fee: 0},
+                {id: 'cod', name: 'Cash on Delivery', fee: 5000}
+            ];
+
+            function qs(id){ return document.getElementById(id); }
+
+            function setFieldError(fieldId, message){
+                try{
+                    var err = qs(fieldId + '-error');
+                    var field = qs(fieldId);
+                    if(err){ err.textContent = message || 'Harus diisi'; err.classList.remove('hidden'); }
+                    if(field){ field.classList.add('error'); }
+                }catch(e){}
+            }
+
+            function clearFieldError(fieldId){
+                try{
+                    var err = qs(fieldId + '-error');
+                    var field = qs(fieldId);
+                    if(err){ err.textContent = ''; err.classList.add('hidden'); }
+                    if(field){ field.classList.remove('error'); }
+                }catch(e){}
+            }
+
+            function saveCheckoutData(){ try{ sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData)); }catch(e){} }
+            function loadCheckoutData(){ try{ const raw = sessionStorage.getItem('checkoutData'); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+
+            function formatRupiah(n){ return 'Rp' + (Number(n)||0).toLocaleString('id-ID'); }
+
+            function getPendingCart(){
+                try{ const raw = sessionStorage.getItem('pendingCart'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+            }
+
+            function populateCartItems(){
+                const items = getPendingCart();
+                const container = qs('checkout-cart-items');
+                const conf = qs('confirmation-items');
+                if(container) container.innerHTML = items.map(it=>`<div class="flex justify-between"><div class="text-sm">${it.name} × ${it.quantity}</div><div class="text-sm">${it.salePrice || ('Rp'+(Number(it.price)||0).toLocaleString('id-ID'))}</div></div>`).join('');
+                if(conf) conf.innerHTML = items.map(it=>`<div class="flex justify-between"><div class="text-sm">${it.name} × ${it.quantity}</div><div class="text-sm">${it.salePrice || ('Rp'+(Number(it.price)||0).toLocaleString('id-ID'))}</div></div>`).join('');
+                // subtotal
+                const subtotal = (items||[]).reduce((s,i)=> s + ((Number(i.price)||0) * (Number(i.quantity)||0)), 0);
+                qs('subtotal-amount').textContent = formatRupiah(subtotal);
+                updateTotals();
+            }
+
+            function populateShippingMethods(){
+                const container = qs('shipping-methods');
+                if(!container) return;
+                container.innerHTML = '';
+                shippingMethods.forEach((m, idx)=>{
+                    const id = 'ship-'+m.id;
+                    const checked = idx===0 ? 'checked' : '';
+                    const el = document.createElement('div');
+                    el.className = 'payment-method rounded-lg p-4';
+                    el.innerHTML = `<div class="flex items-center"><input type="radio" name="shipping_method" id="${id}" value="${m.id}" data-cost="${m.cost}" ${checked} class="h-4 w-4"><label for="${id}" class="ml-3 flex-1 cursor-pointer"><div class="flex items-center justify-between"><div><p class="text-sm font-medium">${m.name}</p><p class="text-sm text-gray-500">Estimasi 1-3 hari</p></div><div class="text-right"><span class="text-xs text-gray-700 font-medium">${formatRupiah(m.cost)}</span></div></div></label></div>`;
+                    container.appendChild(el);
+                });
+                (function(){
+                    const nodes = container.querySelectorAll('input[name="shipping_method"]');
+                    if(nodes && nodes.length){
+                        nodes.forEach(r=> r.addEventListener('change', function(ev){
+                            if(!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
+                            checkoutData.shippingMethod = ev.target.value;
+                            saveCheckoutData();
+                            updateTotals();
+                        }));
+                    }
+                })();
+                // if previously selected, restore
+                if(checkoutData && checkoutData.shippingMethod){ const el = container.querySelector(`input[value="${checkoutData.shippingMethod}"]`); if(el) el.checked = true; }
+                // mark selected class for shipping cards
+                Array.from(container.querySelectorAll('.payment-method')).forEach(x=>{ const rr = x.querySelector('input[type="radio"]'); if(rr && rr.checked) x.classList.add('selected'); else x.classList.remove('selected'); });
+            }
+
+            function populatePaymentMethods(){
+                // Bind existing payment radios and restore selection from checkoutData
+                (function(){
+                    const pmNodes = document.querySelectorAll('input[name="payment_method"]');
+                    if(pmNodes && pmNodes.length){
+                        pmNodes.forEach(r=> r.addEventListener('change', function(ev){
+                            if(!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
+                            checkoutData.paymentMethod = ev.target.value;
+                            saveCheckoutData();
+                            // show credit card form when needed
+                            var ccForm = qs('credit-card-form');
+                            if(ev.target.value === 'credit_card'){ if(ccForm) ccForm.classList.remove('hidden'); } else { if(ccForm) ccForm.classList.add('hidden'); }
+                            updateTotals();
+                        }));
+                    }
+                })();
+                if(checkoutData && checkoutData.paymentMethod){ const el = document.querySelector(`input[name="payment_method"][value="${checkoutData.paymentMethod}"]`); if(el) el.checked = true; if(checkoutData.paymentMethod==='credit_card'){ var ccForm = qs('credit-card-form'); if(ccForm) ccForm.classList.remove('hidden'); } }
+                // mark selected class for payment cards in step-3
+                var pmContainer = qs('step-3'); if(pmContainer){ Array.from(pmContainer.querySelectorAll('.payment-method')).forEach(x=>{ const rr = x.querySelector('input[type="radio"]'); if(rr && rr.checked) x.classList.add('selected'); else x.classList.remove('selected'); }); }
+            }
+
+            // Bind click on the whole card to select the radio and add selected class
+            function bindMethodCardClicks(selector){
+                try{
+                    var cont = document.querySelector(selector);
+                    if(!cont) return;
+                    Array.from(cont.querySelectorAll('.payment-method')).forEach(function(el){
+                        if(el.__cardBound) return; el.__cardBound = true;
+                        el.addEventListener('click', function(e){
+                            var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                            if(tag === 'a' || tag === 'button') return;
+                            var radio = el.querySelector('input[type="radio"]');
+                            if(!radio) return;
+                            if(!radio.checked){ radio.checked = true; radio.dispatchEvent(new Event('change',{bubbles:true})); }
+                            Array.from(cont.querySelectorAll('.payment-method')).forEach(x=> x.classList.remove('selected'));
+                            el.classList.add('selected');
+                        });
+                    });
+                }catch(e){}
+            }
+
+            function getSelectedShippingCost(){
+                const sel = document.querySelector('input[name="shipping_method"]:checked');
+                if(sel) return Number(sel.dataset.cost) || 0;
+                return 0;
+            }
+
+            function getSelectedPaymentFee(){
+                const sel = document.querySelector('input[name="payment_method"]:checked');
+                if(!sel) return 0;
+                // find in defined list
+                const pm = paymentMethods.find(p => p.id === sel.value) || null;
+                return pm ? (pm.fee||0) : 0;
+            }
+
+            function updateTotals(){
+                const items = getPendingCart();
+                const subtotal = (items||[]).reduce((s,i)=> s + ((Number(i.price)||0) * (Number(i.quantity)||0)), 0);
+                const ship = getSelectedShippingCost();
+                const fee = getSelectedPaymentFee();
+                qs('shipping-cost').textContent = formatRupiah(ship);
+                qs('admin-fee').textContent = formatRupiah(fee);
+                const total = subtotal + ship + fee;
+                qs('total-amount').textContent = formatRupiah(total);
+                var ctEl = qs('cart-total'); if(ctEl) ctEl.textContent = formatRupiah(total);
+            }
+
+            function validateStep1(){
+                const fn = (qs('firstName').value||'').trim();
+                const ln = (qs('lastName').value||'').trim();
+                const email = (qs('email').value||'').trim();
+                const phone = (qs('phone').value||'').trim();
+                const addr = (qs('address').value||'').trim();
+                const city = (qs('city').value||'').trim();
+                const pc = (qs('postalCode').value||'').trim();
+                if(!fn || !ln || !email || !phone || !addr || !city || !pc){
+                    // show inline error markers with messages and add error class
+                    if(!fn) setFieldError('firstName','Nama depan harus diisi'); else clearFieldError('firstName');
+                    if(!ln) setFieldError('lastName','Nama belakang harus diisi'); else clearFieldError('lastName');
+                    if(!email) setFieldError('email','Email harus diisi'); else clearFieldError('email');
+                    if(!phone) setFieldError('phone','Nomor telepon harus diisi'); else clearFieldError('phone');
+                    if(!addr) setFieldError('address','Alamat lengkap harus diisi'); else clearFieldError('address');
+                    if(!city) setFieldError('city','Pilih kota'); else clearFieldError('city');
+                    if(!pc) setFieldError('postalCode','Kode pos harus diisi'); else clearFieldError('postalCode');
+                    // focus first invalid field
+                    try{ if(!fn) qs('firstName').focus(); else if(!ln) qs('lastName').focus(); else if(!email) qs('email').focus(); else if(!phone) qs('phone').focus(); else if(!addr) qs('address').focus(); else if(!city) qs('city').focus(); else if(!pc) qs('postalCode').focus(); }catch(e){}
+                    alert('Harap lengkapi semua data terlebih dahulu');
+                    return false;
+                }
+                // clear any leftover errors when valid
+                clearFieldError('firstName'); clearFieldError('lastName'); clearFieldError('email'); clearFieldError('phone'); clearFieldError('address'); clearFieldError('city'); clearFieldError('postalCode');
+                // persist shipping to checkoutData
+                if(!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
+                checkoutData.shipping = { fullName: fn + ' ' + ln, email, phone, address: addr, city, postalCode: pc };
+                saveCheckoutData();
+                return true;
+            }
+
+            function loadShippingFromSession(){
+                // read from checkoutData if present, fallback to legacy key
+                try{ const data = loadCheckoutData(); if(data && data.shipping) return data.shipping; const raw = sessionStorage.getItem('checkoutShipping'); if(!raw) return null; return JSON.parse(raw); }catch(e){ return null; }
+            }
+
+            function populateShippingForm(){
+                const s = loadShippingFromSession();
+                if(!s) return;
+                const parts = (s.fullName||'').split(' ');
+                qs('firstName').value = parts.shift() || '';
+                qs('lastName').value = parts.join(' ') || '';
+                qs('email').value = s.email || '';
+                qs('phone').value = s.phone || '';
+                qs('address').value = s.address || '';
+                qs('city').value = s.city || '';
+                qs('postalCode').value = s.postalCode || '';
+            }
+
+            function showStep(step){
+                if(step < 1) step = 1; if(step > maxStep) step = maxStep;
+                window.currentStep = step;
+                // show/hide sections (use Tailwind hidden class to strictly hide non-active)
+                for(let i=1;i<=maxStep;i++){
+                    const sec = qs('step-' + i);
+                    if(!sec) continue;
+                    if(i === step){ sec.classList.add('active'); sec.classList.remove('hidden'); } else { sec.classList.remove('active'); sec.classList.add('hidden'); }
+                }
+                // update indicators: sync both the step number (circle) and the step container box
+                for(let i=1;i<=4;i++){
+                    const num = qs('step-number-' + i);
+                    const box = qs('step-indicator-' + i);
+                    if(num){
+                        num.classList.remove('active','completed','inactive');
+                        if(i < step) num.classList.add('completed');
+                        else if(i === step) num.classList.add('active');
+                        else num.classList.add('inactive');
+                    }
+                    if(box){
+                        // remove previous state classes
+                        box.classList.remove('active','completed');
+                        if(i < step) box.classList.add('completed');
+                        else if(i === step) box.classList.add('active');
+                        // otherwise leave it as default (no active/completed)
+                    }
+                }
+                // progress
+                const fill = qs('progress-fill'); if(fill) fill.style.width = (step * 25) + '%';
+
+                // buttons
+                const prev = qs('prev-btn'); const next = qs('next-btn'); const submit = qs('submit-btn');
+                if(prev){ if(step === 1) prev.classList.add('hidden'); else prev.classList.remove('hidden'); }
+                if(step < maxStep){ if(next) { next.innerHTML = 'Selanjutnya <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'; next.disabled = false; } if(submit) submit.classList.add('hidden'); }
+                else { if(next) { next.innerHTML = 'Selesaikan Pesanan <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'; } if(submit) submit.classList.add('hidden'); }
+
+                // when entering step4 populate confirmation
+                if(step === 4){ populateConfirmation(); }
+            }
+
+            function nextStep(){
+                console.log('NEXT CLICKED, currentStep=', window.currentStep);
+                // expose validate function to global in case inline calls need it
+                window.validateStep1 = validateStep1;
+                if(window.currentStep === 1){ if(!validateStep1()) return; }
+                if(window.currentStep === 2){ // require shipping method
+                    const sel = document.querySelector('input[name="shipping_method"]:checked'); if(!sel){ alert('Pilih metode pengiriman'); return; } else { if(!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null }; checkoutData.shippingMethod = sel.value; saveCheckoutData(); } }
+                if(window.currentStep === 3){ const sel = document.querySelector('input[name="payment_method"]:checked'); if(!sel){ alert('Pilih metode pembayaran'); return; } else { if(!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null }; checkoutData.paymentMethod = sel.value; saveCheckoutData(); } }
+                if(window.currentStep < maxStep){ showStep(window.currentStep + 1); }
+            }
+
+            function prevStep(){ if(window.currentStep > 1) showStep(window.currentStep - 1); }
+
+            // expose legacy/global names so inline onclicks still work
+            window.nextStep = nextStep;
+            window.previousStep = prevStep; // some markup used previousStep()
+            window.prevStep = prevStep;
+            window.showStep = showStep;
+            window.validateStep1 = validateStep1;
+
+            function populateConfirmation(){
+                // confirmation items already rendered; shipping and payment details
+                const ship = (checkoutData && checkoutData.shipping) ? checkoutData.shipping : loadShippingFromSession();
+                const confShip = qs('confirmation-shipping');
+                const confPay = qs('confirmation-payment');
+                if(confShip){ confShip.innerHTML = ship ? `<div>${ship.fullName}</div><div class="text-sm text-gray-600">${ship.email} • ${ship.phone}</div><div class="text-sm text-gray-600">${ship.address}, ${ship.city} ${ship.postalCode}</div>` : '<div class="text-sm text-gray-600">No shipping info</div>'; }
+                if(confPay){ const pm = document.querySelector('input[name="payment_method"]:checked'); confPay.innerHTML = pm ? `<div class="text-sm">${pm.value}</div>` : '<div class="text-sm text-gray-600">Not selected</div>'; }
+                updateTotals();
+            }
+
+            async function submitOrder(){
+                // final submission: validate and create order using checkoutData
+                if(!validateStep1()) return;
+                const shipping = (checkoutData && checkoutData.shipping) ? checkoutData.shipping : loadShippingFromSession();
+                if(!shipping){ alert('Harap lengkapi semua data terlebih dahulu'); return; }
+                const items = getPendingCart();
+                if(!items || items.length === 0){ alert('Keranjang kosong'); return; }
+                const user = window.auth && typeof window.auth.getCurrentUser === 'function' ? window.auth.getCurrentUser() : null;
+                if(window.ordersAPI && typeof window.ordersAPI.createOrder === 'function'){
+                    const order = await window.ordersAPI.createOrder({ items, user, shipping: checkoutData });
+                    try{ sessionStorage.removeItem('pendingCart'); }catch(e){}
+                    try{ sessionStorage.removeItem('checkoutShipping'); }catch(e){}
+                    try{ sessionStorage.removeItem('checkoutData'); }catch(e){}
+                    try{ if(typeof clearCart === 'function') clearCart(); }catch(e){}
+                    // show result
+                    var onf = qs('order-notfound'); if(onf) onf.classList.add('hidden');
+                    var osuc = qs('order-success'); if(osuc) osuc.classList.remove('hidden');
+                    var osum = qs('order-summary'); if(osum) osum.classList.remove('hidden');
+                    qs('order-id').textContent = order.id || '';
+                    qs('order-user').textContent = (order.user && (order.user.name || order.user.email)) || (shipping && shipping.fullName) || '';
+                    const itemsEl = qs('order-items'); itemsEl.innerHTML = '';
+                    (order.items||[]).forEach(it=>{ const row = document.createElement('div'); row.className='flex justify-between'; const left=document.createElement('div'); left.textContent=it.name+' × '+it.quantity; const right=document.createElement('div'); right.textContent=it.salePrice||('Rp'+(Number(it.price)||0).toLocaleString('id-ID')); row.appendChild(left); row.appendChild(right); itemsEl.appendChild(row); });
+                    qs('order-total').textContent = order.totalDisplay || formatRupiah(order.total);
+                    qs('order-date').textContent = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
+                    qs('order-summary').scrollIntoView({behavior:'smooth'});
+                }
+            }
+
+            // wire buttons
+            document.addEventListener('DOMContentLoaded', async function(){
+                // Wait for Supabase session restore
+                if(window.auth && typeof window.auth.restoreSession === 'function'){
+                    await window.auth.restoreSession();
+                }
+
+                // auth check
+                var isLoggedIn = window.auth && typeof window.auth.isLoggedIn === 'function' ? window.auth.isLoggedIn() : false;
+                if(!isLoggedIn){ try{ sessionStorage.setItem('openAuth','1'); }catch(e){} window.location.href='index.html'; return; }
+
+                // load persisted checkoutData if present
+                checkoutData = loadCheckoutData() || { shipping: null, shippingMethod: null, paymentMethod: null };
+
+                populateShippingMethods();
+                populatePaymentMethods();
+                // allow clicking the whole card for shipping and payment
+                bindMethodCardClicks('#shipping-methods');
+                bindMethodCardClicks('#step-3');
+                populateCartItems();
+                populateShippingForm();
+
+                // adjust order-summary position to sit below header + progress bar
+                function adjustOrderSummaryPosition(){
+                    try{
+                        var order = document.querySelector('.order-summary');
+                        if(!order) return;
+                        var header = document.querySelector('header');
+                        var progress = document.querySelector('.progress-bar');
+                        var headerH = header ? header.getBoundingClientRect().height : 0;
+                        var progH = progress ? progress.getBoundingClientRect().height : 0;
+                        var top = Math.round(headerH + progH + 12); // 12px gap
+                        order.style.top = top + 'px';
+                        // calc max-height so it doesn't overflow viewport
+                        var maxh = window.innerHeight - top - 24; // bottom gap
+                        order.style.maxHeight = maxh + 'px';
+                        order.style.overflowY = 'auto';
+                    }catch(e){}
+                }
+                adjustOrderSummaryPosition();
+                window.addEventListener('resize', function(){ adjustOrderSummaryPosition(); });
+
+                var prevBtn = qs('prev-btn'); if(prevBtn) prevBtn.addEventListener('click', prevStep);
+                const nextBtn = qs('next-btn');
+                if(nextBtn) nextBtn.addEventListener('click', function(){ if(window.currentStep < maxStep) nextStep(); else submitOrder(); });
+                var submitBtn = qs('submit-btn'); if(submitBtn) submitBtn.addEventListener('click', submitOrder);
+
+                // initial step
+                showStep(1);
+
+                // Back to shop button
+                var backBtn = qs('back-to-shop'); if(backBtn) backBtn.addEventListener('click', function(){ window.location.href='index.html'; });
+            });
+        })();
+    </script>
+    
+</body>
+</html>
