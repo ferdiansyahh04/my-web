@@ -487,36 +487,47 @@
         }
         const user = window.auth && typeof window.auth.getCurrentUser === 'function' ? window.auth.getCurrentUser() : null;
         if (window.ordersAPI && typeof window.ordersAPI.createOrder === 'function') {
-            const order = window.ordersAPI.createOrder({ items, user, shipping: checkoutData });
-            try { sessionStorage.removeItem('pendingCart'); } catch (e) {}
-            try { sessionStorage.removeItem('checkoutShipping'); } catch (e) {}
-            try { sessionStorage.removeItem('checkoutData'); } catch (e) {}
-            try { if (typeof clearCart === 'function') clearCart(); } catch (e) {}
+            Promise.resolve(window.ordersAPI.createOrder({ items, user, shipping: checkoutData })).then(function(order) {
+                try { sessionStorage.removeItem('pendingCart'); } catch (e) {}
+                try { sessionStorage.removeItem('checkoutShipping'); } catch (e) {}
+                try { sessionStorage.removeItem('checkoutData'); } catch (e) {}
+                try { if (typeof clearCart === 'function') clearCart(); } catch (e) {}
 
-            var orderNotFound = qs('order-notfound');
-            if (orderNotFound) orderNotFound.classList.add('hidden');
-            var orderSuccess = qs('order-success');
-            if (orderSuccess) orderSuccess.classList.remove('hidden');
-            var orderSummary = qs('order-summary');
-            if (orderSummary) orderSummary.classList.remove('hidden');
-            qs('order-id').textContent = order.id || '';
-            qs('order-user').textContent = (order.user && (order.user.name || order.user.email)) || (shipping && shipping.fullName) || '';
-            const itemsEl = qs('order-items');
-            itemsEl.innerHTML = '';
-            (order.items || []).forEach(function(item) {
-                const row = document.createElement('div');
-                row.className = 'flex justify-between';
-                const left = document.createElement('div');
-                left.textContent = item.name + ' × ' + item.quantity;
-                const right = document.createElement('div');
-                right.textContent = item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'));
-                row.appendChild(left);
-                row.appendChild(right);
-                itemsEl.appendChild(row);
+                var orderNotFound = qs('order-notfound');
+                if (orderNotFound) orderNotFound.classList.add('hidden');
+                var orderSuccess = qs('order-success');
+                if (orderSuccess) orderSuccess.classList.remove('hidden');
+                var orderSummary = qs('order-summary');
+                if (orderSummary) orderSummary.classList.remove('hidden');
+                var orderIdEl = qs('order-id');
+                if (orderIdEl) orderIdEl.textContent = order.id || '';
+                var orderUserEl = qs('order-user');
+                if (orderUserEl) orderUserEl.textContent = (order.user && (order.user.name || order.user.email)) || (shipping && shipping.fullName) || '';
+                const itemsEl = qs('order-items');
+                if (itemsEl) {
+                    itemsEl.innerHTML = '';
+                    (order.items || []).forEach(function(item) {
+                        const row = document.createElement('div');
+                        row.className = 'flex justify-between';
+                        const left = document.createElement('div');
+                        left.textContent = item.name + ' × ' + item.quantity;
+                        const right = document.createElement('div');
+                        right.textContent = item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'));
+                        row.appendChild(left);
+                        row.appendChild(right);
+                        itemsEl.appendChild(row);
+                    });
+                }
+                var orderTotalEl = qs('order-total');
+                if (orderTotalEl) orderTotalEl.textContent = order.totalDisplay || formatRupiah(order.total);
+                var orderDateEl = qs('order-date');
+                if (orderDateEl) orderDateEl.textContent = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
+                var summaryEl = qs('order-summary');
+                if (summaryEl) summaryEl.scrollIntoView({ behavior: 'smooth' });
+            }).catch(function(e) {
+                console.error('Order submission failed', e);
+                alert('Gagal membuat pesanan. Silakan coba lagi.');
             });
-            qs('order-total').textContent = order.totalDisplay || formatRupiah(order.total);
-            qs('order-date').textContent = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
-            qs('order-summary').scrollIntoView({ behavior: 'smooth' });
         }
     }
 

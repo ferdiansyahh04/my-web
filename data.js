@@ -360,7 +360,7 @@ function createProductHTML(product) {
             <div class="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]">
                 <a href="${productHref}"${productTarget} ${productAnchorAttrs} class="block w-full h-full ${available ? '' : 'cursor-not-allowed opacity-70'}">
                     ${badges}
-                    <img src="${product.image1}" alt="${escapedName}" class="product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500" onerror="this.src='https://via.placeholder.com/400x500?text=Product'">
+                    <img src="${product.image1}" alt="${escapedName}" class="product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2216%22 fill=%22%23999%22>Product</text></svg>'">
                     <img src="${product.image2}" alt="${escapedName}" class="product-img absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="pointer-events:none;">
                 </a>
                 <!-- Quick add overlay -->

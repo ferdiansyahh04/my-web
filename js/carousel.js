@@ -1,28 +1,9 @@
 // ================= CAROUSEL AUTO SCROLL =================
-let currentSlide = 1;
-const totalSlides = 3;
-let autoScrollInterval = null;
+// Carousel radio buttons no longer exist in the current HTML.
+// These functions are kept as no-ops so callers don't throw errors.
 
-function nextSlide() {
-    currentSlide = currentSlide >= totalSlides ? 1 : currentSlide + 1;
-
-    const radio = document.getElementById(`carousel-${currentSlide}`);
-    if (radio) {
-        radio.checked = true;
-    }
-}
-
-function startAutoScroll() {
-    stopAutoScroll();
-    autoScrollInterval = setInterval(nextSlide, 5000);
-}
-
-function stopAutoScroll() {
-    if (autoScrollInterval) {
-        clearInterval(autoScrollInterval);
-        autoScrollInterval = null;
-    }
-}
+function startAutoScroll() { /* no-op */ }
+function stopAutoScroll()  { /* no-op */ }
 
 // ===== EXPOSE CAROUSEL FUNCTIONS =====
 window.startAutoScroll = startAutoScroll;

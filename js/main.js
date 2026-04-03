@@ -29,19 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ================= CAROUSEL =================
-    startAutoScroll();
-
-    const carousel = document.querySelector('.carousel');
-    carousel?.addEventListener('mouseenter', stopAutoScroll);
-    carousel?.addEventListener('mouseleave', startAutoScroll);
-
-    document.querySelectorAll('input[name="carousel"]').forEach(input => {
-        input.addEventListener('change', () => {
-            currentSlide = parseInt(input.id.split('-')[1]);
-            stopAutoScroll();
-            setTimeout(startAutoScroll, 8000);
-        });
-    });
+    // Carousel elements no longer exist; skip binding.
 
     // ================= CLOSE CART OVERLAY =================
     document.getElementById('cart-overlay')
