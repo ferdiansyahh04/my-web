@@ -197,6 +197,23 @@
         }
     }
 
+    // ---------- Storage ----------
+
+    async function uploadImage(file) {
+        if (!sb) throw new Error('Supabase not initialized');
+        var ext = (file.name || 'img').split('.').pop().toLowerCase();
+        var safeName = (file.name || 'image').replace(/[^a-zA-Z0-9._-]/g, '_');
+        var path = 'products/' + Date.now() + '-' + safeName;
+        var { data, error } = await sb.storage.from('product-images').upload(path, file, {
+            cacheControl: '31536000',
+            upsert: false,
+            contentType: file.type || 'image/jpeg'
+        });
+        if (error) throw error;
+        var { data: urlData } = sb.storage.from('product-images').getPublicUrl(path);
+        return urlData.publicUrl;
+    }
+
     // Initialize on load
     init();
 
@@ -218,6 +235,8 @@
         // Orders
         saveOrder: saveOrder,
         fetchOrders: fetchOrders,
+        // Storage
+        uploadImage: uploadImage,
         // Client
         getClient: function () { return sb; }
     };

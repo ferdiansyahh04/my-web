@@ -15,6 +15,73 @@
 
     // Check admin role via Supabase profiles table (async)
     async function currentUserIsAdmin() {
+
+    // ---------- Image upload helpers ----------
+
+    function setupImageInput(inputId) {
+        var fileInput = qs(inputId + '-file');
+        var urlInput = qs(inputId);
+        var preview = qs(inputId + '-preview');
+        if (!fileInput || !urlInput || !preview) return;
+
+        fileInput.addEventListener('change', function () {
+            var file = fileInput.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                showImagePreview(inputId, e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        urlInput.addEventListener('change', function () {
+            var url = urlInput.value.trim();
+            if (url) {
+                showImagePreview(inputId, url);
+            } else {
+                hideImagePreview(inputId);
+            }
+        });
+
+        var clearBtn = preview.querySelector('.preview-clear');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                urlInput.value = '';
+                fileInput.value = '';
+                hideImagePreview(inputId);
+            });
+        }
+    }
+
+    function showImagePreview(inputId, src) {
+        var preview = qs(inputId + '-preview');
+        if (!preview) return;
+        var img = preview.querySelector('img');
+        if (img) img.src = src;
+        preview.classList.remove('hidden');
+    }
+
+    function hideImagePreview(inputId) {
+        var preview = qs(inputId + '-preview');
+        if (!preview) return;
+        var img = preview.querySelector('img');
+        if (img) img.src = '';
+        preview.classList.add('hidden');
+    }
+
+    async function resolveImageUrl(inputId) {
+        var fileInput = qs(inputId + '-file');
+        var urlInput = qs(inputId);
+        // If a file was selected, upload it
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            return await window.supabaseAPI.uploadImage(fileInput.files[0]);
+        }
+        // Otherwise use the URL text input
+        return urlInput ? urlInput.value.trim() : '';
+    }
+
+    // Check admin role via Supabase profiles table (async)
+    async function currentUserIsAdmin() {
         try {
             if (!window.supabaseAPI || typeof window.supabaseAPI.isAdmin !== 'function') return false;
             return await window.supabaseAPI.isAdmin();
@@ -64,8 +131,30 @@
                 <input id="p-original" placeholder="Original price (e.g. Rp1.000.000)" class="w-full border px-2 py-1 rounded" />\
                 <input id="p-sale" placeholder="Sale price (e.g. Rp799.000)" class="w-full border px-2 py-1 rounded" />\
                 <input id="p-url" placeholder="Product url" class="w-full border px-2 py-1 rounded" />\
-                <input id="p-image1" placeholder="Image 1 url" class="w-full border px-2 py-1 rounded" />\
-                <input id="p-image2" placeholder="Image 2 url (optional)" class="w-full border px-2 py-1 rounded" />\
+                <div class="space-y-1">\
+                    <label class="text-xs font-medium text-gray-600">Image 1</label>\
+                    <div class="flex gap-1">\
+                        <input id="p-image1" placeholder="Paste URL or upload" class="flex-1 border px-2 py-1 rounded text-sm" />\
+                        <label class="cursor-pointer bg-gray-100 border px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-gray-200">\
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\
+                            Upload\
+                            <input id="p-image1-file" type="file" accept="image/*" class="hidden" />\
+                        </label>\
+                    </div>\
+                    <div id="p-image1-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="text-xs text-red-500 ml-2 preview-clear">Remove</button></div>\
+                </div>\
+                <div class="space-y-1">\
+                    <label class="text-xs font-medium text-gray-600">Image 2 (hover, optional)</label>\
+                    <div class="flex gap-1">\
+                        <input id="p-image2" placeholder="Paste URL or upload" class="flex-1 border px-2 py-1 rounded text-sm" />\
+                        <label class="cursor-pointer bg-gray-100 border px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-gray-200">\
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\
+                            Upload\
+                            <input id="p-image2-file" type="file" accept="image/*" class="hidden" />\
+                        </label>\
+                    </div>\
+                    <div id="p-image2-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="text-xs text-red-500 ml-2 preview-clear">Remove</button></div>\
+                </div>\
                 <div class="flex items-center gap-2">\
                     <label class="text-sm"><input id="p-hasDiscount" type="checkbox" /> Has discount</label>\
                     <label class="text-sm"><input id="p-available" type="checkbox" checked /> Available</label>\
@@ -90,6 +179,10 @@
         </div>';
 
         document.body.insertAdjacentHTML('beforeend', html);
+
+        // Image upload and preview handlers
+        setupImageInput('p-image1');
+        setupImageInput('p-image2');
 
         var closeButton = qs('admin-close');
         if (closeButton) closeButton.addEventListener('click', closeAdminPanel);
@@ -142,6 +235,14 @@
             }
         });
 
+        // Clear file inputs and previews
+        ['p-image1-file', 'p-image2-file'].forEach(function (id) {
+            var field = qs(id);
+            if (field) field.value = '';
+        });
+        hideImagePreview('p-image1');
+        hideImagePreview('p-image2');
+
         var hasDiscount = qs('p-hasDiscount');
         var available = qs('p-available');
         var isNewField = qs('p-isNew');
@@ -173,38 +274,42 @@
         var originalField = qs('p-original');
         var saleField = qs('p-sale');
         var urlField = qs('p-url');
-        var image1Field = qs('p-image1');
-        var image2Field = qs('p-image2');
         var hasDiscountField = qs('p-hasDiscount');
         var availableField = qs('p-available');
         var isNewField = qs('p-isNew');
         var isBestSellerField = qs('p-isBestSeller');
         var form = qs('admin-form');
 
-        var product = {
-            name: name,
-            originalPrice: originalField ? originalField.value.trim() : '',
-            salePrice: saleField ? saleField.value.trim() : '',
-            url: urlField ? urlField.value.trim() : '',
-            image1: image1Field ? image1Field.value.trim() : '',
-            image2: image2Field ? image2Field.value.trim() : '',
-            hasDiscount: hasDiscountField ? !!hasDiscountField.checked : false,
-            available: availableField ? !!availableField.checked : true,
-            isNew: isNewField ? !!isNewField.checked : false,
-            isBestSeller: isBestSellerField ? !!isBestSellerField.checked : false
-        };
+        if (message) message.textContent = 'Uploading images...';
 
-        var editId = form ? form.getAttribute('data-edit-id') : null;
+        // Resolve images (upload files if selected, otherwise use URLs)
+        Promise.all([resolveImageUrl('p-image1'), resolveImageUrl('p-image2')]).then(function (urls) {
+            if (message) message.textContent = '';
 
-        // productStore methods are now async
-        var promise;
-        if (editId) {
-            promise = window.productStore.updateProduct(editId, product);
-        } else {
-            promise = window.productStore.addProduct(product);
-        }
+            var product = {
+                name: name,
+                originalPrice: originalField ? originalField.value.trim() : '',
+                salePrice: saleField ? saleField.value.trim() : '',
+                url: urlField ? urlField.value.trim() : '',
+                image1: urls[0] || '',
+                image2: urls[1] || '',
+                hasDiscount: hasDiscountField ? !!hasDiscountField.checked : false,
+                available: availableField ? !!availableField.checked : true,
+                isNew: isNewField ? !!isNewField.checked : false,
+                isBestSeller: isBestSellerField ? !!isBestSellerField.checked : false
+            };
 
-        Promise.resolve(promise).then(function () {
+            var editId = form ? form.getAttribute('data-edit-id') : null;
+
+            var promise;
+            if (editId) {
+                promise = window.productStore.updateProduct(editId, product);
+            } else {
+                promise = window.productStore.addProduct(product);
+            }
+
+            return Promise.resolve(promise);
+        }).then(function () {
             clearAdminForm();
             renderAdminList();
         }).catch(function (e) {
@@ -227,6 +332,14 @@
         qs('p-url').value = product.url || '';
         qs('p-image1').value = product.image1 || '';
         qs('p-image2').value = product.image2 || '';
+        // Clear any previously selected files
+        var f1 = qs('p-image1-file'); if (f1) f1.value = '';
+        var f2 = qs('p-image2-file'); if (f2) f2.value = '';
+        // Show previews for existing images
+        if (product.image1) showImagePreview('p-image1', product.image1);
+        else hideImagePreview('p-image1');
+        if (product.image2) showImagePreview('p-image2', product.image2);
+        else hideImagePreview('p-image2');
         qs('p-hasDiscount').checked = !!product.hasDiscount;
         qs('p-available').checked = product.available !== false;
         qs('p-isNew').checked = !!product.isNew;
