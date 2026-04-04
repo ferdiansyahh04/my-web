@@ -1,16 +1,18 @@
 # VOLTX
 
-VOLTX adalah website toko produk aksesoris PC dan gaming berbasis HTML, CSS, dan JavaScript tanpa backend framework. Proyek ini menggunakan data lokal dan penyimpanan browser untuk simulasi fitur e-commerce seperti cart, checkout multi-step, autentikasi sederhana, dan panel admin.
+VOLTX adalah website toko aksesoris PC dan gaming berbasis HTML, CSS, dan JavaScript dengan **Supabase** sebagai backend. Proyek ini memiliki fitur e-commerce seperti katalog produk, cart, checkout multi-step, autentikasi, panel admin, dan upload gambar produk.
 
 ## Fitur Utama
 
-- Landing page toko dengan katalog produk
+- Landing page dengan hero showcase dan animasi AOS
 - Announcement bar / marquee di bagian atas
+- Katalog produk dari database Supabase
 - Cart sidebar dengan update jumlah item
 - Checkout multi-step
-- Login dan register sederhana berbasis `localStorage`
-- Panel admin untuk mengelola produk
-- Penyimpanan order lokal melalui browser
+- Login dan register dengan Supabase Auth
+- Panel admin (role-based) untuk mengelola produk dan melihat order
+- Upload gambar produk ke Supabase Storage
+- Pencarian produk
 
 ## Teknologi
 
@@ -18,7 +20,8 @@ VOLTX adalah website toko produk aksesoris PC dan gaming berbasis HTML, CSS, dan
 - CSS3
 - JavaScript vanilla
 - Tailwind CSS via CDN
-- `localStorage` dan `sessionStorage`
+- AOS (Animate on Scroll)
+- Supabase (Auth, Database, Storage)
 
 ## Struktur Proyek
 
@@ -27,20 +30,23 @@ VOLTX adalah website toko produk aksesoris PC dan gaming berbasis HTML, CSS, dan
 |-- checkout_system.html
 |-- data.js
 |-- index.html
+|-- README.md
 |-- style.css
 `-- js/
-	|-- admin.js
-	|-- auth.js
-	|-- carousel.js
-	|-- cart.js
-	|-- main.js
-	|-- orders.js
-	`-- ui.js
+    |-- admin.js
+    |-- auth.js
+    |-- carousel.js
+    |-- cart.js
+    |-- checkout.js
+    |-- main.js
+    |-- orders.js
+    |-- supabase.js
+    `-- ui.js
 ```
 
 ## Cara Menjalankan
 
-Karena ini proyek statis, Anda bisa menjalankannya dengan salah satu cara berikut:
+Karena ini proyek statis dengan Supabase sebagai backend, Anda bisa menjalankannya dengan salah satu cara berikut:
 
 ### Opsi 1: Buka langsung di browser
 
@@ -52,35 +58,36 @@ Disarankan memakai extension seperti Live Server di VS Code agar path dan perila
 
 ## Alur Halaman
 
-- `index.html`: halaman utama toko
+- `index.html`: halaman utama toko (katalog, hero, about)
 - `checkout_system.html`: halaman checkout multi-step
-
-## Login dan Admin Default
-
-Saat aplikasi pertama kali dijalankan, sistem akan membuat akun admin default jika belum ada.
-
-- Email: `admin@voltx.local`
-- Password: `admin123`
-
-Disarankan mengganti mekanisme ini jika proyek akan dipakai di lingkungan produksi.
 
 ## Penyimpanan Data
 
-Data berikut disimpan di browser:
+Data disimpan di **Supabase**:
 
-- Session login pengguna
-- Data cart
-- Data checkout sementara
-- Data order
-- Data produk hasil edit admin
+- **Auth**: login/register pengguna via Supabase Auth
+- **Database**: produk (`products`), order (`orders`), profil pengguna (`profiles`)
+- **Storage**: gambar produk di bucket `product-images`
+- **Browser**: `sessionStorage` untuk data cart sementara dan checkout
 
-Karena semuanya berbasis browser storage, data akan bergantung pada browser/perangkat yang dipakai.
+## Supabase Setup
 
-## Catatan Pengembangan
+Proyek ini membutuhkan tabel berikut di Supabase:
 
-- Proyek ini saat ini belum memakai backend atau database
-- Cocok untuk template, demo, atau prototipe toko online
-- Jika ingin deployment production, sebaiknya tambahkan backend, autentikasi aman, dan penyimpanan server-side
+- `products` — data produk (name, original_price, sale_price, image1, image2, dll.)
+- `orders` — data order (order_id, items, total, user_email, dll.)
+- `profiles` — profil pengguna (id, name, role)
+
+Storage bucket:
+
+- `product-images` — bucket publik untuk gambar produk
+
+RLS (Row Level Security) harus dikonfigurasi agar:
+
+- Semua orang bisa membaca produk
+- Admin bisa insert/update/delete produk
+- User terautentikasi bisa membuat order
+- Admin bisa membaca semua order
 
 ## Git
 
