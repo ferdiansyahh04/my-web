@@ -13,9 +13,6 @@
         }
     }
 
-    // Check admin role via Supabase profiles table (async)
-    async function currentUserIsAdmin() {
-
     // ---------- Image upload helpers ----------
 
     function setupImageInput(inputId) {
