@@ -345,6 +345,11 @@
         openAdminPanel();
     }
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function renderAdminList() {
         var list = qs('admin-products-list');
         if (!list) {
@@ -361,8 +366,8 @@
                 <div class="flex items-center gap-3">\
                     ' + getImageMarkup(getAdminThumbnail(product)) + '\
                     <div class="text-sm">\
-                        <div class="font-semibold">' + product.name + '</div>\
-                        <div class="text-xs text-gray-500">' + (product.salePrice || '') + '</div>\
+                        <div class="font-semibold">' + escapeHTML(product.name) + '</div>\
+                        <div class="text-xs text-gray-500">' + escapeHTML(product.salePrice || '') + '</div>\
                     </div>\
                 </div>\
                 <div class="flex items-center gap-2">\
@@ -433,8 +438,8 @@
                 var date = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
                 item.innerHTML = '\
                     <div class="text-sm">\
-                        <div class="font-semibold">' + order.id + '</div>\
-                        <div class="text-xs text-gray-500">' + ((order.user && (order.user.name || order.user.email)) || 'Guest') + ' \u2014 ' + date + '</div>\
+                        <div class="font-semibold">' + escapeHTML(order.id) + '</div>\
+                        <div class="text-xs text-gray-500">' + escapeHTML((order.user && (order.user.name || order.user.email)) || 'Guest') + ' \u2014 ' + escapeHTML(date) + '</div>\
                     </div>\
                     <div class="flex items-center gap-2">\
                         <div class="text-sm font-medium">Rp' + (order.total || 0).toLocaleString('id-ID') + '</div>\

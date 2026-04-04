@@ -23,17 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') clearSearch();
     });
 
-    // ================= OPEN CART =================
-    document.getElementById('cart-btn')
-        ?.addEventListener('click', openCart);
-
+    // Cart open/close is handled by ui.js — no duplicate binding here.
 
     // ================= CAROUSEL =================
     // Carousel elements no longer exist; skip binding.
-
-    // ================= CLOSE CART OVERLAY =================
-    document.getElementById('cart-overlay')
-        ?.addEventListener('click', closeCart);
 
     // ================= PRODUCT: Add to Cart (event delegation) =================
     const productsContainer = document.getElementById('products-container');

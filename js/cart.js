@@ -42,7 +42,7 @@ function addToCart(product) {
     const salePriceStr = product.salePrice || (numericPrice ? `Rp${numericPrice.toLocaleString('id-ID')}` : 'Rp0');
 
     // Image fallback
-    const imageSrc = product.image1 || product.image || product.image1 || '';
+    const imageSrc = product.image1 || product.image || product.image2 || '';
 
     const existingItem = cart.find(item => item.id === pid);
 

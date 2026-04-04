@@ -201,7 +201,6 @@
 
     async function uploadImage(file) {
         if (!sb) throw new Error('Supabase not initialized');
-        var ext = (file.name || 'img').split('.').pop().toLowerCase();
         var safeName = (file.name || 'image').replace(/[^a-zA-Z0-9._-]/g, '_');
         var path = 'products/' + Date.now() + '-' + safeName;
         var { data, error } = await sb.storage.from('product-images').upload(path, file, {

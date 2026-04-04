@@ -3,6 +3,11 @@
         return document.getElementById(id);
     }
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function buildFallbackImage() {
         return "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2210%22 fill=%22%23999%22>Product</text></svg>";
     }
@@ -35,7 +40,7 @@
                 <div class="flex items-center space-x-4 py-4 border-b" data-item-id="${item.id}">
                     <img src="${imageSrc}" class="w-16 h-16 object-cover rounded" onerror="this.src='${fallbackImage}'">
                     <div class="flex-1">
-                        <h3 class="font-medium text-sm">${item.name}</h3>
+                        <h3 class="font-medium text-sm">${escapeHTML(item.name)}</h3>
                         <p class="text-gray-600 text-sm">${item.salePrice}</p>
                         <div class="flex items-center space-x-2 mt-2">
                             <button data-action="decrease" data-id="${item.id}" class="cart-decrease w-6 h-6 bg-gray-200 rounded hover:bg-gray-300">−</button>
