@@ -1000,27 +1000,126 @@
         flex: 0 1 auto;
     }
 
+    .navbar-side-right {
+        gap: 0.45rem;
+    }
+
+    .navbar-link {
+        font-size: 0.95rem;
+    }
+
     .navbar-center a {
-        font-size: 1rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+    }
+
+    .navbar-pill {
+        min-height: 2.1rem;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    #auth-btn,
+    #admin-btn,
+    #logout-btn {
+        max-width: 5.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .navbar-search-wrap {
+        min-width: 2.5rem;
     }
 
     .navbar-search-input.w-64 {
-        width: 11rem;
+        width: min(9.5rem, calc(100vw - 16rem));
         padding-right: 4.6rem;
     }
 
+    .navbar-search-btn {
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+
     #header .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
     }
 
     #header.header-solid .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
     }
 
     #header {
         margin-bottom: -5rem;
+    }
+
+    .account-shell,
+    .admin-shell {
+        width: min(calc(100vw - 1rem), 42rem);
+        margin-top: 1rem;
+        max-height: calc(100dvh - 1rem);
+        border-radius: 1.75rem;
+    }
+
+    .account-shell > div:first-child,
+    .admin-shell > div:first-child {
+        padding: 1.25rem 1.25rem 1rem !important;
+    }
+
+    .account-body,
+    .admin-body {
+        padding: 1rem 1rem 1.25rem !important;
+    }
+
+    #account-close,
+    #admin-close {
+        height: 2.75rem;
+        width: 2.75rem;
+        flex: 0 0 auto;
+    }
+
+    #account-orders article {
+        padding: 1rem;
+    }
+
+    #account-orders article > div:first-child {
+        gap: 0.75rem;
+    }
+
+    #account-orders article .flex.flex-wrap.items-center.gap-2 {
+        gap: 0.45rem;
+    }
+
+    #account-orders article .flex.items-start.justify-between.gap-3 {
+        align-items: flex-start;
+    }
+
+    #admin-panel .admin-body .grid {
+        gap: 1rem;
+    }
+
+    #admin-products-list > div,
+    #admin-orders-list > div {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    #admin-products-list > div > div:last-child,
+    #admin-orders-list > div > div:last-child {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #admin-orders-list > div > div:last-child {
+        align-items: center;
+    }
+
+    #admin-order-details {
+        margin-top: 0 !important;
     }
 }
 

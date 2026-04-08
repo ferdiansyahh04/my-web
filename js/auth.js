@@ -147,9 +147,10 @@
         if (!button) return;
 
         button.className = 'navbar-pill ml-2';
+        var compactMobile = window.innerWidth <= 640;
 
         if (cachedUser) {
-            button.textContent = cachedUser.name || cachedUser.email || 'Account';
+            button.textContent = compactMobile ? 'Akun' : (cachedUser.name || cachedUser.email || 'Account');
         } else {
             button.textContent = 'Login';
         }
@@ -159,6 +160,7 @@
         var button = qs('logout-btn');
         if (!button) return;
         button.className = 'navbar-pill' + (!cachedUser ? ' hidden' : '');
+        button.textContent = window.innerWidth <= 640 ? 'Keluar' : 'Logout';
         button.classList.toggle('hidden', !cachedUser);
     }
 
@@ -875,6 +877,11 @@
 
         updateAuthButton();
         updateLogoutButton();
+
+        window.addEventListener('resize', function () {
+            updateAuthButton();
+            updateLogoutButton();
+        });
 
         if (window.supabaseAPI && typeof window.supabaseAPI.onAuthStateChange === 'function') {
             window.supabaseAPI.onAuthStateChange(function (_event, session) {
