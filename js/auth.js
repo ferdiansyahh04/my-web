@@ -248,11 +248,11 @@
         if (qs('account-modal')) return;
 
         var html = '\
-        <div id="account-modal" class="fixed inset-0 z-[1190] hidden overflow-y-auto">\
+        <div id="account-modal" class="fixed inset-0 z-[1190] hidden">\
           <div id="account-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
-          <div class="relative flex min-h-full items-start justify-center p-4 md:p-8">\
-            <div class="account-shell mt-16 w-full max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
-              <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 md:px-8">\
+          <div class="relative flex min-h-screen items-start justify-center p-4 md:p-8">\
+            <div class="account-shell mt-16 flex w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
+              <div class="flex flex-shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 md:px-8">\
                 <div>\
                   <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Akun Saya</p>\
                   <h3 id="account-title" class="mt-2 text-2xl font-black tracking-tight text-slate-900">Riwayat Pesanan</h3>\
@@ -260,7 +260,7 @@
                 </div>\
                 <button id="account-close" class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-950" aria-label="Close account modal">&times;</button>\
               </div>\
-              <div class="px-6 py-5 md:px-8 md:py-6">\
+              <div class="account-body min-h-0 flex-1 overflow-y-auto px-6 py-5 md:px-8 md:py-6">\
                 <div id="account-status" class="mb-5 hidden rounded-2xl border px-4 py-3 text-sm font-medium"></div>\
                 <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-4">\
                   <div>\

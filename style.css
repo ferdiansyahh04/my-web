@@ -299,9 +299,12 @@
 }
 
 .account-shell {
-    max-height: none;
-    overflow: visible;
+    max-height: calc(100vh - 7rem);
     -webkit-overflow-scrolling: touch;
+}
+
+.account-body {
+    scrollbar-gutter: stable;
 }
 
 /* Admin panel: ensure it overlays header/cart and is scrollable within viewport */
@@ -328,6 +331,7 @@
 
     .account-shell {
         margin-top: 3.5rem;
+        max-height: calc(100vh - 5rem);
         border-radius: 1.5rem;
     }
 }
