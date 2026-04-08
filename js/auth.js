@@ -99,6 +99,33 @@
         return !!cachedUser;
     }
 
+    function formatOrderCurrency(value) {
+        return 'Rp' + (Number(value) || 0).toLocaleString('id-ID');
+    }
+
+    function formatOrderDate(value) {
+        if (!value) return '-';
+        try {
+            return new Date(value).toLocaleString('id-ID', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            });
+        } catch (error) {
+            return value;
+        }
+    }
+
+    function formatOrderStatus(value) {
+        var status = String(value || 'pending').toLowerCase();
+        if (status === 'pending') return 'Menunggu';
+        if (status === 'paid') return 'Dibayar';
+        if (status === 'processing') return 'Diproses';
+        if (status === 'shipped') return 'Dikirim';
+        if (status === 'completed') return 'Selesai';
+        if (status === 'cancelled') return 'Dibatalkan';
+        return value || 'Menunggu';
+    }
+
     function getRedirectAfterLogin() {
         try {
             return sessionStorage.getItem('authRedirect') || '';
@@ -217,11 +244,62 @@
         document.body.insertAdjacentHTML('beforeend', html);
     }
 
+    function createAccountModal() {
+        if (qs('account-modal')) return;
+
+        var html = '\
+        <div id="account-modal" class="fixed inset-0 z-[1190] hidden">\
+          <div id="account-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
+          <div class="relative min-h-screen flex items-start justify-center p-4 md:p-8">\
+            <div class="account-shell mt-16 w-full max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
+              <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 md:px-8">\
+                <div>\
+                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Akun Saya</p>\
+                  <h3 id="account-title" class="mt-2 text-2xl font-black tracking-tight text-slate-900">Riwayat Pesanan</h3>\
+                  <p id="account-subtitle" class="mt-1 text-sm text-slate-500">Lihat semua pesanan yang sudah Anda buat.</p>\
+                </div>\
+                <button id="account-close" class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-950" aria-label="Close account modal">&times;</button>\
+              </div>\
+              <div class="px-6 py-5 md:px-8 md:py-6">\
+                <div id="account-status" class="mb-5 hidden rounded-2xl border px-4 py-3 text-sm font-medium"></div>\
+                <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-4">\
+                  <div>\
+                    <div id="account-user-name" class="text-sm font-semibold text-slate-900"></div>\
+                    <div id="account-user-email" class="text-sm text-slate-500"></div>\
+                  </div>\
+                  <button id="account-refresh" type="button" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-950">Muat Ulang</button>\
+                </div>\
+                <div id="account-orders" class="mt-6 space-y-4"></div>\
+              </div>\
+            </div>\
+          </div>\
+        </div>';
+
+        document.body.insertAdjacentHTML('beforeend', html);
+    }
+
     function showSuccessMessage(message) {
         var node = qs('auth-success');
         if (!node) return;
         node.textContent = message || '';
         node.classList.toggle('hidden', !message);
+    }
+
+    function setAccountStatus(message, type) {
+        var node = qs('account-status');
+        if (!node) return;
+
+        if (!message) {
+            node.textContent = '';
+            node.className = 'mb-5 hidden rounded-2xl border px-4 py-3 text-sm font-medium';
+            return;
+        }
+
+        node.textContent = message;
+        node.className = 'mb-5 rounded-2xl border px-4 py-3 text-sm font-medium ' +
+            (type === 'error'
+                ? 'border-rose-200 bg-rose-50 text-rose-700'
+                : 'border-emerald-200 bg-emerald-50 text-emerald-700');
     }
 
     function setFormMessage(formName, message) {
@@ -348,6 +426,151 @@
         if (registerTab) registerTab.classList.add('active');
     }
 
+    function openAccountModal() {
+        createAccountModal();
+
+        var modal = qs('account-modal');
+        var userName = qs('account-user-name');
+        var userEmail = qs('account-user-email');
+
+        if (userName) userName.textContent = (cachedUser && cachedUser.name) || 'Akun';
+        if (userEmail) userEmail.textContent = (cachedUser && cachedUser.email) || '';
+
+        setAccountStatus('', '');
+        if (modal) modal.classList.remove('hidden');
+        loadAccountOrders();
+    }
+
+    function closeAccountModal() {
+        var modal = qs('account-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function createAccountMetaBadge(label) {
+        var badge = document.createElement('span');
+        badge.className = 'inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600';
+        badge.textContent = label;
+        return badge;
+    }
+
+    function createAccountOrderCard(order) {
+        var card = document.createElement('article');
+        card.className = 'rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm md:p-5';
+
+        var topRow = document.createElement('div');
+        topRow.className = 'flex flex-col gap-3 md:flex-row md:items-start md:justify-between';
+
+        var left = document.createElement('div');
+
+        var orderId = document.createElement('div');
+        orderId.className = 'text-base font-semibold text-slate-900';
+        orderId.textContent = order.id || '-';
+
+        var orderDate = document.createElement('div');
+        orderDate.className = 'mt-1 text-sm text-slate-500';
+        orderDate.textContent = formatOrderDate(order.createdAt);
+
+        left.appendChild(orderId);
+        left.appendChild(orderDate);
+
+        var right = document.createElement('div');
+        right.className = 'flex flex-wrap items-center gap-2';
+        right.appendChild(createAccountMetaBadge('Total ' + formatOrderCurrency(order.total)));
+        right.appendChild(createAccountMetaBadge('Status ' + formatOrderStatus(order.status)));
+
+        topRow.appendChild(left);
+        topRow.appendChild(right);
+        card.appendChild(topRow);
+
+        var itemsWrap = document.createElement('div');
+        itemsWrap.className = 'mt-4 space-y-2';
+
+        (order.items || []).forEach(function (item) {
+            var row = document.createElement('div');
+            row.className = 'flex items-start justify-between gap-3 rounded-2xl bg-slate-50 px-3 py-3';
+
+            var details = document.createElement('div');
+
+            var name = document.createElement('div');
+            name.className = 'text-sm font-medium text-slate-800';
+            name.textContent = item.name || 'Produk';
+
+            var qty = document.createElement('div');
+            qty.className = 'mt-1 text-xs text-slate-500';
+            qty.textContent = 'Jumlah: ' + (Number(item.quantity) || 0);
+
+            details.appendChild(name);
+            details.appendChild(qty);
+
+            var amount = document.createElement('div');
+            amount.className = 'text-sm font-semibold text-slate-700';
+            amount.textContent = item.salePrice || formatOrderCurrency(item.price);
+
+            row.appendChild(details);
+            row.appendChild(amount);
+            itemsWrap.appendChild(row);
+        });
+
+        card.appendChild(itemsWrap);
+
+        if (order.shipping && (order.shipping.address || order.shipping.city)) {
+            var shipping = document.createElement('div');
+            shipping.className = 'mt-4 text-sm text-slate-500';
+
+            var shippingParts = [];
+            if (order.shipping.address) shippingParts.push(order.shipping.address);
+            if (order.shipping.city) shippingParts.push(order.shipping.city);
+            if (order.shipping.postalCode) shippingParts.push(order.shipping.postalCode);
+
+            shipping.textContent = 'Dikirim ke: ' + shippingParts.join(', ');
+            card.appendChild(shipping);
+        }
+
+        return card;
+    }
+
+    async function loadAccountOrders() {
+        var list = qs('account-orders');
+        if (!list) return;
+
+        list.innerHTML = '<div class="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">Memuat riwayat pesanan...</div>';
+
+        try {
+            if (!window.ordersAPI || typeof window.ordersAPI.loadOrders !== 'function') {
+                throw new Error('Orders API belum siap.');
+            }
+
+            var orders = await window.ordersAPI.loadOrders();
+            list.innerHTML = '';
+
+            if (!orders || orders.length === 0) {
+                var empty = document.createElement('div');
+                empty.className = 'rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 px-4 py-10 text-center';
+
+                var emptyTitle = document.createElement('div');
+                emptyTitle.className = 'text-base font-semibold text-slate-800';
+                emptyTitle.textContent = 'Belum ada pesanan';
+
+                var emptyText = document.createElement('div');
+                emptyText.className = 'mt-2 text-sm text-slate-500';
+                emptyText.textContent = 'Pesanan Anda akan muncul di sini setelah checkout berhasil.';
+
+                empty.appendChild(emptyTitle);
+                empty.appendChild(emptyText);
+                list.appendChild(empty);
+                return;
+            }
+
+            orders.forEach(function (order) {
+                list.appendChild(createAccountOrderCard(order));
+            });
+        } catch (error) {
+            console.error('Failed to load account orders', error);
+            list.innerHTML = '';
+            setAccountStatus('Riwayat pesanan belum bisa dimuat. Silakan coba lagi.', 'error');
+        }
+    }
+
     function openAuthModal(mode) {
         createAuthModal();
         if (mode === 'register') showRegisterForm();
@@ -467,6 +690,7 @@
 
     function bindAuthUI() {
         createAuthModal();
+        createAccountModal();
         bindPasswordToggles();
         bindFieldValidation();
 
@@ -474,7 +698,11 @@
         if (authButton) {
             authButton.addEventListener('click', function () {
                 authReady.then(function () {
-                    if (!isLoggedIn()) openAuthModal('login');
+                    if (!isLoggedIn()) {
+                        openAuthModal('login');
+                        return;
+                    }
+                    openAccountModal();
                 });
             });
         }
@@ -492,6 +720,7 @@
                     updateAuthButton();
                     updateLogoutButton();
                     closeAuthModal();
+                    closeAccountModal();
                     showToast('Signed out successfully.', 'success');
                     document.dispatchEvent(new CustomEvent('auth:changed'));
                 });
@@ -502,8 +731,22 @@
         if (closeButton) closeButton.addEventListener('click', closeAuthModal);
         var backdrop = qs('auth-backdrop');
         if (backdrop) backdrop.addEventListener('click', closeAuthModal);
+        var accountCloseButton = qs('account-close');
+        if (accountCloseButton) accountCloseButton.addEventListener('click', closeAccountModal);
+        var accountBackdrop = qs('account-backdrop');
+        if (accountBackdrop) accountBackdrop.addEventListener('click', closeAccountModal);
+        var accountRefreshButton = qs('account-refresh');
+        if (accountRefreshButton) {
+            accountRefreshButton.addEventListener('click', function () {
+                setAccountStatus('', '');
+                loadAccountOrders();
+            });
+        }
         document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') closeAuthModal();
+            if (event.key === 'Escape') {
+                closeAuthModal();
+                closeAccountModal();
+            }
         });
 
         var showRegisterButton = qs('show-register');
@@ -600,9 +843,18 @@
                 setCachedUserFromSession(session);
                 updateAuthButton();
                 updateLogoutButton();
+                if (!cachedUser) closeAccountModal();
                 document.dispatchEvent(new CustomEvent('auth:changed'));
             });
         }
+
+        document.addEventListener('orders:created', function () {
+            var modal = qs('account-modal');
+            if (modal && !modal.classList.contains('hidden') && cachedUser) {
+                setAccountStatus('Riwayat pesanan berhasil diperbarui.', 'success');
+                loadAccountOrders();
+            }
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function () {

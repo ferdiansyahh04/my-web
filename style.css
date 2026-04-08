@@ -298,6 +298,12 @@
     cursor: not-allowed;
 }
 
+.account-shell {
+    max-height: calc(100vh - 7rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* Admin panel: ensure it overlays header/cart and is scrollable within viewport */
 #admin-panel {
     z-index: 1102;
@@ -317,6 +323,12 @@
     }
 
     .auth-shell {
+        border-radius: 1.5rem;
+    }
+
+    .account-shell {
+        margin-top: 3.5rem;
+        max-height: calc(100vh - 5rem);
         border-radius: 1.5rem;
     }
 }
