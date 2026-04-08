@@ -46,19 +46,19 @@
         </div>
     </div>
     <nav id="header" class="sticky top-0 z-50 w-full bg-white shadow">
-        <div class="container mx-auto flex items-center justify-between py-4 px-6">
+        <div class="container mx-auto relative flex items-center justify-between py-4 px-6">
             <!-- Left: Navigation Links -->
-            <div class="flex items-center space-x-4">
+            <div class="navbar-side navbar-side-left flex items-center space-x-4">
                 <a href="#Store" class="text-gray-700 hover:text-black">Shop</a>
             </div>
 
             <!-- Center: Logo -->
-            <div class="flex justify-center flex-1">
-                <a href="#" class="text-xl font-bold text-gray-800">VOLTX</a>
+            <div class="navbar-center pointer-events-none absolute left-1/2 -translate-x-1/2">
+                <a href="#" class="pointer-events-auto text-xl font-bold text-gray-800">VOLTX</a>
             </div>
 
             <!-- Right: Cart -->
-            <div class="flex items-center space-x-4">
+            <div class="navbar-side navbar-side-right flex items-center space-x-4">
                     <button id="cart-btn" class="text-gray-700 hover:text-black relative">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

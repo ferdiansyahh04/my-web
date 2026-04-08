@@ -307,29 +307,27 @@
     scrollbar-gutter: stable;
 }
 
-/* Admin panel: ensure it overlays header/cart and is scrollable within viewport */
-#admin-panel {
-    z-index: 1102;
-    max-height: calc(100vh - 5rem);
-    overflow-y: auto;
+.admin-shell {
+    max-height: calc(100vh - 7rem);
     -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 768px) {
-    #admin-panel {
-        right: 0 !important;
-        left: 0;
-        width: 100% !important;
-        top: 56px;
-        border-radius: 0;
-        max-height: calc(100vh - 56px);
-    }
+.admin-body {
+    scrollbar-gutter: stable;
+}
 
+@media (max-width: 768px) {
     .auth-shell {
         border-radius: 1.5rem;
     }
 
     .account-shell {
+        margin-top: 3.5rem;
+        max-height: calc(100vh - 5rem);
+        border-radius: 1.5rem;
+    }
+
+    .admin-shell {
         margin-top: 3.5rem;
         max-height: calc(100vh - 5rem);
         border-radius: 1.5rem;
@@ -404,6 +402,23 @@
 
 #header {
     top: 40px;
+}
+
+.navbar-side {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.navbar-side-left {
+    justify-content: flex-start;
+}
+
+.navbar-side-right {
+    justify-content: flex-end;
+}
+
+.navbar-center {
+    z-index: 1;
 }
 
 .hero-showcase {
@@ -738,6 +753,14 @@
 
     .marquee-group span {
         font-size: 0.73rem;
+    }
+
+    .navbar-side {
+        flex: 0 1 auto;
+    }
+
+    .navbar-center a {
+        font-size: 1rem;
     }
 }
 

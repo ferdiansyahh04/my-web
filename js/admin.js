@@ -109,69 +109,97 @@
         }
 
         var html = '\
-        <div id="admin-panel" class="fixed right-4 top-28 w-96 bg-white shadow-lg rounded-lg p-4 z-60 hidden">\
-            <div class="flex items-center justify-between mb-3">\
-                <div class="flex items-center gap-3">\
-                    <h3 id="admin-title" class="font-bold">Admin</h3>\
-                    <div class="text-sm text-gray-500">(Manage)</div>\
-                </div>\
-                <div class="flex items-center gap-2">\
-                    <button id="admin-tab-products" class="text-sm px-2 py-1 rounded bg-gray-100">Products</button>\
-                    <button id="admin-tab-orders" class="text-sm px-2 py-1 rounded">Orders</button>\
-                    <button id="admin-close" class="text-gray-500">\u2715</button>\
-                </div>\
-            </div>\
-            <div id="admin-msg" class="text-sm text-red-600 mb-2"></div>\
-            <div id="admin-products-section">\
-              <form id="admin-form" class="space-y-2 mb-4">\
-                <input id="p-name" placeholder="Name" class="w-full border px-2 py-1 rounded" />\
-                <input id="p-original" placeholder="Original price (e.g. Rp1.000.000)" class="w-full border px-2 py-1 rounded" />\
-                <input id="p-sale" placeholder="Sale price (e.g. Rp799.000)" class="w-full border px-2 py-1 rounded" />\
-                <input id="p-url" placeholder="Product url" class="w-full border px-2 py-1 rounded" />\
-                <div class="space-y-1">\
-                    <label class="text-xs font-medium text-gray-600">Image 1</label>\
-                    <div class="flex gap-1">\
-                        <input id="p-image1" placeholder="Paste URL or upload" class="flex-1 border px-2 py-1 rounded text-sm" />\
-                        <label class="cursor-pointer bg-gray-100 border px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-gray-200">\
+        <div id="admin-panel" class="fixed inset-0 z-[1185] hidden">\
+            <div id="admin-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
+            <div class="relative flex min-h-screen items-start justify-center p-4 md:p-8">\
+                <div class="admin-shell mt-16 flex w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
+                    <div class="flex flex-shrink-0 flex-col gap-4 border-b border-slate-200 px-6 py-5 md:flex-row md:items-start md:justify-between md:px-8">\
+                        <div>\
+                            <div class="flex items-center gap-3">\
+                                <h3 id="admin-title" class="text-2xl font-black tracking-tight text-slate-900">Admin</h3>\
+                                <div class="text-sm text-slate-500">(Manage)</div>\
+                            </div>\
+                            <p class="mt-2 text-sm text-slate-500">Kelola produk dan pantau pesanan dari satu tempat.</p>\
+                        </div>\
+                        <div class="flex items-center gap-2">\
+                            <button id="admin-tab-products" class="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm">Products</button>\
+                            <button id="admin-tab-orders" class="rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Orders</button>\
+                            <button id="admin-close" class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-950">\u2715</button>\
+                        </div>\
+                    </div>\
+                    <div class="admin-body min-h-0 flex-1 overflow-y-auto px-6 py-5 md:px-8 md:py-6">\
+                        <div id="admin-msg" class="mb-4 text-sm font-medium text-rose-600"></div>\
+                        <div id="admin-products-section">\
+                          <div class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">\
+                            <form id="admin-form" class="space-y-3 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 md:p-5">\
+                              <input id="p-name" placeholder="Name" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100" />\
+                              <input id="p-original" placeholder="Original price (e.g. Rp1.000.000)" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100" />\
+                              <input id="p-sale" placeholder="Sale price (e.g. Rp799.000)" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100" />\
+                              <input id="p-url" placeholder="Product url" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100" />\
+                              <div class="space-y-2">\
+                                  <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Image 1</label>\
+                                  <div class="flex gap-2">\
+                                      <input id="p-image1" placeholder="Paste URL or upload" class="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100" />\
+                                      <label class="cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-600 flex items-center gap-1 hover:border-slate-300 hover:bg-slate-50">\
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\
                             Upload\
                             <input id="p-image1-file" type="file" accept="image/*" class="hidden" />\
                         </label>\
-                    </div>\
-                    <div id="p-image1-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="text-xs text-red-500 ml-2 preview-clear">Remove</button></div>\
-                </div>\
-                <div class="space-y-1">\
-                    <label class="text-xs font-medium text-gray-600">Image 2 (hover, optional)</label>\
-                    <div class="flex gap-1">\
-                        <input id="p-image2" placeholder="Paste URL or upload" class="flex-1 border px-2 py-1 rounded text-sm" />\
-                        <label class="cursor-pointer bg-gray-100 border px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-gray-200">\
+                                  </div>\
+                                  <div id="p-image1-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="ml-2 text-xs text-red-500 preview-clear">Remove</button></div>\
+                              </div>\
+                              <div class="space-y-2">\
+                                  <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Image 2 (hover, optional)</label>\
+                                  <div class="flex gap-2">\
+                                      <input id="p-image2" placeholder="Paste URL or upload" class="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-300 focus:ring-4 focus:ring-slate-100" />\
+                                      <label class="cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-600 flex items-center gap-1 hover:border-slate-300 hover:bg-slate-50">\
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\
                             Upload\
                             <input id="p-image2-file" type="file" accept="image/*" class="hidden" />\
                         </label>\
+                                  </div>\
+                                  <div id="p-image2-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="ml-2 text-xs text-red-500 preview-clear">Remove</button></div>\
+                              </div>\
+                              <div class="flex flex-wrap items-center gap-3">\
+                                  <label class="text-sm text-slate-600"><input id="p-hasDiscount" type="checkbox" /> Has discount</label>\
+                                  <label class="text-sm text-slate-600"><input id="p-available" type="checkbox" checked /> Available</label>\
+                                  <label class="text-sm text-slate-600"><input id="p-isNew" type="checkbox" /> New</label>\
+                                  <label class="text-sm text-slate-600"><input id="p-isBestSeller" type="checkbox" /> Best seller</label>\
+                              </div>\
+                              <div class="flex gap-2">\
+                                  <button type="submit" class="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Save</button>\
+                                  <button type="button" id="admin-clear" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900">Clear</button>\
+                              </div>\
+                            </form>\
+                            <div class="rounded-[1.5rem] border border-slate-200 bg-white p-4 md:p-5">\
+                                <div class="mb-4 flex items-center justify-between gap-3">\
+                                    <div>\
+                                        <div class="text-sm font-semibold text-slate-900">Product List</div>\
+                                        <div class="text-sm text-slate-500">Edit atau hapus produk yang sudah tersimpan.</div>\
+                                    </div>\
+                                </div>\
+                                <div class="max-h-[30rem] overflow-y-auto pr-1">\
+                                    <div id="admin-products-list" class="space-y-3"></div>\
+                                </div>\
+                            </div>\
+                          </div>\
+                        </div>\
+                        <div id="admin-orders-section" class="hidden">\
+                          <div class="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(18rem,0.85fr)]">\
+                            <div class="rounded-[1.5rem] border border-slate-200 bg-white p-4 md:p-5">\
+                                <div class="mb-4">\
+                                    <div class="text-sm font-semibold text-slate-900">Order List</div>\
+                                    <div class="text-sm text-slate-500">Pantau pesanan terbaru dari pelanggan.</div>\
+                                </div>\
+                                <div class="max-h-[34rem] overflow-y-auto pr-1">\
+                                    <div id="admin-orders-list" class="space-y-3"></div>\
+                                </div>\
+                            </div>\
+                            <div id="admin-order-details" class="hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 text-sm md:p-5"></div>\
+                          </div>\
+                        </div>\
                     </div>\
-                    <div id="p-image2-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="text-xs text-red-500 ml-2 preview-clear">Remove</button></div>\
                 </div>\
-                <div class="flex items-center gap-2">\
-                    <label class="text-sm"><input id="p-hasDiscount" type="checkbox" /> Has discount</label>\
-                    <label class="text-sm"><input id="p-available" type="checkbox" checked /> Available</label>\
-                    <label class="text-sm"><input id="p-isNew" type="checkbox" /> New</label>\
-                    <label class="text-sm"><input id="p-isBestSeller" type="checkbox" /> Best seller</label>\
-                </div>\
-                <div class="flex gap-2">\
-                    <button type="submit" class="bg-black text-white px-3 py-1 rounded">Save</button>\
-                    <button type="button" id="admin-clear" class="px-3 py-1 rounded border">Clear</button>\
-                </div>\
-              </form>\
-              <div class="overflow-y-auto max-h-64">\
-                  <div id="admin-products-list" class="space-y-2"></div>\
-              </div>\
-            </div>\
-            <div id="admin-orders-section" class="hidden">\
-              <div class="overflow-y-auto max-h-80">\
-                <div id="admin-orders-list" class="space-y-2"></div>\
-              </div>\
-              <div id="admin-order-details" class="hidden mt-3 p-2 border rounded bg-gray-50 text-sm"></div>\
             </div>\
         </div>';
 
@@ -183,6 +211,8 @@
 
         var closeButton = qs('admin-close');
         if (closeButton) closeButton.addEventListener('click', closeAdminPanel);
+        var backdrop = qs('admin-backdrop');
+        if (backdrop) backdrop.addEventListener('click', closeAdminPanel);
         var clearButton = qs('admin-clear');
         if (clearButton) clearButton.addEventListener('click', clearAdminForm);
         var form = qs('admin-form');
@@ -207,6 +237,7 @@
             return;
         }
         panel.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
         renderAdminList();
         renderOrdersList();
         activateAdminTab('products');
@@ -217,6 +248,7 @@
         if (panel) {
             panel.classList.add('hidden');
         }
+        document.body.style.overflow = 'auto';
     }
 
     function clearAdminForm() {
@@ -496,16 +528,16 @@
         if (tab === 'orders') {
             productsSection.classList.add('hidden');
             ordersSection.classList.remove('hidden');
-            productsTab.classList.remove('bg-gray-100');
-            ordersTab.classList.add('bg-gray-100');
+            productsTab.className = 'rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100';
+            ordersTab.className = 'rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm';
             renderOrdersList();
             return;
         }
 
         productsSection.classList.remove('hidden');
         ordersSection.classList.add('hidden');
-        productsTab.classList.add('bg-gray-100');
-        ordersTab.classList.remove('bg-gray-100');
+        productsTab.className = 'rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm';
+        ordersTab.className = 'rounded-full px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100';
     }
 
     async function refreshAdminVisibility() {
@@ -561,6 +593,12 @@
         if (closeButton) {
             closeButton.addEventListener('click', closeAdminPanel);
         }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeAdminPanel();
+            }
+        });
 
         document.addEventListener('products:changed', refreshProductViews);
     }
