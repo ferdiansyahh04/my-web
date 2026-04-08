@@ -24,11 +24,12 @@
         if (error) throw error;
         // Insert profile row
         if (data.user) {
-            await sb.from('profiles').upsert({
+            const { error: profileError } = await sb.from('profiles').upsert({
                 id: data.user.id,
                 name: name,
                 role: 'user'
             });
+            if (profileError) throw profileError;
         }
         return data;
     }
@@ -45,18 +46,21 @@
 
     async function signOut() {
         if (!sb) return;
-        await sb.auth.signOut();
+        const { error } = await sb.auth.signOut();
+        if (error) throw error;
     }
 
     async function getSession() {
         if (!sb) return null;
-        const { data } = await sb.auth.getSession();
+        const { data, error } = await sb.auth.getSession();
+        if (error) throw error;
         return data.session;
     }
 
     async function getUser() {
         if (!sb) return null;
-        const { data } = await sb.auth.getUser();
+        const { data, error } = await sb.auth.getUser();
+        if (error) throw error;
         return data.user;
     }
 

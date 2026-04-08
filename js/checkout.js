@@ -12,12 +12,87 @@
     const paymentMethods = [
         { id: 'bank_transfer', name: 'Transfer Bank', fee: 0 },
         { id: 'e_wallet', name: 'E-Wallet', fee: 0 },
-        { id: 'credit_card', name: 'Credit Card', fee: 0 },
-        { id: 'cod', name: 'Cash on Delivery', fee: 5000 }
+        { id: 'credit_card', name: 'Kartu Kredit', fee: 0 },
+        { id: 'cod', name: 'Bayar di Tempat (COD)', fee: 5000 }
     ];
 
     function qs(id) {
         return document.getElementById(id);
+    }
+
+    function showToast(message, type) {
+        if (window.auth && typeof window.auth.showToast === 'function') {
+            window.auth.showToast(message, type);
+        }
+    }
+
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+    }
+
+    function normalizePhone(phone) {
+        return String(phone || '').replace(/\D/g, '');
+    }
+
+    function isValidPhone(phone) {
+        var normalized = normalizePhone(phone);
+        return normalized.length >= 10 && normalized.length <= 13;
+    }
+
+    function getPaymentMethodLabel(id) {
+        var method = paymentMethods.find(function (item) {
+            return item.id === id;
+        });
+        return method ? method.name : 'Belum dipilih';
+    }
+
+    function ensureCheckoutMessage() {
+        var node = qs('checkout-error');
+        if (node) return node;
+
+        var actions = qs('checkout-actions');
+        if (!actions) return null;
+
+        node = document.createElement('div');
+        node.id = 'checkout-error';
+        node.className = 'mb-4 hidden rounded-xl border px-4 py-3 text-sm font-medium';
+        actions.parentNode.insertBefore(node, actions);
+        return node;
+    }
+
+    function setCheckoutMessage(message, type) {
+        var node = ensureCheckoutMessage();
+        if (!node) return;
+
+        if (!message) {
+            node.textContent = '';
+            node.className = 'mb-4 hidden rounded-xl border px-4 py-3 text-sm font-medium';
+            return;
+        }
+
+        node.textContent = message;
+        node.className = 'mb-4 rounded-xl border px-4 py-3 text-sm font-medium ' +
+            (type === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-rose-200 bg-rose-50 text-rose-700');
+    }
+
+    function clearCheckoutMessage() {
+        setCheckoutMessage('', 'error');
+    }
+
+    function setCheckoutSubmitting(isLoading) {
+        var nextButton = qs('next-btn');
+        if (!nextButton) return;
+
+        if (!nextButton.dataset.defaultLabel) {
+            nextButton.dataset.defaultLabel = nextButton.innerHTML;
+        }
+
+        nextButton.disabled = !!isLoading;
+        nextButton.classList.toggle('opacity-50', !!isLoading);
+        nextButton.classList.toggle('cursor-not-allowed', !!isLoading);
+        nextButton.innerHTML = isLoading ? 'Memproses...' : nextButton.dataset.defaultLabel;
     }
 
     function setFieldError(fieldId, message) {
@@ -25,7 +100,7 @@
             var err = qs(fieldId + '-error');
             var field = qs(fieldId);
             if (err) {
-                err.textContent = message || 'Harus diisi';
+                err.textContent = message || '';
                 err.classList.remove('hidden');
             }
             if (field) {
@@ -77,9 +152,8 @@
     }
 
     function syncSelectedCards(container) {
-        if (!container) {
-            return;
-        }
+        if (!container) return;
+
         Array.from(container.querySelectorAll('.payment-method')).forEach(function(card) {
             const radio = card.querySelector('input[type="radio"]');
             if (radio && radio.checked) {
@@ -90,33 +164,55 @@
         });
     }
 
+    function createLineItemRow(name, quantity, amountText) {
+        const row = document.createElement('div');
+        row.className = 'flex justify-between gap-4';
+
+        const left = document.createElement('div');
+        left.className = 'text-sm';
+        left.textContent = String(name || 'Produk') + ' × ' + (Number(quantity) || 0);
+
+        const right = document.createElement('div');
+        right.className = 'text-sm text-right';
+        right.textContent = amountText;
+
+        row.appendChild(left);
+        row.appendChild(right);
+        return row;
+    }
+
+    function renderLineItems(container, items) {
+        if (!container) return;
+        container.innerHTML = '';
+
+        (items || []).forEach(function(item) {
+            container.appendChild(createLineItemRow(
+                item.name,
+                item.quantity,
+                item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'))
+            ));
+        });
+    }
+
     function populateCartItems() {
         const items = getPendingCart();
         const container = qs('checkout-cart-items');
         const confirmationItems = qs('confirmation-items');
-        const itemMarkup = items.map(function(item) {
-            return `<div class="flex justify-between"><div class="text-sm">${item.name} × ${item.quantity}</div><div class="text-sm">${item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'))}</div></div>`;
-        }).join('');
 
-        if (container) {
-            container.innerHTML = itemMarkup;
-        }
-        if (confirmationItems) {
-            confirmationItems.innerHTML = itemMarkup;
-        }
+        renderLineItems(container, items);
+        renderLineItems(confirmationItems, items);
 
         const subtotal = items.reduce(function(sum, item) {
             return sum + ((Number(item.price) || 0) * (Number(item.quantity) || 0));
         }, 0);
+
         qs('subtotal-amount').textContent = formatRupiah(subtotal);
         updateTotals();
     }
 
     function populateShippingMethods() {
         const container = qs('shipping-methods');
-        if (!container) {
-            return;
-        }
+        if (!container) return;
 
         container.innerHTML = '';
         shippingMethods.forEach(function(method, index) {
@@ -137,6 +233,7 @@
                     }
                     checkoutData.shippingMethod = event.target.value;
                     saveCheckoutData();
+                    clearCheckoutMessage();
                     updateTotals();
                     syncSelectedCards(container);
                 });
@@ -165,14 +262,15 @@
                     }
                     checkoutData.paymentMethod = event.target.value;
                     saveCheckoutData();
+                    clearCheckoutMessage();
+
                     var creditCardForm = qs('credit-card-form');
                     if (event.target.value === 'credit_card') {
-                        if (creditCardForm) {
-                            creditCardForm.classList.remove('hidden');
-                        }
+                        if (creditCardForm) creditCardForm.classList.remove('hidden');
                     } else if (creditCardForm) {
                         creditCardForm.classList.add('hidden');
                     }
+
                     updateTotals();
                     syncSelectedCards(paymentContainer);
                 });
@@ -186,9 +284,7 @@
             }
             if (checkoutData.paymentMethod === 'credit_card') {
                 var creditCardForm = qs('credit-card-form');
-                if (creditCardForm) {
-                    creditCardForm.classList.remove('hidden');
-                }
+                if (creditCardForm) creditCardForm.classList.remove('hidden');
             }
         }
 
@@ -198,28 +294,24 @@
     function bindMethodCardClicks(selector) {
         try {
             var container = document.querySelector(selector);
-            if (!container) {
-                return;
-            }
+            if (!container) return;
 
             Array.from(container.querySelectorAll('.payment-method')).forEach(function(card) {
-                if (card.__cardBound) {
-                    return;
-                }
+                if (card.__cardBound) return;
                 card.__cardBound = true;
+
                 card.addEventListener('click', function(event) {
                     var tag = (event.target && event.target.tagName) ? event.target.tagName.toLowerCase() : '';
-                    if (tag === 'a' || tag === 'button') {
-                        return;
-                    }
+                    if (tag === 'a' || tag === 'button') return;
+
                     var radio = card.querySelector('input[type="radio"]');
-                    if (!radio) {
-                        return;
-                    }
+                    if (!radio) return;
+
                     if (!radio.checked) {
                         radio.checked = true;
                         radio.dispatchEvent(new Event('change', { bubbles: true }));
                     }
+
                     Array.from(container.querySelectorAll('.payment-method')).forEach(function(other) {
                         other.classList.remove('selected');
                     });
@@ -231,20 +323,17 @@
 
     function getSelectedShippingCost() {
         const selected = document.querySelector('input[name="shipping_method"]:checked');
-        if (selected) {
-            return Number(selected.dataset.cost) || 0;
-        }
-        return 0;
+        return selected ? (Number(selected.dataset.cost) || 0) : 0;
     }
 
     function getSelectedPaymentFee() {
         const selected = document.querySelector('input[name="payment_method"]:checked');
-        if (!selected) {
-            return 0;
-        }
+        if (!selected) return 0;
+
         const paymentMethod = paymentMethods.find(function(method) {
             return method.id === selected.value;
         }) || null;
+
         return paymentMethod ? (paymentMethod.fee || 0) : 0;
     }
 
@@ -255,14 +344,15 @@
         }, 0);
         const shippingCost = getSelectedShippingCost();
         const fee = getSelectedPaymentFee();
+
         qs('shipping-cost').textContent = formatRupiah(shippingCost);
         qs('admin-fee').textContent = formatRupiah(fee);
+
         const total = subtotal + shippingCost + fee;
         qs('total-amount').textContent = formatRupiah(total);
+
         var cartTotal = qs('cart-total');
-        if (cartTotal) {
-            cartTotal.textContent = formatRupiah(total);
-        }
+        if (cartTotal) cartTotal.textContent = formatRupiah(total);
     }
 
     function validateStep1() {
@@ -273,27 +363,7 @@
         const address = (qs('address').value || '').trim();
         const city = (qs('city').value || '').trim();
         const postalCode = (qs('postalCode').value || '').trim();
-
-        if (!firstName || !lastName || !email || !phone || !address || !city || !postalCode) {
-            if (!firstName) setFieldError('firstName', 'Nama depan harus diisi'); else clearFieldError('firstName');
-            if (!lastName) setFieldError('lastName', 'Nama belakang harus diisi'); else clearFieldError('lastName');
-            if (!email) setFieldError('email', 'Email harus diisi'); else clearFieldError('email');
-            if (!phone) setFieldError('phone', 'Nomor telepon harus diisi'); else clearFieldError('phone');
-            if (!address) setFieldError('address', 'Alamat lengkap harus diisi'); else clearFieldError('address');
-            if (!city) setFieldError('city', 'Pilih kota'); else clearFieldError('city');
-            if (!postalCode) setFieldError('postalCode', 'Kode pos harus diisi'); else clearFieldError('postalCode');
-            try {
-                if (!firstName) qs('firstName').focus();
-                else if (!lastName) qs('lastName').focus();
-                else if (!email) qs('email').focus();
-                else if (!phone) qs('phone').focus();
-                else if (!address) qs('address').focus();
-                else if (!city) qs('city').focus();
-                else if (!postalCode) qs('postalCode').focus();
-            } catch (e) {}
-            alert('Harap lengkapi semua data terlebih dahulu');
-            return false;
-        }
+        let valid = true;
 
         clearFieldError('firstName');
         clearFieldError('lastName');
@@ -303,13 +373,68 @@
         clearFieldError('city');
         clearFieldError('postalCode');
 
+        if (!firstName) {
+            setFieldError('firstName', 'Nama depan wajib diisi.');
+            valid = false;
+        }
+        if (!lastName) {
+            setFieldError('lastName', 'Nama belakang wajib diisi.');
+            valid = false;
+        }
+        if (!email) {
+            setFieldError('email', 'Email wajib diisi.');
+            valid = false;
+        } else if (!isValidEmail(email)) {
+            setFieldError('email', 'Masukkan alamat email yang valid.');
+            valid = false;
+        }
+        if (!phone) {
+            setFieldError('phone', 'Nomor HP wajib diisi.');
+            valid = false;
+        } else if (!/^\d+$/.test(normalizePhone(phone))) {
+            setFieldError('phone', 'Nomor HP hanya boleh berisi angka.');
+            valid = false;
+        } else if (!isValidPhone(phone)) {
+            setFieldError('phone', 'Nomor HP harus 10 sampai 13 digit.');
+            valid = false;
+        }
+        if (!address) {
+            setFieldError('address', 'Alamat lengkap wajib diisi.');
+            valid = false;
+        }
+        if (!city) {
+            setFieldError('city', 'Kota wajib dipilih.');
+            valid = false;
+        }
+        if (!postalCode) {
+            setFieldError('postalCode', 'Kode pos wajib diisi.');
+            valid = false;
+        }
+
+        if (!valid) {
+            try {
+                if (!firstName) qs('firstName').focus();
+                else if (!lastName) qs('lastName').focus();
+                else if (!email || !isValidEmail(email)) qs('email').focus();
+                else if (!phone || !isValidPhone(phone)) qs('phone').focus();
+                else if (!address) qs('address').focus();
+                else if (!city) qs('city').focus();
+                else if (!postalCode) qs('postalCode').focus();
+            } catch (e) {}
+
+            setCheckoutMessage('Mohon lengkapi data pengiriman dengan benar.', 'error');
+            return false;
+        }
+
+        clearCheckoutMessage();
+
         if (!checkoutData) {
             checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
         }
         checkoutData.shipping = {
             fullName: firstName + ' ' + lastName,
             email: email,
-            phone: phone,
+            phone: normalizePhone(phone),
             address: address,
             city: city,
             postalCode: postalCode
@@ -321,13 +446,9 @@
     function loadShippingFromSession() {
         try {
             const data = loadCheckoutData();
-            if (data && data.shipping) {
-                return data.shipping;
-            }
+            if (data && data.shipping) return data.shipping;
             const raw = sessionStorage.getItem('checkoutShipping');
-            if (!raw) {
-                return null;
-            }
+            if (!raw) return null;
             return JSON.parse(raw);
         } catch (e) {
             return null;
@@ -336,9 +457,8 @@
 
     function populateShippingForm() {
         const shipping = loadShippingFromSession();
-        if (!shipping) {
-            return;
-        }
+        if (!shipping) return;
+
         const parts = (shipping.fullName || '').split(' ');
         qs('firstName').value = parts.shift() || '';
         qs('lastName').value = parts.join(' ') || '';
@@ -356,9 +476,8 @@
 
         for (let index = 1; index <= maxStep; index += 1) {
             const section = qs('step-' + index);
-            if (!section) {
-                continue;
-            }
+            if (!section) continue;
+
             if (index === step) {
                 section.classList.add('active');
                 section.classList.remove('hidden');
@@ -371,12 +490,14 @@
         for (let index = 1; index <= 4; index += 1) {
             const number = qs('step-number-' + index);
             const box = qs('step-indicator-' + index);
+
             if (number) {
                 number.classList.remove('active', 'completed', 'inactive');
                 if (index < step) number.classList.add('completed');
                 else if (index === step) number.classList.add('active');
                 else number.classList.add('inactive');
             }
+
             if (box) {
                 box.classList.remove('active', 'completed');
                 if (index < step) box.classList.add('completed');
@@ -385,32 +506,30 @@
         }
 
         const fill = qs('progress-fill');
-        if (fill) {
-            fill.style.width = (step * 25) + '%';
-        }
+        if (fill) fill.style.width = (step * 25) + '%';
 
         const prev = qs('prev-btn');
         const next = qs('next-btn');
         const submit = qs('submit-btn');
+
         if (prev) {
             if (step === 1) prev.classList.add('hidden');
             else prev.classList.remove('hidden');
         }
+
         if (step < maxStep) {
             if (next) {
                 next.innerHTML = 'Selanjutnya <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+                next.dataset.defaultLabel = next.innerHTML;
                 next.disabled = false;
             }
-            if (submit) {
-                submit.classList.add('hidden');
-            }
+            if (submit) submit.classList.add('hidden');
         } else {
             if (next) {
-                next.innerHTML = 'Selesaikan Pesanan <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+                next.innerHTML = 'Pesan Sekarang <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+                next.dataset.defaultLabel = next.innerHTML;
             }
-            if (submit) {
-                submit.classList.add('hidden');
-            }
+            if (submit) submit.classList.add('hidden');
         }
 
         if (step === 4) {
@@ -419,33 +538,32 @@
     }
 
     function nextStep() {
-        if (window.currentStep === 1 && !validateStep1()) {
-            return;
-        }
+        if (window.currentStep === 1 && !validateStep1()) return;
+
         if (window.currentStep === 2) {
             const shipping = document.querySelector('input[name="shipping_method"]:checked');
             if (!shipping) {
-                alert('Pilih metode pengiriman');
+                setCheckoutMessage('Pilih metode pengiriman terlebih dahulu.', 'error');
                 return;
             }
-            if (!checkoutData) {
-                checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
-            }
+            if (!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
             checkoutData.shippingMethod = shipping.value;
             saveCheckoutData();
         }
+
         if (window.currentStep === 3) {
             const payment = document.querySelector('input[name="payment_method"]:checked');
             if (!payment) {
-                alert('Pilih metode pembayaran');
+                setCheckoutMessage('Pilih metode pembayaran terlebih dahulu.', 'error');
                 return;
             }
-            if (!checkoutData) {
-                checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
-            }
+            if (!checkoutData) checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
             checkoutData.paymentMethod = payment.value;
             saveCheckoutData();
         }
+
+        clearCheckoutMessage();
+
         if (window.currentStep < maxStep) {
             showStep(window.currentStep + 1);
         }
@@ -453,6 +571,7 @@
 
     function prevStep() {
         if (window.currentStep > 1) {
+            clearCheckoutMessage();
             showStep(window.currentStep - 1);
         }
     }
@@ -461,32 +580,66 @@
         const shipping = (checkoutData && checkoutData.shipping) ? checkoutData.shipping : loadShippingFromSession();
         const confirmationShipping = qs('confirmation-shipping');
         const confirmationPayment = qs('confirmation-payment');
+
         if (confirmationShipping) {
-            confirmationShipping.innerHTML = shipping ? `<div>${shipping.fullName}</div><div class="text-sm text-gray-600">${shipping.email} • ${shipping.phone}</div><div class="text-sm text-gray-600">${shipping.address}, ${shipping.city} ${shipping.postalCode}</div>` : '<div class="text-sm text-gray-600">No shipping info</div>';
+            confirmationShipping.innerHTML = '';
+
+            if (shipping) {
+                const nameLine = document.createElement('div');
+                nameLine.textContent = shipping.fullName || '';
+
+                const contactLine = document.createElement('div');
+                contactLine.className = 'text-sm text-gray-600';
+                contactLine.textContent = [shipping.email || '', shipping.phone || ''].filter(Boolean).join(' • ');
+
+                const addressLine = document.createElement('div');
+                addressLine.className = 'text-sm text-gray-600';
+                addressLine.textContent = [shipping.address || '', shipping.city || '', shipping.postalCode || ''].filter(Boolean).join(', ');
+
+                confirmationShipping.appendChild(nameLine);
+                confirmationShipping.appendChild(contactLine);
+                confirmationShipping.appendChild(addressLine);
+            } else {
+                const emptyShipping = document.createElement('div');
+                emptyShipping.className = 'text-sm text-gray-600';
+                emptyShipping.textContent = 'Data pengiriman belum tersedia.';
+                confirmationShipping.appendChild(emptyShipping);
+            }
         }
+
         if (confirmationPayment) {
+            confirmationPayment.innerHTML = '';
             const payment = document.querySelector('input[name="payment_method"]:checked');
-            confirmationPayment.innerHTML = payment ? `<div class="text-sm">${payment.value}</div>` : '<div class="text-sm text-gray-600">Not selected</div>';
+            const paymentLine = document.createElement('div');
+            paymentLine.className = 'text-sm';
+            paymentLine.textContent = payment ? getPaymentMethodLabel(payment.value) : 'Metode pembayaran belum dipilih.';
+            if (!payment) paymentLine.classList.add('text-gray-600');
+            confirmationPayment.appendChild(paymentLine);
         }
+
         updateTotals();
     }
 
     function submitOrder() {
-        if (!validateStep1()) {
-            return;
-        }
+        if (!validateStep1()) return;
+
         const shipping = (checkoutData && checkoutData.shipping) ? checkoutData.shipping : loadShippingFromSession();
         if (!shipping) {
-            alert('Harap lengkapi semua data terlebih dahulu');
+            setCheckoutMessage('Mohon lengkapi data pengiriman terlebih dahulu.', 'error');
             return;
         }
+
         const items = getPendingCart();
         if (!items || items.length === 0) {
-            alert('Keranjang kosong');
+            setCheckoutMessage('Keranjang belanja Anda masih kosong.', 'error');
             return;
         }
+
         const user = window.auth && typeof window.auth.getCurrentUser === 'function' ? window.auth.getCurrentUser() : null;
         if (window.ordersAPI && typeof window.ordersAPI.createOrder === 'function') {
+            clearCheckoutMessage();
+            setCheckoutSubmitting(true);
+
             Promise.resolve(window.ordersAPI.createOrder({ items, user, shipping: checkoutData })).then(function(order) {
                 try { sessionStorage.removeItem('pendingCart'); } catch (e) {}
                 try { sessionStorage.removeItem('checkoutShipping'); } catch (e) {}
@@ -495,38 +648,41 @@
 
                 var orderNotFound = qs('order-notfound');
                 if (orderNotFound) orderNotFound.classList.add('hidden');
+
                 var orderSuccess = qs('order-success');
                 if (orderSuccess) orderSuccess.classList.remove('hidden');
+
                 var orderSummary = qs('order-summary');
                 if (orderSummary) orderSummary.classList.remove('hidden');
+
                 var orderIdEl = qs('order-id');
                 if (orderIdEl) orderIdEl.textContent = order.id || '';
+
                 var orderUserEl = qs('order-user');
-                if (orderUserEl) orderUserEl.textContent = (order.user && (order.user.name || order.user.email)) || (shipping && shipping.fullName) || '';
-                const itemsEl = qs('order-items');
-                if (itemsEl) {
-                    itemsEl.innerHTML = '';
-                    (order.items || []).forEach(function(item) {
-                        const row = document.createElement('div');
-                        row.className = 'flex justify-between';
-                        const left = document.createElement('div');
-                        left.textContent = item.name + ' × ' + item.quantity;
-                        const right = document.createElement('div');
-                        right.textContent = item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'));
-                        row.appendChild(left);
-                        row.appendChild(right);
-                        itemsEl.appendChild(row);
-                    });
+                if (orderUserEl) {
+                    orderUserEl.textContent = (order.user && (order.user.name || order.user.email)) || (shipping && shipping.fullName) || '';
                 }
+
+                const itemsEl = qs('order-items');
+                renderLineItems(itemsEl, order.items || []);
+
                 var orderTotalEl = qs('order-total');
                 if (orderTotalEl) orderTotalEl.textContent = order.totalDisplay || formatRupiah(order.total);
+
                 var orderDateEl = qs('order-date');
                 if (orderDateEl) orderDateEl.textContent = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
+
                 var summaryEl = qs('order-summary');
                 if (summaryEl) summaryEl.scrollIntoView({ behavior: 'smooth' });
+
+                setCheckoutMessage('Pesanan berhasil dibuat. Silakan cek ringkasan pesanan Anda.', 'success');
+                showToast('Pesanan berhasil dibuat.', 'success');
             }).catch(function(e) {
                 console.error('Order submission failed', e);
-                alert('Gagal membuat pesanan. Silakan coba lagi.');
+                setCheckoutMessage('Terjadi kesalahan saat membuat pesanan. Silakan coba lagi.', 'error');
+                showToast('Terjadi kesalahan saat membuat pesanan.', 'error');
+            }).finally(function () {
+                setCheckoutSubmitting(false);
             });
         }
     }
@@ -534,9 +690,8 @@
     function adjustOrderSummaryPosition() {
         try {
             var order = document.querySelector('.order-summary');
-            if (!order) {
-                return;
-            }
+            if (!order) return;
+
             var header = document.querySelector('header');
             var progress = document.querySelector('.progress-bar');
             var headerH = header ? header.getBoundingClientRect().height : 0;
@@ -562,13 +717,11 @@
         const promoMessage = qs('promo-message');
         const promoDiscount = qs('promo-discount');
         const discountAmount = qs('discount-amount');
-        if (!promoInput || !promoMessage || !promoDiscount || !discountAmount) {
-            return;
-        }
+        if (!promoInput || !promoMessage || !promoDiscount || !discountAmount) return;
 
         const code = (promoInput.value || '').trim().toUpperCase();
         if (!code) {
-            promoMessage.textContent = 'Masukkan kode promo terlebih dahulu';
+            promoMessage.textContent = 'Masukkan kode promo terlebih dahulu.';
             promoMessage.className = 'mt-2 text-sm text-red-500';
             promoMessage.classList.remove('hidden');
             promoDiscount.style.display = 'none';
@@ -581,36 +734,35 @@
         }, 0);
 
         let discount = 0;
-        if (code === 'VOLTX10') {
-            discount = Math.round(subtotal * 0.1);
-        } else if (code === 'HEMAT50') {
-            discount = 50000;
-        }
+        if (code === 'VOLTX10') discount = Math.round(subtotal * 0.1);
+        else if (code === 'HEMAT50') discount = 50000;
 
         if (discount <= 0) {
-            promoMessage.textContent = 'Kode promo tidak valid';
+            promoMessage.textContent = 'Kode promo tidak valid.';
             promoMessage.className = 'mt-2 text-sm text-red-500';
             promoMessage.classList.remove('hidden');
             promoDiscount.style.display = 'none';
             return;
         }
 
-        promoMessage.textContent = 'Kode promo berhasil diterapkan';
+        promoMessage.textContent = 'Kode promo berhasil digunakan.';
         promoMessage.className = 'mt-2 text-sm text-green-600';
         promoMessage.classList.remove('hidden');
         promoDiscount.style.display = 'flex';
         discountAmount.textContent = '-' + formatRupiah(discount);
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    function initCheckoutPage() {
         var isLoggedIn = window.auth && typeof window.auth.isLoggedIn === 'function' ? window.auth.isLoggedIn() : false;
         if (!isLoggedIn) {
             try { sessionStorage.setItem('openAuth', '1'); } catch (e) {}
+            try { sessionStorage.setItem('authRedirect', 'checkout_system.html'); } catch (e) {}
             window.location.href = 'index.html';
             return;
         }
 
         checkoutData = loadCheckoutData() || { shipping: null, shippingMethod: null, paymentMethod: null };
+        ensureCheckoutMessage();
 
         populateShippingMethods();
         populatePaymentMethods();
@@ -626,22 +778,40 @@
 
         var prevBtn = qs('prev-btn');
         if (prevBtn) prevBtn.addEventListener('click', prevStep);
+
         var nextBtn = qs('next-btn');
-        if (nextBtn) nextBtn.addEventListener('click', function() {
-            if (window.currentStep < maxStep) nextStep();
-            else submitOrder();
-        });
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                if (window.currentStep < maxStep) nextStep();
+                else submitOrder();
+            });
+        }
+
         var submitBtn = qs('submit-btn');
         if (submitBtn) submitBtn.addEventListener('click', submitOrder);
+
         var backBtn = qs('checkout-back-btn');
         if (backBtn) backBtn.addEventListener('click', goBack);
+
         var promoBtn = qs('apply-promo-btn');
         if (promoBtn) promoBtn.addEventListener('click', applyPromoCode);
+
         var backToShopBtn = qs('back-to-shop');
-        if (backToShopBtn) backToShopBtn.addEventListener('click', function() {
-            window.location.href = 'index.html';
-        });
+        if (backToShopBtn) {
+            backToShopBtn.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+        }
 
         showStep(1);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.auth && typeof window.auth.whenReady === 'function') {
+            window.auth.whenReady().then(initCheckoutPage);
+            return;
+        }
+
+        initCheckoutPage();
     });
 })();

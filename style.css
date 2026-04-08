@@ -211,6 +211,27 @@
     backdrop-filter: blur(10px);
 }
 
+.auth-password-wrap {
+    position: relative;
+}
+
+.auth-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.85rem;
+    transform: translateY(-50%);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+
+.auth-password-toggle:hover {
+    color: #0f172a;
+}
+
 .auth-tab {
     color: #64748b;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
@@ -229,6 +250,52 @@
 
 .auth-input:focus {
     box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+
+.auth-input-error {
+    border-color: #fda4af !important;
+    box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.08);
+}
+
+.auth-inline-error {
+    min-height: 1.25rem;
+    margin-top: -0.35rem;
+    font-size: 0.82rem;
+    color: #e11d48;
+}
+
+.auth-form-message {
+    min-height: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: transparent;
+}
+
+.auth-form-message.has-message {
+    color: #e11d48;
+}
+
+.auth-submit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: 0;
+    border-radius: 1rem;
+    background: #020617;
+    padding: 0.95rem 1rem;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.auth-submit-button:hover {
+    background: #111827;
+}
+
+.auth-submit-button:disabled {
+    cursor: not-allowed;
 }
 
 /* Admin panel: ensure it overlays header/cart and is scrollable within viewport */
