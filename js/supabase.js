@@ -164,6 +164,7 @@
         if (!sb) throw new Error('Supabase not initialized');
         var row = {
             order_id: order.id,
+            user_id: order.user ? order.user.id : null,
             items: order.items,
             total: order.total,
             total_display: order.totalDisplay,
@@ -189,7 +190,11 @@
                     items: row.items || [],
                     total: row.total || 0,
                     totalDisplay: row.total_display || '',
-                    user: { email: row.user_email, name: row.user_name },
+                    user: {
+                        id: row.user_id || null,
+                        email: row.user_email,
+                        name: row.user_name
+                    },
                     shipping: row.shipping,
                     status: row.status,
                     createdAt: row.created_at
