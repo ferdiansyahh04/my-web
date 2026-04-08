@@ -146,20 +146,19 @@
         var button = qs('auth-btn');
         if (!button) return;
 
+        button.className = 'navbar-pill ml-2';
+
         if (cachedUser) {
             button.textContent = cachedUser.name || cachedUser.email || 'Account';
-            button.classList.remove('bg-white');
-            button.classList.add('bg-gray-100');
         } else {
             button.textContent = 'Login';
-            button.classList.remove('bg-gray-100');
-            button.classList.add('bg-white');
         }
     }
 
     function updateLogoutButton() {
         var button = qs('logout-btn');
         if (!button) return;
+        button.className = 'navbar-pill' + (!cachedUser ? ' hidden' : '');
         button.classList.toggle('hidden', !cachedUser);
     }
 

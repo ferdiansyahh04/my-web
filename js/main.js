@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const header = document.getElementById('header');
+    const hero = document.querySelector('.hero-showcase');
+
+    function updateHeaderTheme() {
+        if (!header || !hero) return;
+
+        const heroBottom = hero.offsetTop + hero.offsetHeight;
+        const headerHeight = header.offsetHeight || 0;
+        const triggerPoint = heroBottom - headerHeight - 32;
+        const shouldUseSolid = window.scrollY >= triggerPoint;
+
+        header.classList.toggle('header-solid', shouldUseSolid);
+    }
+
+    let headerTicking = false;
+    function onHeaderScroll() {
+        if (headerTicking) return;
+        headerTicking = true;
+
+        window.requestAnimationFrame(() => {
+            updateHeaderTheme();
+            headerTicking = false;
+        });
+    }
+
+    updateHeaderTheme();
+    window.addEventListener('scroll', onHeaderScroll, { passive: true });
+    window.addEventListener('resize', updateHeaderTheme);
 
     // ================= INIT CART =================
     loadCart();

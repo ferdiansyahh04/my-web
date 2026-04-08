@@ -107,76 +107,188 @@ document.addEventListener('DOMContentLoaded', loadProductsFromSupabase);
 
 let filteredProducts = [...allProducts];
 
-function createProductHTML(product) {
-    const escapedName = escapeHTML(product.name);
+function buildProductFallbackImage() {
+    return "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2216%22 fill=%22%23999%22>Product</text></svg>";
+}
 
-    // availability: default true unless explicitly false
-    const available = product.hasOwnProperty('available') ? !!product.available : true;
+function createBadge(label, className, svgMarkup) {
+    var badge = document.createElement('span');
+    badge.className = className;
 
-    const priceBlock = product.hasDiscount
-        ? `<div class="flex items-baseline gap-2">
-                <span class="text-base font-bold text-gray-900">${product.salePrice}</span>
-                <span class="text-xs line-through text-gray-400">${product.originalPrice || ''}</span>
-            </div>`
-        : `<div class="text-base font-bold text-gray-900">${product.salePrice}</div>`;
-
-    // Build badges array (supports multiple badges)
-    let badges = '';
-    if (!available) {
-        badges = `<span class="badge-soldout absolute top-3 left-3 z-10">Sold out</span>`;
-    } else {
-        const leftBadges = [];
-        const rightBadges = [];
-
-        if (product.isNew) {
-            leftBadges.push(`<span class="badge-new"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.09 6.26L20.18 9l-5.09 3.74L16.18 19 12 15.27 7.82 19l1.09-6.26L3.82 9l6.09-.74z"/></svg> New</span>`);
-        }
-        if (product.isBestSeller) {
-            rightBadges.push(`<span class="badge-bestseller"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Best seller</span>`);
-        }
-        if (product.hasDiscount && product.discountPercentage) {
-            const side = leftBadges.length === 0 ? leftBadges : rightBadges;
-            side.push(`<span class="badge-discount">${product.discountPercentage}</span>`);
-        }
-
-        const left = leftBadges.length ? `<div class="absolute top-3 left-3 z-10 flex flex-col gap-2">${leftBadges.join('')}</div>` : '';
-        const right = rightBadges.length ? `<div class="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">${rightBadges.join('')}</div>` : '';
-        badges = left + right;
+    if (svgMarkup) {
+        badge.insertAdjacentHTML('beforeend', svgMarkup);
+        badge.appendChild(document.createTextNode(' ' + label));
+        return badge;
     }
 
-    const categoryTag = product.category
-        ? `<span class="text-[11px] uppercase tracking-wider text-gray-400 font-medium">${product.category}</span>`
-        : '';
+    badge.textContent = label;
+    return badge;
+}
 
-    const productHref = available ? product.url : 'javascript:void(0)';
-    const productTarget = available ? ' target="_blank" rel="noopener noreferrer"' : '';
-    const productAnchorAttrs = available ? '' : 'onclick="return false;"';
+function buildProductBadgeGroups(product, available) {
+    if (!available) {
+        var soldOutWrap = document.createElement('div');
+        soldOutWrap.className = 'absolute top-3 left-3 z-10';
+        soldOutWrap.appendChild(createBadge('Sold out', 'badge-soldout'));
+        return [soldOutWrap];
+    }
 
-    return `
-        <div class="product-item group opacity-0 translate-y-6">
-            <div class="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]">
-                <a href="${productHref}"${productTarget} ${productAnchorAttrs} class="block w-full h-full ${available ? '' : 'cursor-not-allowed opacity-70'}">
-                    ${badges}
-                    <img src="${product.image1}" alt="${escapedName}" class="product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2216%22 fill=%22%23999%22>Product</text></svg>'">
-                    <img src="${product.image2}" alt="${escapedName}" class="product-img absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500" style="pointer-events:none;">
-                </a>
-                <!-- Quick add overlay -->
-                <div class="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20">
-                    ${available
-                        ? `<button type="button" data-product-id="${product.id}" data-product-name="${escapedName}" data-product-saleprice="${product.salePrice}" data-product-image="${product.image1}" class="add-to-cart-btn w-full text-center bg-white text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl shadow-lg hover:bg-gray-900 hover:text-white transition-colors duration-200">Add to cart</button>`
-                        : `<button type="button" disabled class="w-full text-center bg-gray-200 text-gray-400 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl cursor-not-allowed">Unavailable</button>`
-                    }
-                </div>
-            </div>
-            <a href="${productHref}"${productTarget} ${productAnchorAttrs} class="block mt-4 space-y-1 ${available ? '' : 'cursor-not-allowed opacity-70'}">
-                ${categoryTag}
-                <h3 class="text-sm font-medium text-gray-900 leading-snug line-clamp-2">${escapeHTML(product.name)}</h3>
-                <div class="pt-0.5">
-                    ${priceBlock}
-                </div>
-            </a>
-        </div>
-    `;
+    var groups = [];
+    var leftWrap = document.createElement('div');
+    leftWrap.className = 'absolute top-3 left-3 z-10 flex flex-col gap-2';
+    var rightWrap = document.createElement('div');
+    rightWrap.className = 'absolute top-3 right-3 z-10 flex flex-col gap-2 items-end';
+
+    if (product.isNew) {
+        leftWrap.appendChild(createBadge(
+            'New',
+            'badge-new',
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.09 6.26L20.18 9l-5.09 3.74L16.18 19 12 15.27 7.82 19l1.09-6.26L3.82 9l6.09-.74z"/></svg>'
+        ));
+    }
+
+    if (product.isBestSeller) {
+        rightWrap.appendChild(createBadge(
+            'Best seller',
+            'badge-bestseller',
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+        ));
+    }
+
+    if (product.hasDiscount && product.discountPercentage) {
+        if (leftWrap.childNodes.length === 0) leftWrap.appendChild(createBadge(product.discountPercentage, 'badge-discount'));
+        else rightWrap.appendChild(createBadge(product.discountPercentage, 'badge-discount'));
+    }
+
+    if (leftWrap.childNodes.length > 0) groups.push(leftWrap);
+    if (rightWrap.childNodes.length > 0) groups.push(rightWrap);
+    return groups;
+}
+
+function createProductCard(product) {
+    var available = product.hasOwnProperty('available') ? !!product.available : true;
+    var productHref = available ? (product.url || '#') : 'javascript:void(0)';
+    var fallbackImage = buildProductFallbackImage();
+
+    var card = document.createElement('div');
+    card.className = 'product-item group opacity-0 translate-y-6';
+
+    var media = document.createElement('div');
+    media.className = 'relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]';
+
+    var imageLink = document.createElement('a');
+    imageLink.href = productHref;
+    imageLink.className = 'block w-full h-full' + (available ? '' : ' cursor-not-allowed opacity-70');
+    if (available) {
+        imageLink.target = '_blank';
+        imageLink.rel = 'noopener noreferrer';
+    } else {
+        imageLink.addEventListener('click', function (event) {
+            event.preventDefault();
+        });
+    }
+
+    buildProductBadgeGroups(product, available).forEach(function (group) {
+        imageLink.appendChild(group);
+    });
+
+    var primaryImage = document.createElement('img');
+    primaryImage.src = product.image1 || fallbackImage;
+    primaryImage.alt = product.name || 'Product';
+    primaryImage.className = 'product-img w-full h-full object-cover block group-hover:opacity-0 transition-opacity duration-500';
+    primaryImage.onerror = function () {
+        primaryImage.src = fallbackImage;
+    };
+
+    var hoverImage = document.createElement('img');
+    hoverImage.src = product.image2 || product.image1 || fallbackImage;
+    hoverImage.alt = product.name || 'Product';
+    hoverImage.className = 'product-img absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500';
+    hoverImage.style.pointerEvents = 'none';
+    hoverImage.onerror = function () {
+        hoverImage.src = primaryImage.src;
+    };
+
+    imageLink.appendChild(primaryImage);
+    imageLink.appendChild(hoverImage);
+    media.appendChild(imageLink);
+
+    var quickAddWrap = document.createElement('div');
+    quickAddWrap.className = 'absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20';
+
+    var quickAddButton = document.createElement('button');
+    quickAddButton.type = 'button';
+
+    if (available) {
+        quickAddButton.dataset.productId = product.id;
+        quickAddButton.dataset.productName = product.name || '';
+        quickAddButton.dataset.productSaleprice = product.salePrice || 'Rp0';
+        quickAddButton.dataset.productImage = product.image1 || '';
+        quickAddButton.className = 'add-to-cart-btn w-full text-center bg-white text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl shadow-lg hover:bg-gray-900 hover:text-white transition-colors duration-200';
+        quickAddButton.textContent = 'Add to cart';
+    } else {
+        quickAddButton.disabled = true;
+        quickAddButton.className = 'w-full text-center bg-gray-200 text-gray-400 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl cursor-not-allowed';
+        quickAddButton.textContent = 'Unavailable';
+    }
+
+    quickAddWrap.appendChild(quickAddButton);
+    media.appendChild(quickAddWrap);
+
+    var contentLink = document.createElement('a');
+    contentLink.href = productHref;
+    contentLink.className = 'block mt-4 space-y-1' + (available ? '' : ' cursor-not-allowed opacity-70');
+    if (available) {
+        contentLink.target = '_blank';
+        contentLink.rel = 'noopener noreferrer';
+    } else {
+        contentLink.addEventListener('click', function (event) {
+            event.preventDefault();
+        });
+    }
+
+    if (product.category) {
+        var category = document.createElement('span');
+        category.className = 'text-[11px] uppercase tracking-wider text-gray-400 font-medium';
+        category.textContent = product.category;
+        contentLink.appendChild(category);
+    }
+
+    var title = document.createElement('h3');
+    title.className = 'text-sm font-medium text-gray-900 leading-snug line-clamp-2';
+    title.textContent = product.name || 'Product';
+    contentLink.appendChild(title);
+
+    var priceWrap = document.createElement('div');
+    priceWrap.className = 'pt-0.5';
+
+    if (product.hasDiscount) {
+        var priceRow = document.createElement('div');
+        priceRow.className = 'flex items-baseline gap-2';
+
+        var salePrice = document.createElement('span');
+        salePrice.className = 'text-base font-bold text-gray-900';
+        salePrice.textContent = product.salePrice || 'Rp0';
+
+        var originalPrice = document.createElement('span');
+        originalPrice.className = 'text-xs line-through text-gray-400';
+        originalPrice.textContent = product.originalPrice || '';
+
+        priceRow.appendChild(salePrice);
+        priceRow.appendChild(originalPrice);
+        priceWrap.appendChild(priceRow);
+    } else {
+        var priceOnly = document.createElement('div');
+        priceOnly.className = 'text-base font-bold text-gray-900';
+        priceOnly.textContent = product.salePrice || 'Rp0';
+        priceWrap.appendChild(priceOnly);
+    }
+
+    contentLink.appendChild(priceWrap);
+
+    card.appendChild(media);
+    card.appendChild(contentLink);
+    return card;
 }
 
 function clearProducts() {
@@ -192,9 +304,7 @@ function loadProducts() {
 
     container.innerHTML = '';
     filteredProducts.forEach(product => {
-        const productElement = document.createElement('div');
-        productElement.innerHTML = createProductHTML(product);
-        container.appendChild(productElement.firstElementChild);
+        container.appendChild(createProductCard(product));
     });
 
     // Animate new products with stagger
@@ -232,35 +342,79 @@ function searchProducts(query) {
     }
 }
 
-function toggleSearchInput() {
+function setSearchExpanded(isOpen) {
     const searchInput = document.getElementById('search-input');
     const clearBtn = document.getElementById('clear-search-btn');
 
     if (!searchInput) return;
 
-    if (searchInput.classList.contains('w-0')) {
-        searchInput.classList.remove('w-0', 'opacity-0');
+    searchInput.dataset.open = isOpen ? 'true' : 'false';
+
+    if (isOpen) {
+        searchInput.classList.remove('w-0', 'opacity-0', 'px-0', 'py-0');
         searchInput.classList.add('w-64', 'opacity-100');
-        if (clearBtn) clearBtn.classList.remove('opacity-0');
-        setTimeout(() => searchInput.focus(), 300);
+        if (clearBtn) clearBtn.classList.toggle('opacity-0', searchInput.value.trim() === '');
+        return;
+    }
+
+    searchInput.classList.add('w-0', 'opacity-0', 'px-0', 'py-0');
+    searchInput.classList.remove('w-64', 'opacity-100');
+    if (clearBtn) clearBtn.classList.add('opacity-0');
+}
+
+function toggleSearchInput() {
+    const searchInput = document.getElementById('search-input');
+
+    if (!searchInput) return;
+
+    const isCollapsed = searchInput.dataset.open !== 'true';
+
+    if (isCollapsed) {
+        setSearchExpanded(true);
+        setTimeout(() => searchInput.focus(), 250);
     } else if (searchInput.value.trim() === '') {
-        searchInput.classList.add('w-0', 'opacity-0');
-        searchInput.classList.remove('w-64', 'opacity-100');
-        if (clearBtn) clearBtn.classList.add('opacity-0');
+        setSearchExpanded(false);
     }
 }
 
 function clearSearch() {
     const searchInput = document.getElementById('search-input');
-    const clearBtn = document.getElementById('clear-search-btn');
 
     if (!searchInput) return;
 
     searchInput.value = '';
-    searchInput.classList.add('w-0', 'opacity-0');
-    searchInput.classList.remove('w-64', 'opacity-100');
-    if (clearBtn) clearBtn.classList.add('opacity-0');
-
     searchProducts('');
+    setSearchExpanded(false);
 }
 
+function syncSearchClearButton() {
+    const searchInput = document.getElementById('search-input');
+    const clearBtn = document.getElementById('clear-search-btn');
+
+    if (!searchInput || !clearBtn) return;
+
+    if (searchInput.dataset.open !== 'true') {
+        clearBtn.classList.add('opacity-0');
+        return;
+    }
+
+    clearBtn.classList.toggle('opacity-0', searchInput.value.trim() === '');
+}
+
+document.addEventListener('click', function (event) {
+    const searchWrap = document.querySelector('.navbar-search-wrap');
+    const searchInput = document.getElementById('search-input');
+
+    if (!searchWrap || !searchInput) return;
+    if (searchWrap.contains(event.target)) return;
+    if (searchInput.dataset.open !== 'true') return;
+    if (searchInput.value.trim() !== '') return;
+
+    setSearchExpanded(false);
+});
+
+document.addEventListener('input', function (event) {
+    if (event.target && event.target.id === 'search-input') {
+        syncSearchClearButton();
+    }
+});

@@ -13,6 +13,46 @@
         }
     }
 
+    function showToast(message, type) {
+        if (window.auth && typeof window.auth.showToast === 'function') {
+            window.auth.showToast(message, type);
+        }
+    }
+
+    function setAdminMessage(message, type, actions) {
+        var node = qs('admin-msg');
+        if (!node) return;
+
+        node.innerHTML = '';
+        node.className = 'mb-4 text-sm font-medium';
+
+        if (!message) {
+            return;
+        }
+
+        node.classList.add(type === 'error' ? 'text-rose-600' : 'text-slate-600');
+
+        var text = document.createElement('span');
+        text.textContent = message;
+        node.appendChild(text);
+
+        if (Array.isArray(actions) && actions.length > 0) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mt-3 flex flex-wrap gap-2';
+
+            actions.forEach(function (action) {
+                var button = document.createElement('button');
+                button.type = 'button';
+                button.className = action.className || 'rounded-xl border px-3 py-2 text-sm';
+                button.textContent = action.label;
+                button.addEventListener('click', action.onClick);
+                wrap.appendChild(button);
+            });
+
+            node.appendChild(wrap);
+        }
+    }
+
     // ---------- Image upload helpers ----------
 
     function setupImageInput(inputId) {
@@ -98,7 +138,7 @@
         var button = document.createElement('button');
         button.id = 'admin-btn';
         button.textContent = 'Admin';
-        button.className = 'ml-2 bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-50 hidden';
+        button.className = 'navbar-pill ml-2 hidden';
         authButton.insertAdjacentElement('afterend', button);
         button.addEventListener('click', toggleAdminPanel);
     }
@@ -350,10 +390,6 @@
         return product.image1 || product.image2 || '';
     }
 
-    function getImageMarkup(src) {
-        return '<img src="' + src + '" alt="" class="w-12 h-12 object-cover rounded" onerror="this.style.display=\'none\'">';
-    }
-
     function fillAdminForm(product, productId) {
         qs('p-name').value = product.name || '';
         qs('p-original').value = product.originalPrice || '';
@@ -394,18 +430,54 @@
         products.forEach(function (product) {
             var item = document.createElement('div');
             item.className = 'p-2 border rounded flex items-center justify-between gap-2';
-            item.innerHTML = '\
-                <div class="flex items-center gap-3">\
-                    ' + getImageMarkup(getAdminThumbnail(product)) + '\
-                    <div class="text-sm">\
-                        <div class="font-semibold">' + escapeHTML(product.name) + '</div>\
-                        <div class="text-xs text-gray-500">' + escapeHTML(product.salePrice || '') + '</div>\
-                    </div>\
-                </div>\
-                <div class="flex items-center gap-2">\
-                    <button data-id="' + product.id + '" class="admin-edit text-sm px-2 py-1 border rounded">Edit</button>\
-                    <button data-id="' + product.id + '" class="admin-delete text-sm px-2 py-1 bg-red-500 text-white rounded">Delete</button>\
-                </div>';
+
+            var left = document.createElement('div');
+            left.className = 'flex items-center gap-3';
+
+            var thumbnail = document.createElement('img');
+            thumbnail.className = 'w-12 h-12 object-cover rounded';
+            thumbnail.alt = '';
+            thumbnail.src = getAdminThumbnail(product) || '';
+            thumbnail.onerror = function () {
+                thumbnail.style.display = 'none';
+            };
+
+            var text = document.createElement('div');
+            text.className = 'text-sm';
+
+            var name = document.createElement('div');
+            name.className = 'font-semibold';
+            name.textContent = product.name || '';
+
+            var price = document.createElement('div');
+            price.className = 'text-xs text-gray-500';
+            price.textContent = product.salePrice || '';
+
+            text.appendChild(name);
+            text.appendChild(price);
+            left.appendChild(thumbnail);
+            left.appendChild(text);
+
+            var actions = document.createElement('div');
+            actions.className = 'flex items-center gap-2';
+
+            var editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.dataset.id = product.id;
+            editButton.className = 'admin-edit text-sm px-2 py-1 border rounded';
+            editButton.textContent = 'Edit';
+
+            var deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.dataset.id = product.id;
+            deleteButton.className = 'admin-delete text-sm px-2 py-1 bg-red-500 text-white rounded';
+            deleteButton.textContent = 'Delete';
+
+            actions.appendChild(editButton);
+            actions.appendChild(deleteButton);
+
+            item.appendChild(left);
+            item.appendChild(actions);
             list.appendChild(item);
         });
 
@@ -425,12 +497,28 @@
         list.querySelectorAll('.admin-delete').forEach(function (button) {
             button.addEventListener('click', function () {
                 var productId = button.getAttribute('data-id');
-                if (!confirm('Delete this product?')) {
-                    return;
-                }
-                Promise.resolve(window.productStore.deleteProduct(productId)).then(function () {
-                    renderAdminList();
-                });
+                setAdminMessage('Hapus produk ini?', 'error', [
+                    {
+                        label: 'Ya, hapus',
+                        className: 'rounded-xl bg-rose-600 px-3 py-2 text-sm font-semibold text-white',
+                        onClick: function () {
+                            Promise.resolve(window.productStore.deleteProduct(productId)).then(function () {
+                                setAdminMessage('');
+                                renderAdminList();
+                                showToast('Produk berhasil dihapus.', 'success');
+                            }).catch(function (error) {
+                                setAdminMessage('Gagal menghapus produk: ' + (error.message || error), 'error');
+                            });
+                        }
+                    },
+                    {
+                        label: 'Batal',
+                        className: 'rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600',
+                        onClick: function () {
+                            setAdminMessage('');
+                        }
+                    }
+                ]);
             });
         });
     }
@@ -468,15 +556,39 @@
                 var item = document.createElement('div');
                 item.className = 'p-2 border rounded flex items-center justify-between gap-2';
                 var date = order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '';
-                item.innerHTML = '\
-                    <div class="text-sm">\
-                        <div class="font-semibold">' + escapeHTML(order.id) + '</div>\
-                        <div class="text-xs text-gray-500">' + escapeHTML((order.user && (order.user.name || order.user.email)) || 'Guest') + ' \u2014 ' + escapeHTML(date) + '</div>\
-                    </div>\
-                    <div class="flex items-center gap-2">\
-                        <div class="text-sm font-medium">Rp' + (order.total || 0).toLocaleString('id-ID') + '</div>\
-                        <button data-id="' + order.id + '" class="admin-view-order text-sm px-2 py-1 border rounded">View Details</button>\
-                    </div>';
+
+                var info = document.createElement('div');
+                info.className = 'text-sm';
+
+                var id = document.createElement('div');
+                id.className = 'font-semibold';
+                id.textContent = order.id || '';
+
+                var meta = document.createElement('div');
+                meta.className = 'text-xs text-gray-500';
+                meta.textContent = ((order.user && (order.user.name || order.user.email)) || 'Guest') + ' — ' + date;
+
+                info.appendChild(id);
+                info.appendChild(meta);
+
+                var actions = document.createElement('div');
+                actions.className = 'flex items-center gap-2';
+
+                var total = document.createElement('div');
+                total.className = 'text-sm font-medium';
+                total.textContent = 'Rp' + (order.total || 0).toLocaleString('id-ID');
+
+                var viewButton = document.createElement('button');
+                viewButton.type = 'button';
+                viewButton.dataset.id = order.id;
+                viewButton.className = 'admin-view-order text-sm px-2 py-1 border rounded';
+                viewButton.textContent = 'View Details';
+
+                actions.appendChild(total);
+                actions.appendChild(viewButton);
+
+                item.appendChild(info);
+                item.appendChild(actions);
                 list.appendChild(item);
             });
 
@@ -501,20 +613,50 @@
 
             if (!order) {
                 details.classList.remove('hidden');
-                details.innerHTML = '<div class="text-sm text-red-600">Order not found</div>';
+                details.innerHTML = '';
+                var notFound = document.createElement('div');
+                notFound.className = 'text-sm text-red-600';
+                notFound.textContent = 'Order not found';
+                details.appendChild(notFound);
                 return;
             }
 
-            var lines = [];
-            lines.push('<div class="font-semibold mb-2">Order ' + order.id + '</div>');
-            lines.push('<div class="text-xs text-gray-600 mb-2">' + (order.user ? (order.user.name || order.user.email) : 'Guest') + ' \u2014 ' + (order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '') + '</div>');
-            lines.push('<div class="space-y-1">');
+            details.innerHTML = '';
+
+            var title = document.createElement('div');
+            title.className = 'font-semibold mb-2';
+            title.textContent = 'Order ' + (order.id || '');
+
+            var metaText = document.createElement('div');
+            metaText.className = 'text-xs text-gray-600 mb-2';
+            metaText.textContent = (order.user ? (order.user.name || order.user.email) : 'Guest') + ' — ' + (order.createdAt ? new Date(order.createdAt).toLocaleString('id-ID') : '');
+
+            var itemsWrap = document.createElement('div');
+            itemsWrap.className = 'space-y-1';
+
             (order.items || []).forEach(function (item) {
-                lines.push('<div class="flex justify-between"><div>' + item.name + ' \u00d7 ' + item.quantity + '</div><div>' + (item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'))) + '</div></div>');
+                var row = document.createElement('div');
+                row.className = 'flex justify-between gap-3';
+
+                var name = document.createElement('div');
+                name.textContent = (item.name || 'Produk') + ' × ' + (Number(item.quantity) || 0);
+
+                var price = document.createElement('div');
+                price.textContent = item.salePrice || ('Rp' + (Number(item.price) || 0).toLocaleString('id-ID'));
+
+                row.appendChild(name);
+                row.appendChild(price);
+                itemsWrap.appendChild(row);
             });
-            lines.push('</div>');
-            lines.push('<div class="mt-2 font-medium">Total: Rp' + (order.total || 0).toLocaleString('id-ID') + '</div>');
-            details.innerHTML = lines.join('');
+
+            var totalLine = document.createElement('div');
+            totalLine.className = 'mt-2 font-medium';
+            totalLine.textContent = 'Total: Rp' + (order.total || 0).toLocaleString('id-ID');
+
+            details.appendChild(title);
+            details.appendChild(metaText);
+            details.appendChild(itemsWrap);
+            details.appendChild(totalLine);
             details.classList.remove('hidden');
         });
     }
