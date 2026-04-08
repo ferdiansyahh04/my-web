@@ -151,6 +151,27 @@
     transform: translateX(0);
 }
 
+.popup-backdrop {
+    opacity: 0;
+    transition: opacity 220ms ease;
+}
+
+.popup-shell {
+    opacity: 0;
+    transform: translateY(20px) scale(0.985);
+    transition: opacity 240ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity;
+}
+
+.popup-shell.is-open,
+.popup-backdrop.is-open {
+    opacity: 1;
+}
+
+.popup-shell.is-open {
+    transform: translateY(0) scale(1);
+}
+
 .auth-shell {
     background:
         radial-gradient(circle at top left, rgba(59, 130, 246, 0.28), transparent 34%),

@@ -162,35 +162,75 @@
         button.classList.toggle('hidden', !cachedUser);
     }
 
+    function refreshAOS() {
+        try {
+            if (window.AOS && typeof window.AOS.refreshHard === 'function') window.AOS.refreshHard();
+            else if (window.AOS && typeof window.AOS.refresh === 'function') window.AOS.refresh();
+        } catch (error) {
+            // ignore
+        }
+    }
+
+    function animatePopupOpen(modalId, backdropId, shellId) {
+        var modal = qs(modalId);
+        var backdrop = qs(backdropId);
+        var shell = qs(shellId);
+        if (!modal || !backdrop || !shell) return;
+
+        modal.classList.remove('hidden');
+        backdrop.classList.remove('is-open');
+        shell.classList.remove('is-open');
+
+        requestAnimationFrame(function () {
+            backdrop.classList.add('is-open');
+            shell.classList.add('is-open');
+            refreshAOS();
+        });
+    }
+
+    function animatePopupClose(modalId, backdropId, shellId) {
+        var modal = qs(modalId);
+        var backdrop = qs(backdropId);
+        var shell = qs(shellId);
+        if (!modal || !backdrop || !shell) return;
+
+        backdrop.classList.remove('is-open');
+        shell.classList.remove('is-open');
+
+        setTimeout(function () {
+            modal.classList.add('hidden');
+        }, 240);
+    }
+
     function createAuthModal() {
         if (qs('auth-modal')) return;
 
         var html = '\
         <div id="auth-modal" class="fixed inset-0 z-[1200] hidden">\
-          <div id="auth-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>\
+          <div id="auth-backdrop" class="popup-backdrop absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>\
           <div class="relative min-h-screen flex items-center justify-center p-4 md:p-8">\
-            <div class="auth-shell relative w-full max-w-5xl overflow-hidden rounded-[2rem] shadow-2xl">\
+            <div id="auth-shell" data-aos="zoom-in-up" data-aos-duration="420" class="popup-shell auth-shell relative w-full max-w-5xl overflow-hidden rounded-[2rem] shadow-2xl">\
               <button id="auth-close" class="absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-950" aria-label="Close auth modal">&times;</button>\
               <div class="grid md:grid-cols-[1.05fr_0.95fr]">\
-                <div class="auth-panel-brand relative px-8 py-10 md:px-12 md:py-14">\
+                <div data-aos="fade-right" data-aos-delay="60" class="auth-panel-brand relative px-8 py-10 md:px-12 md:py-14">\
                   <div class="auth-brand-badge">VOLTX STORE</div>\
                   <div class="mt-10 max-w-md">\
-                    <p class="auth-kicker">Member access</p>\
-                    <h2 class="mt-3 text-4xl font-black leading-tight text-white md:text-5xl">Upgrade your setup,<br>then keep it saved.</h2>\
-                    <p class="mt-5 text-sm leading-6 text-slate-200 md:text-base">Sign in to track orders, save your cart, and access premium drops built for your desk and gaming setup.</p>\
+                    <p data-aos="fade-up" data-aos-delay="110" class="auth-kicker">Member access</p>\
+                    <h2 data-aos="fade-up" data-aos-delay="160" class="mt-3 text-4xl font-black leading-tight text-white md:text-5xl">Upgrade your setup,<br>then keep it saved.</h2>\
+                    <p data-aos="fade-up" data-aos-delay="220" class="mt-5 text-sm leading-6 text-slate-200 md:text-base">Sign in to track orders, save your cart, and access premium drops built for your desk and gaming setup.</p>\
                   </div>\
                   <div class="auth-feature-list mt-10 space-y-4 text-sm text-slate-100">\
-                    <div class="auth-feature-item">Fast checkout with your saved session</div>\
-                    <div class="auth-feature-item">Access order history and account details</div>\
-                    <div class="auth-feature-item">Member-only promos and early product drops</div>\
+                    <div data-aos="fade-up" data-aos-delay="260" class="auth-feature-item">Fast checkout with your saved session</div>\
+                    <div data-aos="fade-up" data-aos-delay="320" class="auth-feature-item">Access order history and account details</div>\
+                    <div data-aos="fade-up" data-aos-delay="380" class="auth-feature-item">Member-only promos and early product drops</div>\
                   </div>\
                 </div>\
-                <div class="auth-panel-form bg-white px-6 py-8 md:px-10 md:py-12">\
+                <div data-aos="fade-left" data-aos-delay="90" class="auth-panel-form bg-white px-6 py-8 md:px-10 md:py-12">\
                   <div class="mx-auto w-full max-w-md">\
-                    <p class="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">Authentication</p>\
-                    <h3 id="auth-title" class="mt-2 text-3xl font-black tracking-tight text-slate-900">Welcome back</h3>\
-                    <p id="auth-subtitle" class="mt-2 text-sm text-slate-500">Use your account to continue shopping.</p>\
-                    <div class="auth-tab-row mt-8 grid grid-cols-2 rounded-full bg-slate-100 p-1">\
+                    <p data-aos="fade-up" data-aos-delay="150" class="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">Authentication</p>\
+                    <h3 id="auth-title" data-aos="fade-up" data-aos-delay="200" class="mt-2 text-3xl font-black tracking-tight text-slate-900">Welcome back</h3>\
+                    <p id="auth-subtitle" data-aos="fade-up" data-aos-delay="250" class="mt-2 text-sm text-slate-500">Use your account to continue shopping.</p>\
+                    <div data-aos="fade-up" data-aos-delay="300" class="auth-tab-row mt-8 grid grid-cols-2 rounded-full bg-slate-100 p-1">\
                       <button type="button" id="show-login" class="auth-tab active rounded-full px-4 py-3 text-sm font-semibold">Sign in</button>\
                       <button type="button" id="show-register" class="auth-tab rounded-full px-4 py-3 text-sm font-semibold">Create account</button>\
                     </div>\
@@ -248,9 +288,9 @@
 
         var html = '\
         <div id="account-modal" class="fixed inset-0 z-[1190] hidden">\
-          <div id="account-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
+          <div id="account-backdrop" class="popup-backdrop absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
           <div class="relative flex min-h-screen items-start justify-center p-4 md:p-8">\
-            <div class="account-shell mt-16 flex w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
+            <div id="account-shell" data-aos="fade-up" data-aos-duration="420" class="popup-shell account-shell mt-16 flex w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
               <div class="flex flex-shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 md:px-8">\
                 <div>\
                   <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Akun Saya</p>\
@@ -436,14 +476,13 @@
         if (userEmail) userEmail.textContent = (cachedUser && cachedUser.email) || '';
 
         setAccountStatus('', '');
-        if (modal) modal.classList.remove('hidden');
+        animatePopupOpen('account-modal', 'account-backdrop', 'account-shell');
         document.body.style.overflow = 'hidden';
         loadAccountOrders();
     }
 
     function closeAccountModal() {
-        var modal = qs('account-modal');
-        if (modal) modal.classList.add('hidden');
+        animatePopupClose('account-modal', 'account-backdrop', 'account-shell');
         document.body.style.overflow = 'auto';
     }
 
@@ -581,13 +620,11 @@
         clearLoginErrors();
         clearRegisterErrors();
 
-        var modal = qs('auth-modal');
-        if (modal) modal.classList.remove('hidden');
+        animatePopupOpen('auth-modal', 'auth-backdrop', 'auth-shell');
     }
 
     function closeAuthModal() {
-        var modal = qs('auth-modal');
-        if (modal) modal.classList.add('hidden');
+        animatePopupClose('auth-modal', 'auth-backdrop', 'auth-shell');
     }
 
     async function registerUser(payload) {

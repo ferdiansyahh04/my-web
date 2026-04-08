@@ -19,6 +19,46 @@
         }
     }
 
+    function refreshAOS() {
+        try {
+            if (window.AOS && typeof window.AOS.refreshHard === 'function') window.AOS.refreshHard();
+            else if (window.AOS && typeof window.AOS.refresh === 'function') window.AOS.refresh();
+        } catch (error) {
+            // ignore
+        }
+    }
+
+    function animateAdminOpen() {
+        var panel = qs('admin-panel');
+        var backdrop = qs('admin-backdrop');
+        var shell = qs('admin-shell');
+        if (!panel || !backdrop || !shell) return;
+
+        panel.classList.remove('hidden');
+        backdrop.classList.remove('is-open');
+        shell.classList.remove('is-open');
+
+        requestAnimationFrame(function () {
+            backdrop.classList.add('is-open');
+            shell.classList.add('is-open');
+            refreshAOS();
+        });
+    }
+
+    function animateAdminClose() {
+        var panel = qs('admin-panel');
+        var backdrop = qs('admin-backdrop');
+        var shell = qs('admin-shell');
+        if (!panel || !backdrop || !shell) return;
+
+        backdrop.classList.remove('is-open');
+        shell.classList.remove('is-open');
+
+        setTimeout(function () {
+            panel.classList.add('hidden');
+        }, 240);
+    }
+
     function setAdminMessage(message, type, actions) {
         var node = qs('admin-msg');
         if (!node) return;
@@ -150,9 +190,9 @@
 
         var html = '\
         <div id="admin-panel" class="fixed inset-0 z-[1185] hidden">\
-            <div id="admin-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
+            <div id="admin-backdrop" class="popup-backdrop absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
             <div class="relative flex min-h-screen items-start justify-center p-4 md:p-8">\
-                <div class="admin-shell mt-16 flex w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
+                <div id="admin-shell" data-aos="zoom-in-up" data-aos-duration="420" class="popup-shell admin-shell mt-16 flex w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
                     <div class="flex flex-shrink-0 flex-col gap-4 border-b border-slate-200 px-6 py-5 md:flex-row md:items-start md:justify-between md:px-8">\
                         <div>\
                             <div class="flex items-center gap-3">\
@@ -272,11 +312,10 @@
     }
 
     function openAdminPanel() {
-        var panel = qs('admin-panel');
-        if (!panel) {
+        if (!qs('admin-panel')) {
             return;
         }
-        panel.classList.remove('hidden');
+        animateAdminOpen();
         document.body.style.overflow = 'hidden';
         renderAdminList();
         renderOrdersList();
@@ -284,10 +323,8 @@
     }
 
     function closeAdminPanel() {
-        var panel = qs('admin-panel');
-        if (panel) {
-            panel.classList.add('hidden');
-        }
+        if (!qs('admin-panel')) return;
+        animateAdminClose();
         document.body.style.overflow = 'auto';
     }
 
