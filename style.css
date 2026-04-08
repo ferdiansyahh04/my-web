@@ -177,6 +177,9 @@
         radial-gradient(circle at top left, rgba(59, 130, 246, 0.28), transparent 34%),
         radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.18), transparent 30%),
         #0f172a;
+    max-height: min(92vh, 58rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .auth-panel-brand {
@@ -339,7 +342,29 @@
 
 @media (max-width: 768px) {
     .auth-shell {
+        max-height: min(92dvh, 44rem);
         border-radius: 1.5rem;
+        background: #ffffff;
+    }
+
+    .auth-panel-brand {
+        display: none;
+    }
+
+    .auth-panel-form {
+        min-height: auto;
+        padding: 1.5rem 1.25rem 1.75rem !important;
+    }
+
+    #auth-shell .grid {
+        display: block;
+    }
+
+    #auth-close {
+        right: 1rem;
+        top: 1rem;
+        height: 2.75rem;
+        width: 2.75rem;
     }
 
     .account-shell {
@@ -352,6 +377,14 @@
         margin-top: 3.5rem;
         max-height: calc(100vh - 5rem);
         border-radius: 1.5rem;
+    }
+}
+
+@media (max-height: 780px) {
+    .auth-shell,
+    .account-shell,
+    .admin-shell {
+        max-height: calc(100vh - 2rem);
     }
 }
 
