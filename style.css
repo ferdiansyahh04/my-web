@@ -151,6 +151,86 @@
     transform: translateX(0);
 }
 
+.auth-shell {
+    background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.28), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.18), transparent 30%),
+        #0f172a;
+}
+
+.auth-panel-brand {
+    background:
+        linear-gradient(160deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.95)),
+        url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+}
+
+.auth-panel-brand::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0.72)),
+        linear-gradient(135deg, rgba(59, 130, 246, 0.26), transparent 40%);
+    pointer-events: none;
+}
+
+.auth-panel-brand > * {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+}
+
+.auth-kicker {
+    color: #bfdbfe;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.auth-feature-item {
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+}
+
+.auth-tab {
+    color: #64748b;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-tab.active {
+    background: #0f172a;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+}
+
+.auth-input {
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.auth-input:focus {
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+
 /* Admin panel: ensure it overlays header/cart and is scrollable within viewport */
 #admin-panel {
     z-index: 1102;
@@ -167,6 +247,10 @@
         top: 56px;
         border-radius: 0;
         max-height: calc(100vh - 56px);
+    }
+
+    .auth-shell {
+        border-radius: 1.5rem;
     }
 }
 
