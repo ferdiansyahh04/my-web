@@ -299,8 +299,8 @@
 }
 
 .account-shell {
-    max-height: calc(100vh - 7rem);
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -328,7 +328,6 @@
 
     .account-shell {
         margin-top: 3.5rem;
-        max-height: calc(100vh - 5rem);
         border-radius: 1.5rem;
     }
 }

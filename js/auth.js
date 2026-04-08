@@ -248,9 +248,9 @@
         if (qs('account-modal')) return;
 
         var html = '\
-        <div id="account-modal" class="fixed inset-0 z-[1190] hidden">\
+        <div id="account-modal" class="fixed inset-0 z-[1190] hidden overflow-y-auto">\
           <div id="account-backdrop" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
-          <div class="relative min-h-screen flex items-start justify-center p-4 md:p-8">\
+          <div class="relative flex min-h-full items-start justify-center p-4 md:p-8">\
             <div class="account-shell mt-16 w-full max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
               <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 md:px-8">\
                 <div>\
@@ -438,12 +438,14 @@
 
         setAccountStatus('', '');
         if (modal) modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
         loadAccountOrders();
     }
 
     function closeAccountModal() {
         var modal = qs('account-modal');
         if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 
     function createAccountMetaBadge(label) {
