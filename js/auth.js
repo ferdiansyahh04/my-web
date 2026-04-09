@@ -144,24 +144,35 @@
 
     function updateAuthButton() {
         var button = qs('auth-btn');
+        var mobileButton = qs('mobile-auth-btn');
         if (!button) return;
 
         button.className = 'navbar-pill ml-2';
         var compactMobile = window.innerWidth <= 640;
+        var label = 'Login';
 
         if (cachedUser) {
-            button.textContent = compactMobile ? 'Akun' : (cachedUser.name || cachedUser.email || 'Account');
-        } else {
-            button.textContent = 'Login';
+            label = compactMobile ? 'Akun' : (cachedUser.name || cachedUser.email || 'Account');
+        }
+
+        button.textContent = label;
+
+        if (mobileButton) {
+            mobileButton.textContent = cachedUser ? 'Akun Saya' : 'Login';
         }
     }
 
     function updateLogoutButton() {
         var button = qs('logout-btn');
+        var mobileButton = qs('mobile-logout-btn');
         if (!button) return;
         button.className = 'navbar-pill' + (!cachedUser ? ' hidden' : '');
         button.textContent = window.innerWidth <= 640 ? 'Keluar' : 'Logout';
         button.classList.toggle('hidden', !cachedUser);
+        if (mobileButton) {
+            mobileButton.textContent = 'Keluar';
+            mobileButton.classList.toggle('hidden', !cachedUser);
+        }
     }
 
     function refreshAOS() {

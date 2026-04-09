@@ -721,6 +721,7 @@
 
     async function refreshAdminVisibility() {
         var adminButton = qs('admin-btn');
+        var mobileAdminButton = qs('mobile-admin-btn');
         if (!adminButton) {
             return;
         }
@@ -730,6 +731,11 @@
             adminButton.classList.remove('hidden');
         } else {
             adminButton.classList.add('hidden');
+            closeAdminPanel();
+        }
+
+        if (mobileAdminButton) {
+            mobileAdminButton.classList.toggle('hidden', !isAdmin);
         }
     }
 

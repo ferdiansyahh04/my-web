@@ -83,6 +83,32 @@
                 </button>
                 <button id="auth-btn" class="navbar-pill ml-2">Login</button>
                 <button id="logout-btn" class="navbar-pill hidden">Logout</button>
+                <button id="mobile-menu-toggle" class="mobile-menu-toggle hidden" type="button" aria-label="Buka menu" aria-expanded="false">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M4 7h16"></path>
+                        <path d="M4 12h16"></path>
+                        <path d="M4 17h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-nav-menu" class="mobile-nav-menu hidden" aria-hidden="true">
+            <div class="container mx-auto px-4">
+                <div class="mobile-nav-card">
+                    <div class="mobile-nav-search">
+                        <input id="mobile-search-input" type="text" placeholder="Cari produk..." class="mobile-nav-search-input" />
+                        <button id="mobile-clear-search-btn" type="button" class="mobile-nav-search-clear hidden" aria-label="Hapus pencarian">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6l-12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mobile-nav-actions">
+                        <button id="mobile-auth-btn" type="button" class="mobile-nav-action">Login</button>
+                        <button id="mobile-admin-btn" type="button" class="mobile-nav-action hidden">Admin</button>
+                        <button id="mobile-logout-btn" type="button" class="mobile-nav-action hidden">Keluar</button>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
