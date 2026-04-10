@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.classList.toggle('hidden', !isOpen);
         mobileMenu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
         mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        document.body.classList.toggle('mobile-menu-open', isOpen && window.innerWidth <= 640);
     }
 
     function syncMobileSearchState() {
@@ -130,6 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mobileMenu.classList.contains('hidden')) return;
         if (mobileMenu.contains(event.target) || mobileMenuToggle.contains(event.target)) return;
         setMobileMenuOpen(false);
+    });
+
+    mobileMenu?.addEventListener('click', event => {
+        if (event.target.closest('a[href^="#"]')) {
+            setMobileMenuOpen(false);
+        }
     });
 
     document.addEventListener('keydown', event => {
