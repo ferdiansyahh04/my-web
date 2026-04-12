@@ -12,6 +12,12 @@ body {
     overflow-x: hidden;
 }
 
+body.scroll-locked {
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+}
+
 .cart-count {
     position: absolute;
     top: -8px;
@@ -1209,7 +1215,7 @@ body {
     }
 
     body.mobile-menu-open {
-        overflow: hidden;
+        overscroll-behavior: none;
     }
 
     .mobile-nav-menu {

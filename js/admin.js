@@ -316,7 +316,9 @@
             return;
         }
         animateAdminOpen();
-        document.body.style.overflow = 'hidden';
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.lock === 'function') {
+            window.bodyScrollLock.lock('admin-panel');
+        }
         renderAdminList();
         renderOrdersList();
         activateAdminTab('products');
@@ -325,7 +327,9 @@
     function closeAdminPanel() {
         if (!qs('admin-panel')) return;
         animateAdminClose();
-        document.body.style.overflow = 'auto';
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.unlock === 'function') {
+            window.bodyScrollLock.unlock('admin-panel');
+        }
     }
 
     function clearAdminForm() {

@@ -490,13 +490,17 @@
 
         setAccountStatus('', '');
         animatePopupOpen('account-modal', 'account-backdrop', 'account-shell');
-        document.body.style.overflow = 'hidden';
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.lock === 'function') {
+            window.bodyScrollLock.lock('account-modal');
+        }
         loadAccountOrders();
     }
 
     function closeAccountModal() {
         animatePopupClose('account-modal', 'account-backdrop', 'account-shell');
-        document.body.style.overflow = 'auto';
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.unlock === 'function') {
+            window.bodyScrollLock.unlock('account-modal');
+        }
     }
 
     function createAccountMetaBadge(label) {

@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
         mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         document.body.classList.toggle('mobile-menu-open', isOpen && window.innerWidth <= 640);
+        if (window.bodyScrollLock && typeof window.bodyScrollLock[isOpen ? 'lock' : 'unlock'] === 'function') {
+            window.bodyScrollLock[isOpen ? 'lock' : 'unlock']('mobile-menu');
+        }
     }
 
     function syncMobileSearchState() {

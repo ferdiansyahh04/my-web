@@ -3,6 +3,31 @@
         return document.getElementById(id);
     }
 
+    var activeBodyLocks = new Set();
+
+    function applyBodyLockState() {
+        document.body.classList.toggle('scroll-locked', activeBodyLocks.size > 0);
+    }
+
+    function lockBodyScroll(lockId) {
+        activeBodyLocks.add(lockId || 'default');
+        applyBodyLockState();
+    }
+
+    function unlockBodyScroll(lockId) {
+        if (lockId) {
+            activeBodyLocks.delete(lockId);
+        } else {
+            activeBodyLocks.clear();
+        }
+        applyBodyLockState();
+    }
+
+    window.bodyScrollLock = {
+        lock: lockBodyScroll,
+        unlock: unlockBodyScroll
+    };
+
     function buildFallbackImage() {
         return "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2210%22 fill=%22%23999%22>Product</text></svg>";
     }
@@ -124,7 +149,7 @@
         var overlay = qs('cart-overlay');
         if (sidebar) sidebar.classList.add('open');
         if (overlay) overlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
+        lockBodyScroll('cart');
     }
 
     function closeCart() {
@@ -132,7 +157,7 @@
         var overlay = qs('cart-overlay');
         if (sidebar) sidebar.classList.remove('open');
         if (overlay) overlay.classList.remove('open');
-        document.body.style.overflow = 'auto';
+        unlockBodyScroll('cart');
     }
 
     function showAddToCartNotification(productName) {
