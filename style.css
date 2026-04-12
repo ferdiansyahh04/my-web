@@ -472,10 +472,13 @@ body.scroll-locked {
 }
 
 #header {
+    position: fixed;
+    left: 0;
+    right: 0;
     top: var(--top-banner-height);
     background: transparent;
     box-shadow: none;
-    margin-bottom: -5.75rem;
+    margin-bottom: 0;
     pointer-events: none;
 }
 
@@ -1221,7 +1224,7 @@ body.scroll-locked {
     }
 
     #header {
-        margin-bottom: calc(-1 * var(--mobile-header-overlap));
+        margin-bottom: 0;
     }
 
     body.mobile-menu-open {
