@@ -638,10 +638,16 @@
         clearRegisterErrors();
 
         animatePopupOpen('auth-modal', 'auth-backdrop', 'auth-shell');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.lock === 'function') {
+            window.bodyScrollLock.lock('auth-modal');
+        }
     }
 
     function closeAuthModal() {
         animatePopupClose('auth-modal', 'auth-backdrop', 'auth-shell');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.unlock === 'function') {
+            window.bodyScrollLock.unlock('auth-modal');
+        }
     }
 
     async function registerUser(payload) {

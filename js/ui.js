@@ -9,6 +9,26 @@
         document.body.classList.toggle('scroll-locked', activeBodyLocks.size > 0);
     }
 
+    function syncBodyLocksFromDom() {
+        activeBodyLocks.clear();
+
+        var mobileMenu = qs('mobile-nav-menu');
+        var cartSidebar = qs('cart-sidebar');
+        var authModal = qs('auth-modal');
+        var accountModal = qs('account-modal');
+        var adminPanel = qs('admin-panel');
+        var isMobileMenuOpen = !!(mobileMenu && !mobileMenu.classList.contains('hidden') && window.innerWidth <= 640);
+
+        if (isMobileMenuOpen) activeBodyLocks.add('mobile-menu');
+        if (cartSidebar && cartSidebar.classList.contains('open')) activeBodyLocks.add('cart');
+        if (authModal && !authModal.classList.contains('hidden')) activeBodyLocks.add('auth-modal');
+        if (accountModal && !accountModal.classList.contains('hidden')) activeBodyLocks.add('account-modal');
+        if (adminPanel && !adminPanel.classList.contains('hidden')) activeBodyLocks.add('admin-panel');
+
+        document.body.classList.toggle('mobile-menu-open', isMobileMenuOpen);
+        applyBodyLockState();
+    }
+
     function lockBodyScroll(lockId) {
         activeBodyLocks.add(lockId || 'default');
         applyBodyLockState();
@@ -25,7 +45,8 @@
 
     window.bodyScrollLock = {
         lock: lockBodyScroll,
-        unlock: unlockBodyScroll
+        unlock: unlockBodyScroll,
+        sync: syncBodyLocksFromDom
     };
 
     function buildFallbackImage() {
@@ -215,6 +236,8 @@
     window.showAddToCartNotification = showAddToCartNotification;
 
     document.addEventListener('DOMContentLoaded', function () {
+        syncBodyLocksFromDom();
+
         var cartButton = qs('cart-btn');
         if (cartButton) {
             cartButton.addEventListener('click', openCart);
@@ -235,4 +258,7 @@
             checkoutButton.addEventListener('click', handleCheckoutClick);
         }
     });
+
+    window.addEventListener('pageshow', syncBodyLocksFromDom);
+    window.addEventListener('resize', syncBodyLocksFromDom);
 })();

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix VOLTX Bug"
+  short_description: "Debug and fix VOLTX Store bugs"
+  default_prompt: "Use $fix-voltx-bug to diagnose and fix a bug in this VOLTX Store project."
