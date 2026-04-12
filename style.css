@@ -476,6 +476,7 @@ body.scroll-locked {
     background: transparent;
     box-shadow: none;
     margin-bottom: -5.75rem;
+    pointer-events: none;
 }
 
 #header .container {
@@ -484,6 +485,12 @@ body.scroll-locked {
     border-radius: 0;
     margin-top: 0;
     box-shadow: none;
+    pointer-events: auto;
+}
+
+#header .navbar-center,
+#mobile-nav-menu {
+    pointer-events: auto;
 }
 
 .navbar-link,
