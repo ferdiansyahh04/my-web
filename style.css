@@ -4,6 +4,7 @@
 
 :root {
     --top-banner-height: 40px;
+    --mobile-header-overlap: 4.5rem;
 }
 
 html,
@@ -15,6 +16,7 @@ body {
 body.scroll-locked {
     overflow: hidden;
     overscroll-behavior: none;
+    touch-action: none;
 }
 
 .cart-count {

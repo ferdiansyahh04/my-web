@@ -1,4 +1,6 @@
 (function () {
+    var ADMIN_CLOSE_DELAY = 240;
+
     function qs(id) {
         return document.getElementById(id);
     }
@@ -56,7 +58,7 @@
 
         setTimeout(function () {
             panel.classList.add('hidden');
-        }, 240);
+        }, ADMIN_CLOSE_DELAY);
     }
 
     function setAdminMessage(message, type, actions) {
@@ -327,8 +329,8 @@
     function closeAdminPanel() {
         if (!qs('admin-panel')) return;
         animateAdminClose();
-        if (window.bodyScrollLock && typeof window.bodyScrollLock.unlock === 'function') {
-            window.bodyScrollLock.unlock('admin-panel');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.scheduleUnlock === 'function') {
+            window.bodyScrollLock.scheduleUnlock('admin-panel', ADMIN_CLOSE_DELAY);
         }
     }
 

@@ -4,9 +4,57 @@
     }
 
     var activeBodyLocks = new Set();
+    var pendingUnlockTimers = new Map();
+    var lockedScrollY = 0;
+    var bodyLockApplied = false;
+
+    function getScrollTop() {
+        return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    }
+
+    function clearPendingUnlock(lockId) {
+        if (!lockId) return;
+        var timerId = pendingUnlockTimers.get(lockId);
+        if (timerId) {
+            window.clearTimeout(timerId);
+            pendingUnlockTimers.delete(lockId);
+        }
+    }
+
+    function clearAllPendingUnlocks() {
+        pendingUnlockTimers.forEach(function (timerId) {
+            window.clearTimeout(timerId);
+        });
+        pendingUnlockTimers.clear();
+    }
 
     function applyBodyLockState() {
-        document.body.classList.toggle('scroll-locked', activeBodyLocks.size > 0);
+        var shouldLock = activeBodyLocks.size > 0;
+        var body = document.body;
+        if (!body) return;
+
+        body.classList.toggle('scroll-locked', shouldLock);
+
+        if (shouldLock) {
+            if (!bodyLockApplied) {
+                lockedScrollY = getScrollTop();
+            }
+
+            body.style.position = 'fixed';
+            body.style.top = '-' + lockedScrollY + 'px';
+            body.style.left = '0';
+            body.style.right = '0';
+            body.style.width = '100%';
+        } else if (bodyLockApplied) {
+            body.style.position = '';
+            body.style.top = '';
+            body.style.left = '';
+            body.style.right = '';
+            body.style.width = '';
+            window.scrollTo(0, lockedScrollY);
+        }
+
+        bodyLockApplied = shouldLock;
     }
 
     function syncBodyLocksFromDom() {
@@ -30,22 +78,36 @@
     }
 
     function lockBodyScroll(lockId) {
-        activeBodyLocks.add(lockId || 'default');
+        var resolvedLockId = lockId || 'default';
+        clearPendingUnlock(resolvedLockId);
+        activeBodyLocks.add(resolvedLockId);
         applyBodyLockState();
     }
 
     function unlockBodyScroll(lockId) {
         if (lockId) {
+            clearPendingUnlock(lockId);
             activeBodyLocks.delete(lockId);
         } else {
+            clearAllPendingUnlocks();
             activeBodyLocks.clear();
         }
         applyBodyLockState();
     }
 
+    function scheduleUnlockBodyScroll(lockId, delay) {
+        var resolvedLockId = lockId || 'default';
+        clearPendingUnlock(resolvedLockId);
+        pendingUnlockTimers.set(resolvedLockId, window.setTimeout(function () {
+            pendingUnlockTimers.delete(resolvedLockId);
+            unlockBodyScroll(resolvedLockId);
+        }, Math.max(0, Number(delay) || 0)));
+    }
+
     window.bodyScrollLock = {
         lock: lockBodyScroll,
         unlock: unlockBodyScroll,
+        scheduleUnlock: scheduleUnlockBodyScroll,
         sync: syncBodyLocksFromDom
     };
 

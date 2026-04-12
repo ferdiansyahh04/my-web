@@ -9,8 +9,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileAdminBtn = document.getElementById('mobile-admin-btn');
     const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
+    function syncHeaderMetrics() {
+        if (!header) return;
+
+        if (window.innerWidth <= 640) {
+            const headerHeight = Math.ceil(header.offsetHeight || 0);
+            if (headerHeight > 0) {
+                document.documentElement.style.setProperty('--mobile-header-overlap', `${headerHeight}px`);
+            }
+            return;
+        }
+
+        document.documentElement.style.removeProperty('--mobile-header-overlap');
+    }
+
     function updateHeaderTheme() {
         if (!header || !hero) return;
+
+        syncHeaderMetrics();
 
         const heroBottom = hero.offsetTop + hero.offsetHeight;
         const headerHeight = header.offsetHeight || 0;
@@ -18,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const shouldUseSolid = window.scrollY >= triggerPoint;
 
         header.classList.toggle('header-solid', shouldUseSolid);
+    }
+
+    function refreshHeaderState() {
+        window.requestAnimationFrame(updateHeaderTheme);
     }
 
     let headerTicking = false;
@@ -41,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.bodyScrollLock && typeof window.bodyScrollLock[isOpen ? 'lock' : 'unlock'] === 'function') {
             window.bodyScrollLock[isOpen ? 'lock' : 'unlock']('mobile-menu');
         }
+        refreshHeaderState();
     }
 
     function syncMobileSearchState() {
@@ -76,7 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateHeaderTheme();
     window.addEventListener('scroll', onHeaderScroll, { passive: true });
-    window.addEventListener('resize', updateHeaderTheme);
+    window.addEventListener('resize', refreshHeaderState);
+    window.addEventListener('load', refreshHeaderState);
+    window.addEventListener('pageshow', refreshHeaderState);
+
+    if (document.fonts && typeof document.fonts.ready === 'object') {
+        document.fonts.ready.then(refreshHeaderState).catch(() => {});
+    }
 
     // ================= INIT CART =================
     loadCart();
@@ -151,11 +178,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         if (window.innerWidth > 640) {
             setMobileMenuOpen(false);
+            return;
         }
+
+        refreshHeaderState();
     });
 
     document.addEventListener('auth:changed', () => {
         setMobileMenuOpen(false);
+        refreshHeaderState();
     });
 
     syncSearchValue(searchInput?.value || '');

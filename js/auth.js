@@ -4,6 +4,7 @@
     var authReady = new Promise(function (resolve) {
         authReadyResolve = resolve;
     });
+    var POPUP_CLOSE_DELAY = 240;
 
     function qs(id) {
         return document.getElementById(id);
@@ -212,7 +213,7 @@
 
         setTimeout(function () {
             modal.classList.add('hidden');
-        }, 240);
+        }, POPUP_CLOSE_DELAY);
     }
 
     function createAuthModal() {
@@ -498,8 +499,8 @@
 
     function closeAccountModal() {
         animatePopupClose('account-modal', 'account-backdrop', 'account-shell');
-        if (window.bodyScrollLock && typeof window.bodyScrollLock.unlock === 'function') {
-            window.bodyScrollLock.unlock('account-modal');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.scheduleUnlock === 'function') {
+            window.bodyScrollLock.scheduleUnlock('account-modal', POPUP_CLOSE_DELAY);
         }
     }
 
@@ -645,8 +646,8 @@
 
     function closeAuthModal() {
         animatePopupClose('auth-modal', 'auth-backdrop', 'auth-shell');
-        if (window.bodyScrollLock && typeof window.bodyScrollLock.unlock === 'function') {
-            window.bodyScrollLock.unlock('auth-modal');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.scheduleUnlock === 'function') {
+            window.bodyScrollLock.scheduleUnlock('auth-modal', POPUP_CLOSE_DELAY);
         }
     }
 
