@@ -15,7 +15,6 @@ body {
 body.scroll-locked {
     overflow: hidden;
     overscroll-behavior: none;
-    touch-action: none;
 }
 
 .cart-count {
@@ -823,6 +822,7 @@ body.scroll-locked {
 
 .hero-thumb-strip {
     background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    pointer-events: none;
 }
 
 .hero-thumb {
@@ -1123,6 +1123,7 @@ body.scroll-locked {
 @media (max-width: 640px) {
     :root {
         --top-banner-height: 36px;
+        --mobile-header-overlap: 5rem;
     }
 
     .marquee-bar {
@@ -1211,7 +1212,7 @@ body.scroll-locked {
     }
 
     #header {
-        margin-bottom: -4.5rem;
+        margin-bottom: calc(-1 * var(--mobile-header-overlap));
     }
 
     body.mobile-menu-open {
