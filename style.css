@@ -821,6 +821,7 @@ body.scroll-locked {
     min-height: 100dvh;
     background-size: cover;
     background-position: center;
+    touch-action: pan-y;
 }
 
 .hero-overlay {
@@ -830,6 +831,7 @@ body.scroll-locked {
         rgba(0, 0, 0, 0.15) 40%,
         rgba(0, 0, 0, 0.5) 100%
     );
+    pointer-events: none;
 }
 
 .hero-thumb-strip {
