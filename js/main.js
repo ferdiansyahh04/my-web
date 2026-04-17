@@ -9,24 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileAdminBtn = document.getElementById('mobile-admin-btn');
     const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
-    function syncHeaderMetrics() {
-        if (!header) return;
-
-        if (window.innerWidth <= 640) {
-            const headerHeight = Math.ceil(header.offsetHeight || 0);
-            if (headerHeight > 0) {
-                document.documentElement.style.setProperty('--mobile-header-overlap', `${headerHeight}px`);
-            }
-            return;
-        }
-
-        document.documentElement.style.removeProperty('--mobile-header-overlap');
-    }
-
     function updateHeaderTheme() {
         if (!header || !hero) return;
-
-        syncHeaderMetrics();
 
         const heroBottom = hero.offsetTop + hero.offsetHeight;
         const headerHeight = header.offsetHeight || 0;

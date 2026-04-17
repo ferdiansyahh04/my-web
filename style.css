@@ -4,7 +4,6 @@
 
 :root {
     --top-banner-height: 40px;
-    --mobile-header-overlap: 4.5rem;
 }
 
 html,
@@ -479,7 +478,6 @@ body.scroll-locked {
     background: transparent;
     box-shadow: none;
     margin-bottom: 0;
-    pointer-events: none;
 }
 
 #header .container {
@@ -488,12 +486,6 @@ body.scroll-locked {
     border-radius: 0;
     margin-top: 0;
     box-shadow: none;
-    pointer-events: auto;
-}
-
-#header .navbar-center,
-#mobile-nav-menu {
-    pointer-events: auto;
 }
 
 .navbar-link,
@@ -895,6 +887,18 @@ body.scroll-locked {
     transform: scale(1.05);
 }
 
+.product-quick-add {
+    pointer-events: none;
+}
+
+.product-quick-add > * {
+    pointer-events: auto;
+}
+
+section[id] {
+    scroll-margin-top: calc(var(--top-banner-height) + 5.5rem);
+}
+
 @keyframes marquee-scroll {
     0% {
         transform: translateX(0);
@@ -1137,7 +1141,6 @@ body.scroll-locked {
 @media (max-width: 640px) {
     :root {
         --top-banner-height: 36px;
-        --mobile-header-overlap: 5rem;
     }
 
     .marquee-bar {
@@ -1268,6 +1271,10 @@ body.scroll-locked {
         padding-bottom: 7rem;
     }
 
+    .product-quick-add {
+        transform: translateY(0) !important;
+    }
+
     .hero-thumb-strip .container {
         padding-left: 0.75rem;
         padding-right: 0.75rem;
@@ -1386,6 +1393,12 @@ body.scroll-locked {
     #admin-orders-list img {
         width: 4.5rem;
         height: 4.5rem;
+    }
+}
+
+@media (hover: none) {
+    .product-quick-add {
+        transform: translateY(0) !important;
     }
 }
 

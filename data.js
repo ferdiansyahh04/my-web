@@ -214,7 +214,7 @@ function createProductCard(product) {
     media.appendChild(imageLink);
 
     var quickAddWrap = document.createElement('div');
-    quickAddWrap.className = 'absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20';
+    quickAddWrap.className = 'product-quick-add absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20';
 
     var quickAddButton = document.createElement('button');
     quickAddButton.type = 'button';
