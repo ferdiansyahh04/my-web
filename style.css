@@ -409,8 +409,11 @@ body.scroll-locked {
     background: #000;
     color: #fff;
     overflow: hidden;
-    position: sticky;
+    position: fixed;
+    left: 0;
+    right: 0;
     top: 0;
+    width: 100%;
     z-index: 70;
     height: 40px;
     display: flex;
@@ -475,9 +478,11 @@ body.scroll-locked {
     left: 0;
     right: 0;
     top: var(--top-banner-height);
+    z-index: 60;
     background: transparent;
     box-shadow: none;
     margin-bottom: 0;
+    transition: top 0.24s ease, background-color 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
 }
 
 #header .container {
