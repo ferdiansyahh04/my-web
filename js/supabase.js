@@ -179,10 +179,19 @@
         return data[0];
     }
 
-    async function fetchOrders() {
+    async function fetchOrders(options) {
         if (!sb) return [];
         try {
-            var { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+            var userId = options && options.userId ? String(options.userId) : '';
+            var userEmail = options && options.userEmail ? String(options.userEmail).trim().toLowerCase() : '';
+            var query = sb.from('orders').select('*');
+            if (userId) {
+                query = query.eq('user_id', userId);
+            } else if (userEmail) {
+                query = query.eq('user_email', userEmail);
+            }
+
+            var { data, error } = await query.order('created_at', { ascending: false });
             if (error) throw error;
             return (data || []).map(function (row) {
                 return {

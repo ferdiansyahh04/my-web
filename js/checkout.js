@@ -337,22 +337,58 @@
         return paymentMethod ? (paymentMethod.fee || 0) : 0;
     }
 
-    function updateTotals() {
+    function getAppliedPromo() {
+        if (!checkoutData || !checkoutData.promo) return null;
+
+        var code = String(checkoutData.promo.code || '').trim().toUpperCase();
+        var discount = Number(checkoutData.promo.discount) || 0;
+        if (!code || discount <= 0) return null;
+
+        return {
+            code: code,
+            discount: discount
+        };
+    }
+
+    function calculateTotals() {
         const items = getPendingCart();
         const subtotal = items.reduce(function(sum, item) {
             return sum + ((Number(item.price) || 0) * (Number(item.quantity) || 0));
         }, 0);
         const shippingCost = getSelectedShippingCost();
-        const fee = getSelectedPaymentFee();
+        const paymentFee = getSelectedPaymentFee();
+        const appliedPromo = getAppliedPromo();
+        const discount = appliedPromo ? appliedPromo.discount : 0;
+        const total = Math.max(0, subtotal + shippingCost + paymentFee - discount);
 
-        qs('shipping-cost').textContent = formatRupiah(shippingCost);
-        qs('admin-fee').textContent = formatRupiah(fee);
+        return {
+            subtotal: subtotal,
+            shippingCost: shippingCost,
+            paymentFee: paymentFee,
+            discount: discount,
+            total: total,
+            promoCode: appliedPromo ? appliedPromo.code : ''
+        };
+    }
 
-        const total = subtotal + shippingCost + fee;
-        qs('total-amount').textContent = formatRupiah(total);
+    function updateTotals() {
+        const totals = calculateTotals();
+
+        qs('shipping-cost').textContent = formatRupiah(totals.shippingCost);
+        qs('admin-fee').textContent = formatRupiah(totals.paymentFee);
+
+        var paymentFeeRow = qs('payment-fee');
+        if (paymentFeeRow) paymentFeeRow.style.display = totals.paymentFee > 0 ? 'flex' : 'none';
+
+        var promoDiscountRow = qs('promo-discount');
+        var discountAmount = qs('discount-amount');
+        if (promoDiscountRow) promoDiscountRow.style.display = totals.discount > 0 ? 'flex' : 'none';
+        if (discountAmount) discountAmount.textContent = '-' + formatRupiah(totals.discount);
+
+        qs('total-amount').textContent = formatRupiah(totals.total);
 
         var cartTotal = qs('cart-total');
-        if (cartTotal) cartTotal.textContent = formatRupiah(total);
+        if (cartTotal) cartTotal.textContent = formatRupiah(totals.total);
     }
 
     function validateStep1() {
@@ -507,6 +543,8 @@
 
         const fill = qs('progress-fill');
         if (fill) fill.style.width = (step * 25) + '%';
+        var currentStepDisplay = qs('current-step-display');
+        if (currentStepDisplay) currentStepDisplay.textContent = String(step);
 
         const prev = qs('prev-btn');
         const next = qs('next-btn');
@@ -629,6 +667,18 @@
             return;
         }
 
+        const shippingMethod = document.querySelector('input[name="shipping_method"]:checked');
+        if (!shippingMethod) {
+            setCheckoutMessage('Pilih metode pengiriman terlebih dahulu.', 'error');
+            return;
+        }
+
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (!paymentMethod) {
+            setCheckoutMessage('Pilih metode pembayaran terlebih dahulu.', 'error');
+            return;
+        }
+
         const items = getPendingCart();
         if (!items || items.length === 0) {
             setCheckoutMessage('Keranjang belanja Anda masih kosong.', 'error');
@@ -640,7 +690,22 @@
             clearCheckoutMessage();
             setCheckoutSubmitting(true);
 
-            Promise.resolve(window.ordersAPI.createOrder({ items, user, shipping: checkoutData })).then(function(order) {
+            var totals = calculateTotals();
+            Promise.resolve(window.ordersAPI.createOrder({
+                items,
+                user,
+                shipping: shipping,
+                pricing: {
+                    subtotal: totals.subtotal,
+                    shippingCost: totals.shippingCost,
+                    paymentFee: totals.paymentFee,
+                    discount: totals.discount,
+                    total: totals.total,
+                    shippingMethod: shippingMethod.value,
+                    paymentMethod: paymentMethod.value,
+                    promoCode: totals.promoCode
+                }
+            })).then(function(order) {
                 try { sessionStorage.removeItem('pendingCart'); } catch (e) {}
                 try { sessionStorage.removeItem('checkoutShipping'); } catch (e) {}
                 try { sessionStorage.removeItem('checkoutData'); } catch (e) {}
@@ -721,10 +786,15 @@
 
         const code = (promoInput.value || '').trim().toUpperCase();
         if (!code) {
+            if (checkoutData && checkoutData.promo) {
+                delete checkoutData.promo;
+                saveCheckoutData();
+            }
             promoMessage.textContent = 'Masukkan kode promo terlebih dahulu.';
             promoMessage.className = 'mt-2 text-sm text-red-500';
             promoMessage.classList.remove('hidden');
             promoDiscount.style.display = 'none';
+            updateTotals();
             return;
         }
 
@@ -738,18 +808,33 @@
         else if (code === 'HEMAT50') discount = 50000;
 
         if (discount <= 0) {
+            if (checkoutData && checkoutData.promo) {
+                delete checkoutData.promo;
+                saveCheckoutData();
+            }
             promoMessage.textContent = 'Kode promo tidak valid.';
             promoMessage.className = 'mt-2 text-sm text-red-500';
             promoMessage.classList.remove('hidden');
             promoDiscount.style.display = 'none';
+            updateTotals();
             return;
         }
+
+        if (!checkoutData) {
+            checkoutData = { shipping: null, shippingMethod: null, paymentMethod: null };
+        }
+        checkoutData.promo = {
+            code: code,
+            discount: discount
+        };
+        saveCheckoutData();
 
         promoMessage.textContent = 'Kode promo berhasil digunakan.';
         promoMessage.className = 'mt-2 text-sm text-green-600';
         promoMessage.classList.remove('hidden');
         promoDiscount.style.display = 'flex';
         discountAmount.textContent = '-' + formatRupiah(discount);
+        updateTotals();
     }
 
     function initCheckoutPage() {
@@ -814,4 +899,7 @@
 
         initCheckoutPage();
     });
+
+    window.goBack = goBack;
+    window.applyPromoCode = applyPromoCode;
 })();

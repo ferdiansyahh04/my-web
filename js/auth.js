@@ -598,7 +598,11 @@
                 throw new Error('Orders API belum siap.');
             }
 
-            var orders = await window.ordersAPI.loadOrders();
+            var currentUser = getCurrentUser();
+            var orders = await window.ordersAPI.loadOrders(currentUser ? {
+                userId: currentUser.id,
+                userEmail: currentUser.email
+            } : undefined);
             list.innerHTML = '';
 
             if (!orders || orders.length === 0) {

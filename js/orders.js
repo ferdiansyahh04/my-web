@@ -1,16 +1,16 @@
 // Orders API — backed by Supabase only, no localStorage.
 (function(){
 
-    async function loadOrders(){
+    async function loadOrders(options){
         try {
-            return await window.supabaseAPI.fetchOrders();
+            return await window.supabaseAPI.fetchOrders(options);
         } catch(e) {
             console.warn('Failed to load orders from Supabase', e);
             return [];
         }
     }
 
-    async function createOrder({items, user, shipping} = {}){
+    async function createOrder({items, user, shipping, pricing} = {}){
         var id = 'order-' + Date.now();
         var sanitizedItems = Array.isArray(items) ? items.map(function(i){
             return {
@@ -23,7 +23,15 @@
             };
         }) : [];
 
-        var total = sanitizedItems.reduce(function(s,it){ return s + (Number(it.price)||0) * (Number(it.quantity)||0); }, 0);
+        var subtotal = sanitizedItems.reduce(function(s,it){ return s + (Number(it.price)||0) * (Number(it.quantity)||0); }, 0);
+        var pricingInfo = pricing && typeof pricing === 'object' ? pricing : {};
+        var shippingCost = Number(pricingInfo.shippingCost) || 0;
+        var paymentFee = Number(pricingInfo.paymentFee) || 0;
+        var discount = Number(pricingInfo.discount) || 0;
+        var total = Number(pricingInfo.total);
+        if (!Number.isFinite(total)) {
+            total = Math.max(0, subtotal + shippingCost + paymentFee - discount);
+        }
 
         var order = {
             id: id,
@@ -37,17 +45,20 @@
                 phone: shipping.phone || '',
                 address: shipping.address || '',
                 city: shipping.city || '',
-                postalCode: shipping.postalCode || ''
+                postalCode: shipping.postalCode || '',
+                shippingMethod: pricingInfo.shippingMethod || '',
+                paymentMethod: pricingInfo.paymentMethod || '',
+                subtotal: subtotal,
+                shippingCost: shippingCost,
+                paymentFee: paymentFee,
+                discount: discount,
+                promoCode: pricingInfo.promoCode || ''
             } : null,
             createdAt: new Date().toISOString(),
             status: 'pending'
         };
 
-        try {
-            await window.supabaseAPI.saveOrder(order);
-        } catch(e) {
-            console.warn('Supabase saveOrder failed', e);
-        }
+        await window.supabaseAPI.saveOrder(order);
 
         try{ sessionStorage.setItem('lastOrderId', id); } catch(e){}
         try{ document.dispatchEvent(new CustomEvent('orders:created', { detail: { order: order } })); } catch(e){}

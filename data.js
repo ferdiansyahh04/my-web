@@ -66,12 +66,9 @@ window.productStore = {
     getAll: () => allProducts,
     addProduct: async function (prod) {
         var p = normalizeProduct(Object.assign({}, prod));
-        try {
-            var saved = await window.supabaseAPI.addProduct(p);
-            if (saved) p = normalizeProduct(saved);
-        } catch (e) {
-            console.warn('Supabase addProduct failed', e);
-        }
+        var saved = await window.supabaseAPI.addProduct(p);
+        if (!saved) throw new Error('Product was not saved.');
+        p = normalizeProduct(saved);
         allProducts.unshift(p);
         emitProductsChanged();
         return p;
@@ -79,22 +76,15 @@ window.productStore = {
     updateProduct: async function (id, updates) {
         var idx = allProducts.findIndex(x => x.id === id);
         if (idx === -1) return null;
-        try {
-            await window.supabaseAPI.updateProduct(id, updates);
-        } catch (e) {
-            console.warn('Supabase updateProduct failed', e);
-        }
-        allProducts[idx] = normalizeProduct(Object.assign({}, allProducts[idx], updates));
+        var saved = await window.supabaseAPI.updateProduct(id, updates);
+        if (!saved) throw new Error('Product update was not saved.');
+        allProducts[idx] = normalizeProduct(saved);
         emitProductsChanged();
         return allProducts[idx];
     },
     deleteProduct: async function (id) {
         var before = allProducts.length;
-        try {
-            await window.supabaseAPI.deleteProduct(id);
-        } catch (e) {
-            console.warn('Supabase deleteProduct failed', e);
-        }
+        await window.supabaseAPI.deleteProduct(id);
         allProducts = allProducts.filter(x => x.id !== id);
         if (allProducts.length === before) return false;
         emitProductsChanged();
