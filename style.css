@@ -59,6 +59,7 @@ body.scroll-locked {
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: all 0.3s ease;
     z-index: 999;
 }
@@ -66,6 +67,17 @@ body.scroll-locked {
 .cart-overlay.open {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+}
+
+#Store {
+    min-height: 32rem;
+    scroll-margin-top: calc(var(--top-banner-height) + 4.5rem);
+}
+
+#products-container,
+#no-results {
+    min-height: 18rem;
 }
 
 @media (max-width: 768px) {

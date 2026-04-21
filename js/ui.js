@@ -40,18 +40,33 @@
                 lockedScrollY = getScrollTop();
             }
 
+            body.style.overflow = 'hidden';
+            body.style.overscrollBehavior = 'none';
+            body.style.touchAction = 'none';
             body.style.position = 'fixed';
             body.style.top = '-' + lockedScrollY + 'px';
             body.style.left = '0';
             body.style.right = '0';
             body.style.width = '100%';
         } else if (bodyLockApplied) {
+            body.style.overflow = '';
+            body.style.overscrollBehavior = '';
+            body.style.touchAction = '';
             body.style.position = '';
             body.style.top = '';
             body.style.left = '';
             body.style.right = '';
             body.style.width = '';
             window.scrollTo(0, lockedScrollY);
+        } else {
+            body.style.overflow = '';
+            body.style.overscrollBehavior = '';
+            body.style.touchAction = '';
+            body.style.position = '';
+            body.style.top = '';
+            body.style.left = '';
+            body.style.right = '';
+            body.style.width = '';
         }
 
         bodyLockApplied = shouldLock;
@@ -232,6 +247,10 @@
         var overlay = qs('cart-overlay');
         if (sidebar) sidebar.classList.add('open');
         if (overlay) overlay.classList.add('open');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.sync === 'function') {
+            window.bodyScrollLock.sync();
+            return;
+        }
         lockBodyScroll('cart');
     }
 
@@ -240,6 +259,10 @@
         var overlay = qs('cart-overlay');
         if (sidebar) sidebar.classList.remove('open');
         if (overlay) overlay.classList.remove('open');
+        if (window.bodyScrollLock && typeof window.bodyScrollLock.sync === 'function') {
+            window.bodyScrollLock.sync();
+            return;
+        }
         unlockBodyScroll('cart');
     }
 
