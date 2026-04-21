@@ -87,7 +87,8 @@ body.scroll-locked {
 }
 
 #Store {
-    min-height: 32rem;
+    min-height: 100vh;
+    min-height: 100dvh;
     scroll-margin-top: calc(var(--top-banner-height) + 4.5rem);
 }
 
