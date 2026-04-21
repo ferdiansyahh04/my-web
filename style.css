@@ -12,6 +12,10 @@ body {
     overflow-x: hidden;
 }
 
+body {
+    width: 100%;
+}
+
 body.scroll-locked {
     overflow: hidden;
     overscroll-behavior: none;
@@ -38,12 +42,15 @@ body.scroll-locked {
     position: fixed;
     top: 0;
     right: -400px;
-    width: 400px;
+    width: min(100%, 24rem);
+    max-width: 100vw;
     height: 100vh;
     background: white;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     transition: right 0.3s ease;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
 }
 
 .cart-sidebar.open {
@@ -68,6 +75,15 @@ body.scroll-locked {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+}
+
+.close-cart-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 999px;
 }
 
 #Store {
@@ -421,11 +437,13 @@ body.scroll-locked {
     background: #000;
     color: #fff;
     overflow: hidden;
+    overflow-x: clip;
     position: fixed;
     left: 0;
     right: 0;
     top: 0;
     width: 100%;
+    max-width: 100vw;
     z-index: 70;
     height: 40px;
     display: flex;
@@ -459,6 +477,7 @@ body.scroll-locked {
     align-items: center;
     flex: 0 0 auto;
     width: max-content;
+    min-width: max-content;
     will-change: transform;
     animation: marquee-scroll 24s linear infinite;
 }
@@ -467,6 +486,7 @@ body.scroll-locked {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    flex-shrink: 0;
     gap: clamp(1.75rem, 3vw, 3rem);
     flex: 0 0 auto;
     min-width: max-content;
@@ -509,6 +529,11 @@ body.scroll-locked {
 .navbar-brand,
 .navbar-icon-btn {
     color: #f8fafc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
     transition: color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -522,7 +547,7 @@ body.scroll-locked {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.25rem;
+    min-height: 44px;
     padding: 0.4rem 0.95rem;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.92);
@@ -651,14 +676,32 @@ body.scroll-locked {
     top: 50%;
     transform: translateY(-50%);
     z-index: 4;
-    height: 1.75rem;
-    width: 1.75rem;
+    height: 2rem;
+    width: 2rem;
     border-radius: 999px;
     cursor: pointer;
 }
 
 .navbar-search-clear:not(.opacity-0) {
     background: rgba(255, 255, 255, 0.16);
+}
+
+.mobile-safe-media {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.setup-card-stack {
+    width: 100%;
+}
+
+.feature-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
 }
 
 .navbar-search-input.w-64 + .navbar-search-btn {
@@ -743,8 +786,8 @@ body.scroll-locked {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 1.9rem;
-    width: 1.9rem;
+    height: 2.25rem;
+    width: 2.25rem;
     border-radius: 999px;
     color: #64748b;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -765,7 +808,7 @@ body.scroll-locked {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.85rem;
+    min-height: 44px;
     width: 100%;
     border-radius: 999px;
     border: 1px solid rgba(203, 213, 225, 0.95);
@@ -846,6 +889,7 @@ body.scroll-locked {
 .hero-thumb-strip {
     background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
     pointer-events: none;
+    overflow-x: hidden;
 }
 
 .hero-thumb {
@@ -1164,6 +1208,10 @@ section[id] {
         height: 36px;
     }
 
+    .marquee-inner {
+        animation-duration: 18s;
+    }
+
     .marquee-bar::before,
     .marquee-bar::after {
         width: 40px;
@@ -1172,6 +1220,7 @@ section[id] {
     .marquee-group {
         gap: 1.25rem;
         padding-inline: 0.75rem;
+        padding-right: 1.15rem;
     }
 
     .marquee-group span {
@@ -1217,13 +1266,6 @@ section[id] {
         padding: 0.35rem 0.75rem;
         font-size: 0.78rem;
         white-space: nowrap;
-    }
-
-    .navbar-side-right .navbar-search-wrap,
-    #auth-btn,
-    #admin-btn,
-    #logout-btn {
-        display: none !important;
     }
 
     .mobile-menu-toggle,

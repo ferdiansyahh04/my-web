@@ -48,7 +48,7 @@
     <nav id="header" class="z-50 w-full">
         <div class="container mx-auto relative flex items-center justify-between py-4 px-6">
             <!-- Left: Navigation Links -->
-            <div class="navbar-side navbar-side-left flex items-center space-x-4">
+            <div class="navbar-side navbar-side-left hidden md:flex items-center space-x-4">
                 <a href="#Store" class="navbar-link">Shop</a>
             </div>
 
@@ -58,32 +58,34 @@
             </div>
 
             <!-- Right: Cart -->
-            <div class="navbar-side navbar-side-right flex items-center space-x-4">
-                <div class="navbar-search-wrap relative flex items-center">
-                    <input type="text" id="search-input" placeholder="Cari produk..."
-                        class="navbar-search-input w-0 opacity-0 px-0 py-0 transition-all duration-300 ease-in-out text-sm" />
-                    <button id="search-btn" class="navbar-search-btn" aria-label="Cari produk">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="7"></circle>
-                            <path d="M20 20l-3.5-3.5"></path>
-                        </svg>
-                    </button>
-                    <button id="clear-search-btn" class="navbar-search-clear opacity-0" aria-label="Hapus pencarian">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6l-12 12" />
-                        </svg>
-                    </button>
+            <div class="navbar-side navbar-side-right flex items-center gap-2 md:gap-4">
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="navbar-search-wrap relative flex items-center">
+                        <input type="text" id="search-input" placeholder="Cari produk..."
+                            class="navbar-search-input w-0 opacity-0 px-0 py-0 transition-all duration-300 ease-in-out text-sm" />
+                        <button id="search-btn" class="navbar-search-btn" aria-label="Cari produk">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <path d="M20 20l-3.5-3.5"></path>
+                            </svg>
+                        </button>
+                        <button id="clear-search-btn" class="navbar-search-clear opacity-0" aria-label="Hapus pencarian">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6l-12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <button id="auth-btn" class="navbar-pill ml-2">Login</button>
+                    <button id="logout-btn" class="navbar-pill hidden">Logout</button>
                 </div>
-                    <button id="cart-btn" class="navbar-icon-btn relative">
+                <button id="cart-btn" class="navbar-icon-btn relative">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.8 7.2M7 13l-1.8 7.2m0 0h12.6M19 20a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
                     </svg>
                     <span id="cart-count" class="cart-count hidden">0</span>
                 </button>
-                <button id="auth-btn" class="navbar-pill ml-2">Login</button>
-                <button id="logout-btn" class="navbar-pill hidden">Logout</button>
-                <button id="mobile-menu-toggle" class="mobile-menu-toggle" type="button" aria-label="Buka menu" aria-expanded="false">
+                <button id="mobile-menu-toggle" class="mobile-menu-toggle md:hidden" type="button" aria-label="Buka menu" aria-expanded="false">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <path d="M4 7h16"></path>
                         <path d="M4 12h16"></path>
@@ -92,7 +94,7 @@
                 </button>
             </div>
         </div>
-        <div id="mobile-nav-menu" class="mobile-nav-menu hidden" aria-hidden="true">
+        <div id="mobile-nav-menu" class="mobile-nav-menu hidden md:hidden" aria-hidden="true">
             <div class="container mx-auto px-4">
                 <div class="mobile-nav-card">
                     <div class="mobile-nav-search">
@@ -118,11 +120,11 @@
     <div id="cart-overlay" class="cart-overlay"></div>
 
     <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-sidebar">
+    <div id="cart-sidebar" class="cart-sidebar w-full sm:w-96">
         <div class="p-6 border-b">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-bold">Shopping Cart</h2>
-                <button class="close-cart-btn text-gray-500 hover:text-black">
+                <button type="button" class="close-cart-btn text-gray-500 hover:text-black" aria-label="Close cart">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -173,7 +175,7 @@
         <div class="absolute bottom-0 left-0 right-0 hero-thumb-strip">
             <div data-aos="fade-right" data-aos-delay="700" class="container mx-auto px-6 py-4 flex items-center gap-4">
                 <div class="w-16 h-16 rounded-lg overflow-hidden border-2 border-white border-opacity-40 flex-shrink-0 hero-thumb">
-                    <img src="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=200&auto=format&fit=crop" alt="thumb" class="w-full h-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=200&auto=format&fit=crop" alt="thumb" class="mobile-safe-media w-full h-full max-w-full object-cover">
                 </div>
                 <div class="text-white">
                     <div class="text-sm font-semibold">VoltX x Collection</div>
@@ -219,17 +221,17 @@
                     <span class="text-xs uppercase tracking-widest text-gray-500 mb-4 block">Featured</span>
                     <h2 class="text-4xl md:text-5xl font-black text-white leading-none tracking-tight mb-6">Premium Gear<br>for Your Setup</h2>
                     <p class="text-gray-500 text-base mb-8 max-w-md font-normal">Koleksi keyboard, mouse, headset, dan aksesoris pilihan untuk setup PC & laptop terbaik kamu.</p>
-                    <div class="flex gap-4">
-                        <a href="#Store" class="bg-white text-black px-7 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-gray-200 transition-colors">Shop New</a>
-                        <a href="#Store" class="border border-gray-600 text-gray-300 px-7 py-3 text-sm font-semibold uppercase tracking-wider hover:border-white hover:text-white transition-colors">Explore</a>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#Store" class="feature-cta bg-white text-black px-7 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-gray-200 transition-colors">Shop New</a>
+                        <a href="#Store" class="feature-cta border border-gray-600 text-gray-300 px-7 py-3 text-sm font-semibold uppercase tracking-wider hover:border-white hover:text-white transition-colors">Explore</a>
                     </div>
                 </div>
             </div>
             <div class="relative hidden lg:block" data-aos="fade-left" data-aos-duration="1000">
-                <img src="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=1600&auto=format&fit=crop" alt="Featured gear" class="absolute inset-0 w-full h-full object-cover">
+                <img src="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=1600&auto=format&fit=crop" alt="Featured gear" class="mobile-safe-media absolute inset-0 w-full h-full max-w-full object-cover">
                 <div class="absolute bottom-6 left-6 bg-white bg-opacity-90 backdrop-blur-sm px-4 py-3 rounded-lg">
                     <div class="flex items-center gap-3">
-                        <img src="https://plus.unsplash.com/premium_photo-1761316008887-673d53bed151?q=80&w=200&auto=format&fit=crop" class="w-12 h-12 object-cover rounded" alt="collection">
+                        <img src="https://plus.unsplash.com/premium_photo-1761316008887-673d53bed151?q=80&w=200&auto=format&fit=crop" class="mobile-safe-media w-12 h-12 max-w-full object-cover rounded" alt="collection">
                         <div>
                             <div class="text-sm font-semibold text-gray-900">VoltX x Collection</div>
                             <div class="text-xs text-gray-500">Limited drop</div>
@@ -243,42 +245,42 @@
     <!-- Feature showcase above About -->
     <section class="bg-gray-50 py-16 md:py-24 lg:py-28">
         <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div data-aos="fade-up" data-aos-delay="0" class="relative rounded-lg overflow-hidden shadow-lg">
-                    <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=1200&auto=format&fit=crop" alt="editors-pick" class="w-full h-56 object-cover">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div data-aos="fade-up" data-aos-delay="0" class="relative rounded-lg overflow-hidden shadow-lg md:flex-1">
+                    <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=1200&auto=format&fit=crop" alt="editors-pick" class="mobile-safe-media w-full h-56 max-w-full object-cover">
                     <div class="absolute inset-0 bg-black bg-opacity-30"></div>
                     <div class="absolute left-6 bottom-6 text-white">
                         <div class="text-xs uppercase bg-white bg-opacity-10 px-2 py-1 rounded-full mb-2">Editor's pick</div>
                         <h3 class="text-lg font-bold">VoltX x Collection</h3>
                         <p class="text-sm mt-1 max-w-xs">Limited drop - curated selections chosen by our team.</p>
                         <div class="mt-3">
-                            <a href="#Store" class="inline-block bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Shop now</a>
+                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Shop now</a>
                         </div>
                     </div>
                 </div>
 
-                <div data-aos="fade-up" data-aos-delay="150" class="relative rounded-lg overflow-hidden shadow-lg">
-                    <img src="https://images.unsplash.com/photo-1593152167544-085d3b9c4938?q=80&w=1200&auto=format&fit=crop" alt="best-sellers" class="w-full h-56 object-cover">
+                <div data-aos="fade-up" data-aos-delay="150" class="relative rounded-lg overflow-hidden shadow-lg md:flex-1">
+                    <img src="https://images.unsplash.com/photo-1593152167544-085d3b9c4938?q=80&w=1200&auto=format&fit=crop" alt="best-sellers" class="mobile-safe-media w-full h-56 max-w-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent"></div>
                     <div class="absolute left-6 bottom-6 text-white">
                         <div class="text-xs uppercase bg-white bg-opacity-10 px-2 py-1 rounded-full mb-2">Best sellers</div>
                         <h3 class="text-lg font-bold">Most loved gear</h3>
                         <p class="text-sm mt-1 max-w-xs">Top-rated keyboards, mice, and headsets favored by the community.</p>
                         <div class="mt-3">
-                            <a href="#Store" class="inline-block bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Browse</a>
+                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Browse</a>
                         </div>
                     </div>
                 </div>
 
-                <div data-aos="fade-up" data-aos-delay="300" class="relative rounded-lg overflow-hidden shadow-lg">
-                    <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=1200&auto=format&fit=crop" alt="limited" class="w-full h-56 object-cover">
+                <div data-aos="fade-up" data-aos-delay="300" class="relative rounded-lg overflow-hidden shadow-lg md:flex-1">
+                    <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=1200&auto=format&fit=crop" alt="limited" class="mobile-safe-media w-full h-56 max-w-full object-cover">
                     <div class="absolute inset-0 bg-black bg-opacity-25"></div>
                     <div class="absolute left-6 bottom-6 text-white">
                         <div class="text-xs uppercase bg-white bg-opacity-10 px-2 py-1 rounded-full mb-2">Limited</div>
                         <h3 class="text-lg font-bold">Seasonal drops</h3>
                         <p class="text-sm mt-1 max-w-xs">Grab seasonal pieces before they're gone - limited stock available.</p>
                         <div class="mt-3">
-                            <a href="#Store" class="inline-block bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Explore</a>
+                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">Explore</a>
                         </div>
                     </div>
                 </div>
@@ -305,9 +307,9 @@
                 <!-- Card 1 - Mechanical Keyboard -->
                 <div data-aos="fade-up" data-aos-delay="0" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
                     <div class="flex justify-center -mt-10 mb-6">
-                        <div class="relative w-44 h-32">
-                            <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=400&auto=format&fit=crop" alt="Mechanical Keyboard" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=400&auto=format&fit=crop" alt="Keyboard detail" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
+                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
+                            <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=400&auto=format&fit=crop" alt="Mechanical Keyboard" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
+                            <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=400&auto=format&fit=crop" alt="Keyboard detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
                         </div>
                     </div>
                     <h3 class="text-base font-bold text-gray-900 mb-1.5">Mechanical Keyboard</h3>
@@ -322,9 +324,9 @@
                 <!-- Card 2 - Gaming Mouse -->
                 <div data-aos="fade-up" data-aos-delay="100" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
                     <div class="flex justify-center -mt-10 mb-6">
-                        <div class="relative w-44 h-32">
-                            <img src="https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=400&auto=format&fit=crop" alt="Gaming Mouse" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?q=80&w=400&auto=format&fit=crop" alt="Mouse detail" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
+                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
+                            <img src="https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=400&auto=format&fit=crop" alt="Gaming Mouse" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
+                            <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?q=80&w=400&auto=format&fit=crop" alt="Mouse detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
                         </div>
                     </div>
                     <h3 class="text-base font-bold text-gray-900 mb-1.5">Gaming Mouse</h3>
@@ -339,9 +341,9 @@
                 <!-- Card 3 - Gaming Headset -->
                 <div data-aos="fade-up" data-aos-delay="200" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
                     <div class="flex justify-center -mt-10 mb-6">
-                        <div class="relative w-44 h-32">
-                            <img src="https://images.unsplash.com/photo-1599669454699-248893623440?q=80&w=400&auto=format&fit=crop" alt="Gaming Headset" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=400&auto=format&fit=crop" alt="Headset detail" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
+                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
+                            <img src="https://images.unsplash.com/photo-1599669454699-248893623440?q=80&w=400&auto=format&fit=crop" alt="Gaming Headset" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
+                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=400&auto=format&fit=crop" alt="Headset detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
                         </div>
                     </div>
                     <h3 class="text-base font-bold text-gray-900 mb-1.5">Gaming Headset</h3>
@@ -356,9 +358,9 @@
                 <!-- Card 4 - Desk Setup -->
                 <div data-aos="fade-up" data-aos-delay="0" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
                     <div class="flex justify-center -mt-10 mb-6">
-                        <div class="relative w-44 h-32">
-                            <img src="https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=400&auto=format&fit=crop" alt="Desk Setup" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1616588589676-62b3d4ff6e04?q=80&w=400&auto=format&fit=crop" alt="Setup detail" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
+                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
+                            <img src="https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=400&auto=format&fit=crop" alt="Desk Setup" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
+                            <img src="https://images.unsplash.com/photo-1616588589676-62b3d4ff6e04?q=80&w=400&auto=format&fit=crop" alt="Setup detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
                         </div>
                     </div>
                     <h3 class="text-base font-bold text-gray-900 mb-1.5">Desk Setup</h3>
@@ -373,9 +375,9 @@
                 <!-- Card 5 - Deskmat / Mousepad -->
                 <div data-aos="fade-up" data-aos-delay="100" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
                     <div class="flex justify-center -mt-10 mb-6">
-                        <div class="relative w-44 h-32">
-                            <img src="https://images.unsplash.com/photo-1616400619175-5beda3a17896?q=80&w=400&auto=format&fit=crop" alt="Deskmat" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?q=80&w=400&auto=format&fit=crop" alt="Mousepad detail" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
+                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
+                            <img src="https://images.unsplash.com/photo-1616400619175-5beda3a17896?q=80&w=400&auto=format&fit=crop" alt="Deskmat" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
+                            <img src="https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?q=80&w=400&auto=format&fit=crop" alt="Mousepad detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
                         </div>
                     </div>
                     <h3 class="text-base font-bold text-gray-900 mb-1.5">Deskmat & Mousepad</h3>
@@ -390,9 +392,9 @@
                 <!-- Card 6 - Gaming Accessories -->
                 <div data-aos="fade-up" data-aos-delay="200" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
                     <div class="flex justify-center -mt-10 mb-6">
-                        <div class="relative w-44 h-32">
-                            <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=400&auto=format&fit=crop" alt="Accessories" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1625842268584-8f3296236761?q=80&w=400&auto=format&fit=crop" alt="Accessory detail" class="absolute w-36 h-28 object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
+                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
+                            <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=400&auto=format&fit=crop" alt="Accessories" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
+                            <img src="https://images.unsplash.com/photo-1625842268584-8f3296236761?q=80&w=400&auto=format&fit=crop" alt="Accessory detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
                         </div>
                     </div>
                     <h3 class="text-base font-bold text-gray-900 mb-1.5">Clean Accessories</h3>
