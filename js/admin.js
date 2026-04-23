@@ -144,7 +144,7 @@
         var preview = qs(inputId + '-preview');
         if (!preview) return;
         var img = preview.querySelector('img');
-        if (img) img.src = '';
+        if (img) img.removeAttribute('src');
         preview.classList.add('hidden');
     }
 
@@ -228,7 +228,7 @@
                             <input id="p-image1-file" type="file" accept="image/*" class="hidden" />\
                         </label>\
                                   </div>\
-                                  <div id="p-image1-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="ml-2 text-xs text-red-500 preview-clear">Remove</button></div>\
+                                  <div id="p-image1-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" alt="Image 1 preview" /><button type="button" class="ml-2 text-xs text-red-500 preview-clear">Remove</button></div>\
                               </div>\
                               <div class="space-y-2">\
                                   <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Image 2 (hover, optional)</label>\
@@ -240,7 +240,7 @@
                             <input id="p-image2-file" type="file" accept="image/*" class="hidden" />\
                         </label>\
                                   </div>\
-                                  <div id="p-image2-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" /><button type="button" class="ml-2 text-xs text-red-500 preview-clear">Remove</button></div>\
+                                  <div id="p-image2-preview" class="hidden"><img class="w-16 h-16 object-cover rounded border" alt="Image 2 preview" /><button type="button" class="ml-2 text-xs text-red-500 preview-clear">Remove</button></div>\
                               </div>\
                               <div class="flex flex-wrap items-center gap-3">\
                                   <label class="text-sm text-slate-600"><input id="p-hasDiscount" type="checkbox" /> Has discount</label>\

@@ -297,6 +297,9 @@ function loadProducts() {
         container.appendChild(createProductCard(product));
     });
 
+    const noResults = document.getElementById('no-results');
+    if (noResults) noResults.classList.toggle('hidden', filteredProducts.length > 0);
+
     // Animate new products with stagger
     setTimeout(() => {
         const newProducts = container.querySelectorAll('.product-item.opacity-0');

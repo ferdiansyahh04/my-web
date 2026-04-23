@@ -257,7 +257,7 @@
                         <p id="login-email-error" class="auth-inline-error"></p>\
                         <label class="block text-sm font-medium text-slate-700">Password\
                           <div class="auth-password-wrap mt-2">\
-                            <input id="login-password" placeholder="Enter your password" type="password" class="auth-input w-full rounded-2xl border border-slate-200 px-4 py-3 pr-16 text-slate-900 outline-none transition" />\
+                            <input id="login-password" placeholder="Enter your password" type="password" autocomplete="current-password" class="auth-input w-full rounded-2xl border border-slate-200 px-4 py-3 pr-16 text-slate-900 outline-none transition" />\
                             <button type="button" class="auth-password-toggle" data-password-toggle="login-password">Show</button>\
                           </div>\
                         </label>\
@@ -277,7 +277,7 @@
                         <p id="reg-email-error" class="auth-inline-error"></p>\
                         <label class="block text-sm font-medium text-slate-700">Password\
                           <div class="auth-password-wrap mt-2">\
-                            <input id="reg-password" placeholder="Minimum 6 characters" type="password" class="auth-input w-full rounded-2xl border border-slate-200 px-4 py-3 pr-16 text-slate-900 outline-none transition" />\
+                            <input id="reg-password" placeholder="Minimum 6 characters" type="password" autocomplete="new-password" class="auth-input w-full rounded-2xl border border-slate-200 px-4 py-3 pr-16 text-slate-900 outline-none transition" />\
                             <button type="button" class="auth-password-toggle" data-password-toggle="reg-password">Show</button>\
                           </div>\
                         </label>\
