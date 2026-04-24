@@ -411,7 +411,7 @@ body.scroll-locked {
 }
 
 .admin-shell {
-    max-height: calc(100vh - 7rem);
+    max-height: calc(100vh - 3rem);
     -webkit-overflow-scrolling: touch;
 }
 
@@ -454,8 +454,8 @@ body.scroll-locked {
     }
 
     .admin-shell {
-        margin-top: 3.5rem;
-        max-height: calc(100vh - 5rem);
+        margin-top: 1rem;
+        max-height: calc(100vh - 2rem);
         border-radius: 1.5rem;
     }
 }
@@ -1413,7 +1413,7 @@ section[id] {
     .admin-shell {
         width: min(calc(100vw - 1rem), 42rem);
         margin-top: 0;
-        max-height: calc(100dvh - 2rem);
+        max-height: calc(100dvh - 1rem);
         height: auto;
         border-radius: 1.75rem;
     }
@@ -1467,8 +1467,8 @@ section[id] {
     #admin-panel > div:last-child {
         min-height: 100dvh;
         align-items: flex-start;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
     }
 
     #admin-shell > div:first-child {

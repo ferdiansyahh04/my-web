@@ -194,7 +194,7 @@
         <div id="admin-panel" class="fixed inset-0 z-[1185] hidden">\
             <div id="admin-backdrop" class="popup-backdrop absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>\
             <div class="relative flex min-h-screen items-start justify-center p-4 md:p-8">\
-                <div id="admin-shell" data-aos="zoom-in-up" data-aos-duration="420" class="popup-shell admin-shell mt-16 flex w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
+                <div id="admin-shell" data-aos="zoom-in-up" data-aos-duration="420" class="popup-shell admin-shell mt-4 flex w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl">\
                     <div class="flex flex-shrink-0 flex-col gap-4 border-b border-slate-200 px-6 py-5 md:flex-row md:items-start md:justify-between md:px-8">\
                         <div>\
                             <div class="flex items-center gap-3">\
