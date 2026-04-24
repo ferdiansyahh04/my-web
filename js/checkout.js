@@ -206,7 +206,9 @@
             return sum + ((Number(item.price) || 0) * (Number(item.quantity) || 0));
         }, 0);
 
-        qs('subtotal-amount').textContent = formatRupiah(subtotal);
+        // FIX Bug #5: null check before accessing textContent
+        var subtotalEl = qs('subtotal-amount');
+        if (subtotalEl) subtotalEl.textContent = formatRupiah(subtotal);
         updateTotals();
     }
 
@@ -374,8 +376,12 @@
     function updateTotals() {
         const totals = calculateTotals();
 
-        qs('shipping-cost').textContent = formatRupiah(totals.shippingCost);
-        qs('admin-fee').textContent = formatRupiah(totals.paymentFee);
+        // FIX Bug #5: null checks to avoid TypeError when elements are missing
+        var shippingCostEl = qs('shipping-cost');
+        if (shippingCostEl) shippingCostEl.textContent = formatRupiah(totals.shippingCost);
+
+        var adminFeeEl = qs('admin-fee');
+        if (adminFeeEl) adminFeeEl.textContent = formatRupiah(totals.paymentFee);
 
         var paymentFeeRow = qs('payment-fee');
         if (paymentFeeRow) paymentFeeRow.style.display = totals.paymentFee > 0 ? 'flex' : 'none';
@@ -385,7 +391,8 @@
         if (promoDiscountRow) promoDiscountRow.style.display = totals.discount > 0 ? 'flex' : 'none';
         if (discountAmount) discountAmount.textContent = '-' + formatRupiah(totals.discount);
 
-        qs('total-amount').textContent = formatRupiah(totals.total);
+        var totalAmountEl = qs('total-amount');
+        if (totalAmountEl) totalAmountEl.textContent = formatRupiah(totals.total);
 
         var cartTotal = qs('cart-total');
         if (cartTotal) cartTotal.textContent = formatRupiah(totals.total);
@@ -427,7 +434,9 @@
         if (!phone) {
             setFieldError('phone', 'Nomor HP wajib diisi.');
             valid = false;
-        } else if (!/^\d+$/.test(normalizePhone(phone))) {
+        } else if (!/^[\d\s\-+().]+$/.test(phone)) {
+            // FIX Bug #6: Test the RAW input for illegal characters BEFORE normalizing.
+            // normalizePhone() strips non-digits so testing after normalize always returns digits-only.
             setFieldError('phone', 'Nomor HP hanya boleh berisi angka.');
             valid = false;
         } else if (!isValidPhone(phone)) {

@@ -167,7 +167,9 @@
         var button = qs('logout-btn');
         var mobileButton = qs('mobile-logout-btn');
         if (!button) return;
-        button.className = 'navbar-pill' + (!cachedUser ? ' hidden' : '');
+        // FIX Bug #8: Remove redundant double class assignment.
+        // classList.toggle below is the single source of truth for visibility.
+        button.className = 'navbar-pill';
         button.textContent = window.innerWidth <= 640 ? 'Keluar' : 'Logout';
         button.classList.toggle('hidden', !cachedUser);
         if (mobileButton) {

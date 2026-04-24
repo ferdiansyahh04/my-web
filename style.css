@@ -710,15 +710,36 @@ body.scroll-locked {
     background: rgba(255, 255, 255, 0.26);
 }
 
-.mobile-menu-toggle,
+/* FIX Bug #2 & #3: Split selectors so mobile-menu-toggle is visible on mobile
+   and mobile-nav-menu can be shown/hidden by JS removing/adding the .hidden class. */
+
+/* Mobile nav menu: hidden by default, shown by JS (removing .hidden class) */
 .mobile-nav-menu {
     display: none;
+}
+
+/* Mobile menu toggle: hidden on desktop (md+), visible on mobile via flex */
+@media (max-width: 767px) {
+    .mobile-menu-toggle {
+        display: flex;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
 }
 
 .mobile-nav-menu.hidden,
 .mobile-nav-search-clear.hidden,
 .mobile-nav-action.hidden {
     display: none !important;
+}
+
+/* FIX Bug #3: When JS removes .hidden, the menu must be visible */
+.mobile-nav-menu:not(.hidden) {
+    display: block;
 }
 
 .mobile-menu-toggle {

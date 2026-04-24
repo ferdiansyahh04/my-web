@@ -234,7 +234,19 @@
 
         if (cartItems) {
             var fallbackImage = buildFallbackImage();
+
+            // FIX Bug #1: Detach #empty-cart before clearing, so it is not destroyed
+            // then re-append it after clearing item nodes.
+            var detachedEmptyCart = emptyCart && emptyCart.parentNode === cartItems
+                ? cartItems.removeChild(emptyCart)
+                : null;
+
             cartItems.innerHTML = '';
+
+            // Re-append #empty-cart so it stays in the DOM
+            if (detachedEmptyCart) {
+                cartItems.appendChild(detachedEmptyCart);
+            }
 
             items.forEach(function (item) {
                 cartItems.appendChild(createCartItemNode(item, fallbackImage));

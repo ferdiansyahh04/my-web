@@ -710,6 +710,9 @@
         var productsTab = qs('admin-tab-products');
         var ordersTab = qs('admin-tab-orders');
 
+        // FIX Bug #7: null guard all elements before accessing classList
+        if (!productsSection || !ordersSection || !productsTab || !ordersTab) return;
+
         if (tab === 'orders') {
             productsSection.classList.add('hidden');
             ordersSection.classList.remove('hidden');
@@ -747,10 +750,14 @@
 
     function refreshProductViews() {
         renderAdminList();
+        // FIX Bug #4: filteredProducts & allProducts are let-scoped in data.js
+        // Use searchProducts('') which internally resets filteredProducts and re-renders.
         try {
-            filteredProducts = [].concat(allProducts);
-            clearProducts();
-            loadProducts();
+            if (typeof searchProducts === 'function') {
+                searchProducts('');
+            } else if (typeof loadProducts === 'function') {
+                loadProducts();
+            }
         } catch (error) {
             // ignore dependent reload issues
         }

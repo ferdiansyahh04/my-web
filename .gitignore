@@ -37,3 +37,13 @@ out/
 tmp/
 temp/
 *.tmp
+temp-superpowers/
+temp-uiux/
+
+# AI assistant files
+.claude/
+
+# Package files (not needed for vanilla JS project)
+package.json
+package-lock.json
+node_modules/
