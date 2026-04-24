@@ -10,7 +10,33 @@ html,
 body {
     max-width: 100%;
     overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
+
+/* Custom scrollbar — thin and unobtrusive */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+
+
 
 body {
     width: 100%;
@@ -373,7 +399,8 @@ body.scroll-locked {
 }
 
 .account-body {
-    scrollbar-gutter: stable;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .admin-shell {
@@ -382,7 +409,8 @@ body.scroll-locked {
 }
 
 .admin-body {
-    scrollbar-gutter: stable;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 768px) {
@@ -439,6 +467,8 @@ body.scroll-locked {
     color: #fff;
     overflow: hidden;
     overflow-x: clip;
+    clip-path: inset(0);
+    contain: paint;
     position: fixed;
     left: 0;
     right: 0;
