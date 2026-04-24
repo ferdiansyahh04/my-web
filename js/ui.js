@@ -41,8 +41,7 @@
             }
 
             body.style.overflow = 'hidden';
-            body.style.overscrollBehavior = 'none';
-            body.style.touchAction = 'none';
+            body.style.overscrollBehavior = 'contain';
             body.style.position = 'fixed';
             body.style.top = '-' + lockedScrollY + 'px';
             body.style.left = '0';
@@ -51,7 +50,6 @@
         } else if (bodyLockApplied) {
             body.style.overflow = '';
             body.style.overscrollBehavior = '';
-            body.style.touchAction = '';
             body.style.position = '';
             body.style.top = '';
             body.style.left = '';
@@ -61,7 +59,6 @@
         } else {
             body.style.overflow = '';
             body.style.overscrollBehavior = '';
-            body.style.touchAction = '';
             body.style.position = '';
             body.style.top = '';
             body.style.left = '';

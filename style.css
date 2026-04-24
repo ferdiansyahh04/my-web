@@ -9,7 +9,6 @@
 html {
     scroll-behavior: smooth;
     overflow-x: hidden;
-    overscroll-behavior: none;
 }
 
 /* Hide ALL scrollbars — clean app-like feel */
@@ -43,7 +42,7 @@ section,
 main,
 footer {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 /* Global image safety — prevent images from overflowing on small screens */
@@ -55,8 +54,7 @@ img {
 
 body.scroll-locked {
     overflow: hidden;
-    overscroll-behavior: none;
-    touch-action: none;
+    overscroll-behavior: contain;
 }
 
 .cart-count {
