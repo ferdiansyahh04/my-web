@@ -40,18 +40,67 @@ function normalizeProduct(product) {
     return product;
 }
 
-// Load products from Supabase. Falls back to hardcoded allProducts on failure.
+// ---------- Store UI state helpers ----------
+
+function showStoreMessage(icon, title, subtitle) {
+    var container = document.getElementById('products-container');
+    var noResults = document.getElementById('no-results');
+    if (container) container.innerHTML = '';
+    if (noResults) noResults.classList.add('hidden');
+
+    var msg = document.createElement('div');
+    msg.className = 'w-full text-center py-20';
+    msg.innerHTML =
+        '<div class="text-4xl mb-4">' + icon + '</div>' +
+        '<h3 class="text-lg font-medium text-gray-900 mb-1">' + escapeHTML(title) + '</h3>' +
+        '<p class="text-sm text-gray-400">' + escapeHTML(subtitle) + '</p>';
+    if (container) container.appendChild(msg);
+}
+
+function showErrorState(subtitle) {
+    showStoreMessage('⚠️', 'Gagal memuat produk', subtitle);
+}
+
+function showEmptyState(subtitle) {
+    showStoreMessage('🔧', 'Belum ada produk', subtitle);
+}
+
+// ---------- Supabase product fetch with retry ----------
+
+var _supabaseRetryCount = 0;
+var MAX_RETRIES = 1;
+var RETRY_DELAY_MS = 2000;
+
 async function loadProductsFromSupabase() {
     if (!window.supabaseAPI || typeof window.supabaseAPI.fetchProducts !== 'function') return;
     try {
         var remote = await window.supabaseAPI.fetchProducts();
-        if (remote && remote.length > 0) {
-            allProducts = remote.map(function (p) { return normalizeProduct(p); });
-            filteredProducts = allProducts.slice();
-            if (typeof loadProducts === 'function') loadProducts();
+
+        if (remote === null) {
+            // fetchProducts returned null — Supabase client may not be ready
+            throw new Error('Supabase returned null (client may not be initialized)');
         }
+
+        if (remote.length === 0) {
+            showEmptyState('Produk sedang dipersiapkan, stay tuned!');
+            return;
+        }
+
+        _supabaseRetryCount = 0; // reset on success
+        allProducts = remote.map(function (p) { return normalizeProduct(p); });
+        filteredProducts = allProducts.slice();
+        if (typeof loadProducts === 'function') loadProducts();
     } catch (e) {
-        console.warn('Failed to load products from Supabase, using defaults', e);
+        console.error('[VoltX] Supabase fetch failed:', e);
+
+        if (_supabaseRetryCount < MAX_RETRIES) {
+            _supabaseRetryCount++;
+            console.log('[VoltX] Retrying product fetch in ' + (RETRY_DELAY_MS / 1000) + 's... (attempt ' + (_supabaseRetryCount + 1) + ')');
+            showStoreMessage('⏳', 'Memuat ulang...', 'Mencoba menghubungi server...');
+            setTimeout(loadProductsFromSupabase, RETRY_DELAY_MS);
+        } else {
+            showErrorState('Gagal memuat produk. Coba refresh halaman.');
+        }
     }
 }
 
