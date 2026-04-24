@@ -10,13 +10,22 @@ html {
     scroll-behavior: smooth;
     overflow-x: hidden;
     overscroll-behavior: none;
-    /* Hide scrollbar — clean app-like feel */
-    scrollbar-width: none;
 }
 
-html::-webkit-scrollbar {
-    display: none;
+/* Hide ALL scrollbars — clean app-like feel */
+html,
+body {
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE/Edge legacy */
 }
+
+::-webkit-scrollbar {
+    display: none !important;       /* Chrome, Safari, Edge (Chromium) */
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
 
 html,
 body {
