@@ -28,6 +28,22 @@ body {
     width: 100%;
 }
 
+/* Prevent any section or container from causing horizontal overflow */
+section,
+.container,
+main,
+footer {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Global image safety — prevent images from overflowing on small screens */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
 body.scroll-locked {
     overflow: hidden;
     overscroll-behavior: none;
