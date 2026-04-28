@@ -11,6 +11,9 @@
     }
 
     async function createOrder({items, user, shipping, pricing} = {}){
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            throw new Error('Pesanan tidak valid: Keranjang kosong.');
+        }
         var id = 'order-' + Date.now();
         var sanitizedItems = Array.isArray(items) ? items.map(function(i){
             return {
@@ -58,7 +61,12 @@
             status: 'pending'
         };
 
-        await window.supabaseAPI.saveOrder(order);
+        try {
+            await window.supabaseAPI.saveOrder(order);
+        } catch(error) {
+            console.error('Failed to save order to Supabase:', error);
+            throw new Error('Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
 
         try{ sessionStorage.setItem('lastOrderId', id); } catch(e){}
         try{ document.dispatchEvent(new CustomEvent('orders:created', { detail: { order: order } })); } catch(e){}

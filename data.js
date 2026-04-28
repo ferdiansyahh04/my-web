@@ -213,7 +213,7 @@ function createProductCard(product) {
     card.className = 'product-item group opacity-0 translate-y-6';
 
     var media = document.createElement('div');
-    media.className = 'relative overflow-hidden rounded-2xl bg-gray-100 aspect-[3/4]';
+    media.className = 'relative overflow-hidden rounded-xl bg-neutral-100 aspect-[3/4]';
 
     var imageLink = document.createElement('a');
     imageLink.href = productHref;
@@ -253,7 +253,7 @@ function createProductCard(product) {
     media.appendChild(imageLink);
 
     var quickAddWrap = document.createElement('div');
-    quickAddWrap.className = 'product-quick-add absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-20';
+    quickAddWrap.className = 'product-quick-add absolute inset-x-0 bottom-0 p-3 md:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] z-20';
 
     var quickAddButton = document.createElement('button');
     quickAddButton.type = 'button';
@@ -263,7 +263,7 @@ function createProductCard(product) {
         quickAddButton.dataset.productName = product.name || '';
         quickAddButton.dataset.productSaleprice = product.salePrice || 'Rp0';
         quickAddButton.dataset.productImage = product.image1 || '';
-        quickAddButton.className = 'add-to-cart-btn w-full text-center bg-white text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl shadow-lg hover:bg-gray-900 hover:text-white transition-colors duration-200';
+        quickAddButton.className = 'add-to-cart-btn w-full text-center text-gray-900 text-xs font-semibold uppercase tracking-wider py-3 rounded-xl transition-colors duration-200';
         quickAddButton.textContent = 'Add to cart';
     } else {
         quickAddButton.disabled = true;
@@ -276,7 +276,7 @@ function createProductCard(product) {
 
     var contentLink = document.createElement('a');
     contentLink.href = productHref;
-    contentLink.className = 'block mt-4 space-y-1' + (available ? '' : ' cursor-not-allowed opacity-70');
+    contentLink.className = 'block mt-3 space-y-0.5' + (available ? '' : ' cursor-not-allowed opacity-70');
     if (available) {
         contentLink.target = '_blank';
         contentLink.rel = 'noopener noreferrer';
@@ -294,7 +294,7 @@ function createProductCard(product) {
     }
 
     var title = document.createElement('h3');
-    title.className = 'text-sm font-medium text-gray-900 leading-snug line-clamp-2';
+    title.className = 'text-sm font-medium text-gray-900 leading-snug truncate';
     title.textContent = product.name || 'Product';
     contentLink.appendChild(title);
 
@@ -306,7 +306,7 @@ function createProductCard(product) {
         priceRow.className = 'flex items-baseline gap-2';
 
         var salePrice = document.createElement('span');
-        salePrice.className = 'text-base font-bold text-gray-900';
+        salePrice.className = 'text-sm font-semibold text-gray-900';
         salePrice.textContent = product.salePrice || 'Rp0';
 
         var originalPrice = document.createElement('span');
@@ -318,7 +318,7 @@ function createProductCard(product) {
         priceWrap.appendChild(priceRow);
     } else {
         var priceOnly = document.createElement('div');
-        priceOnly.className = 'text-base font-bold text-gray-900';
+        priceOnly.className = 'text-sm font-semibold text-gray-900';
         priceOnly.textContent = product.salePrice || 'Rp0';
         priceWrap.appendChild(priceOnly);
     }

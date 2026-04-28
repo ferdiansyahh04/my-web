@@ -6,16 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>VoltX Store - Premium Gear for Your Setup</title>
+    <meta name="description" content="Koleksi keyboard, mouse, headset, dan aksesoris pilihan untuk setup PC & laptop terbaik kamu. Beli perlengkapan gaming premium di VoltX.">
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://voltx.com/">
+    <meta property="og:title" content="VoltX Store - Premium Gear for Your Setup">
+    <meta property="og:description" content="Koleksi keyboard, mouse, headset, dan aksesoris pilihan untuk setup PC & laptop terbaik kamu.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=1200&auto=format&fit=crop">
 
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://voltx.com/">
+    <meta property="twitter:title" content="VoltX Store - Premium Gear for Your Setup">
+    <meta property="twitter:description" content="Koleksi keyboard, mouse, headset, dan aksesoris pilihan untuk setup PC & laptop terbaik kamu.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=1200&auto=format&fit=crop">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>⚡</text></svg>">
-    <link href="https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 </head>
 
-<body id="top" class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal">
+<body id="top" class="leading-normal text-base tracking-normal">
     <!-- Top scrolling banner (continuous) -->
     <div class="marquee-bar" aria-hidden="false">
         <div class="marquee-inner" aria-hidden="true">
@@ -47,7 +61,7 @@
         </div>
     </div>
     <nav id="header" class="z-50 w-full">
-        <div class="container mx-auto relative flex items-center justify-between py-4 px-6">
+        <div class="container mx-auto relative flex items-center justify-between py-3 px-6">
             <!-- Left: Navigation Links -->
             <div class="navbar-side navbar-side-left hidden md:flex items-center space-x-4">
                 <a href="#Store" class="navbar-link">Shop</a>
@@ -55,7 +69,7 @@
 
             <!-- Center: Logo -->
             <div class="navbar-center pointer-events-none absolute left-1/2 -translate-x-1/2">
-                <a href="#top" class="navbar-brand pointer-events-auto text-xl font-bold">VOLTX</a>
+                <a href="#top" class="navbar-brand pointer-events-auto">VOLTX</a>
             </div>
 
             <!-- Right: Cart -->
@@ -80,7 +94,7 @@
                     <button id="logout-btn" class="navbar-pill hidden">Logout</button>
                 </div>
                 <button id="cart-btn" class="navbar-icon-btn relative">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.8 7.2M7 13l-1.8 7.2m0 0h12.6M19 20a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
                     </svg>
@@ -150,7 +164,7 @@
                 <span id="cart-total" class="text-lg font-bold">Rp0</span>
             </div>
             <button id="checkout-btn"
-                class="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                class="btn-primary w-full">
                 Checkout
             </button>
         </div>
@@ -162,37 +176,24 @@
     <section class="hero-showcase relative bg-center bg-cover bg-no-repeat overflow-hidden">
         <div class="absolute inset-0 hero-overlay"></div>
         <div class="relative flex items-center justify-center min-h-screen px-6 py-20 md:py-32">
-            <div class="max-w-3xl text-center text-white">
-                <span data-aos="fade-down" data-aos-delay="100" class="inline-block text-xs uppercase tracking-widest text-white text-opacity-80 mb-6">New / Latest Gear Drop</span>
-                <h1 data-aos="fade-up" data-aos-delay="250" class="text-5xl md:text-7xl lg:text-8xl font-black leading-none tracking-tight mb-6">Premium Gear<br>for Your Setup</h1>
-                <p data-aos="fade-up" data-aos-delay="400" class="text-base md:text-lg text-white max-w-xl mx-auto mb-10 font-normal">Temukan koleksi terbaru keyboard, mouse, dan aksesoris berkualitas untuk upgrade setup kamu.</p>
-                <div data-aos="fade-up" data-aos-delay="550" class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="#Store" class="bg-white text-black px-8 py-3.5 text-sm font-semibold uppercase tracking-wider hover:bg-gray-100 transition-colors">See all collections</a>
-                    <a href="#About" class="border border-white border-opacity-60 text-white px-8 py-3.5 text-sm font-semibold uppercase tracking-wider hover:bg-white hover:bg-opacity-10 transition-colors">Contact us</a>
-                </div>
-            </div>
-        </div>
-        <!-- Thumbnail preview strip -->
-        <div class="absolute bottom-0 left-0 right-0 hero-thumb-strip">
-            <div data-aos="fade-right" data-aos-delay="700" class="container mx-auto px-6 py-4 flex items-center gap-4">
-                <div class="w-16 h-16 rounded-lg overflow-hidden border-2 border-white border-opacity-40 flex-shrink-0 hero-thumb">
-                    <img src="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=200&auto=format&fit=crop" alt="thumb" class="mobile-safe-media w-full h-full max-w-full object-cover">
-                </div>
-                <div class="text-white">
-                    <div class="text-sm font-semibold">VoltX x Collection</div>
-                    <div class="text-xs text-white text-opacity-60">Limited drop - shop now</div>
+            <div class="max-w-2xl text-center text-white">
+                <span data-aos="fade-down" data-aos-delay="100" class="inline-block text-xs uppercase tracking-[0.25em] text-white/70 mb-5 font-medium">New Collection</span>
+                <h1 data-aos="fade-up" data-aos-delay="250" class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[0.95] tracking-tight mb-6">Premium Gear<br>for Your Setup</h1>
+                <p data-aos="fade-up" data-aos-delay="400" class="text-sm md:text-base text-white/75 max-w-md mx-auto mb-10 font-normal leading-relaxed">Curated keyboards, mice, and accessories — hand-picked for performance and style.</p>
+                <div data-aos="fade-up" data-aos-delay="550">
+                    <a href="#Store" class="hero-cta">Explore Collection</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="bg-white py-16 md:py-24" id="Store">
+    <section class="section-spacing" id="Store">
         <div class="container mx-auto px-6">
             <div class="flex flex-wrap items-end justify-between mb-12">
                 <div data-aos="fade-right">
-                    <span class="text-xs uppercase tracking-widest text-gray-500 mb-2 block">Collections</span>
-                    <h2 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">Store</h2>
-                    <p class="text-sm text-gray-500 mt-2 max-w-sm font-normal">Curated gear and peripherals, hand-picked for performance and style.</p>
+                    <span class="text-xs uppercase tracking-[0.2em] text-gray-400 mb-2 block font-medium">Collections</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Store</h2>
+                    <p class="text-sm text-gray-400 mt-2 max-w-sm font-normal leading-relaxed">Curated gear and peripherals, hand-picked for performance and style.</p>
                 </div>
                 <div data-aos="fade-left" class="flex items-center gap-3 mt-4 md:mt-0" id="store-nav-content"></div>
             </div>
@@ -219,18 +220,18 @@
         <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-[480px]">
             <div class="flex items-center px-8 py-16 lg:px-16 lg:py-24">
                 <div data-aos="fade-right" data-aos-duration="1000">
-                    <span class="text-xs uppercase tracking-widest text-gray-500 mb-4 block">Featured</span>
-                    <h2 class="text-4xl md:text-5xl font-black text-white leading-none tracking-tight mb-6">Premium Gear<br>for Your Setup</h2>
-                    <p class="text-gray-500 text-base mb-8 max-w-md font-normal">Koleksi keyboard, mouse, headset, dan aksesoris pilihan untuk setup PC & laptop terbaik kamu.</p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#Store" class="feature-cta bg-white text-black px-7 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-gray-200 transition-colors">Shop New</a>
-                        <a href="#Store" class="feature-cta border border-gray-600 text-gray-300 px-7 py-3 text-sm font-semibold uppercase tracking-wider hover:border-white hover:text-white transition-colors">Explore</a>
+                    <span class="text-xs uppercase tracking-[0.2em] text-gray-500 mb-4 block font-medium">Featured</span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-[0.95] tracking-tight mb-6">Premium Gear<br>for Your Setup</h2>
+                    <p class="text-gray-500 text-sm md:text-base mb-8 max-w-md font-normal leading-relaxed">Koleksi keyboard, mouse, headset, dan aksesoris pilihan untuk setup PC & laptop terbaik kamu.</p>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="#Store" class="btn-primary">Shop New</a>
+                        <a href="#Store" class="btn-outline">Explore</a>
                     </div>
                 </div>
             </div>
             <div class="relative hidden lg:block" data-aos="fade-left" data-aos-duration="1000">
                 <img src="https://images.unsplash.com/photo-1600881217197-068e1d79ffb8?q=80&w=800&auto=format&fit=crop" alt="Featured keyboard and gear setup" class="mobile-safe-media absolute inset-0 w-full h-full max-w-full object-cover" loading="lazy" width="800" height="600">
-                <div class="absolute bottom-6 left-6 bg-white bg-opacity-90 backdrop-blur-sm px-4 py-3 rounded-lg">
+                <div class="absolute bottom-6 left-6 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl">
                     <div class="flex items-center gap-3">
                         <img src="https://plus.unsplash.com/premium_photo-1761316008887-673d53bed151?q=80&w=200&auto=format&fit=crop" class="mobile-safe-media w-12 h-12 max-w-full object-cover rounded" alt="collection">
                         <div>
@@ -244,44 +245,44 @@
     </section>
 
     <!-- Feature showcase above About -->
-    <section class="bg-gray-50 py-16 md:py-24 lg:py-28">
+    <section class="bg-gray-50/80 section-spacing">
         <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row gap-6">
-                <div data-aos="fade-up" data-aos-delay="0" class="relative rounded-lg overflow-hidden shadow-lg md:flex-1">
-                    <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=600&auto=format&fit=crop" alt="Editor's pick collection showcase" class="mobile-safe-media w-full h-56 max-w-full object-cover" loading="lazy" width="600" height="400">
-                    <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            <div class="flex flex-col md:flex-row gap-5">
+                <div data-aos="fade-up" data-aos-delay="0" class="relative rounded-2xl overflow-hidden md:flex-1 group">
+                    <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=600&auto=format&fit=crop" alt="Editor's pick collection showcase" class="mobile-safe-media w-full h-64 md:h-72 max-w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" width="600" height="400">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
                     <div class="absolute left-6 bottom-6 text-white">
-                        <div class="text-xs uppercase bg-white bg-opacity-10 px-2 py-1 rounded-full mb-2">Editor's pick</div>
+                        <span class="text-[11px] uppercase tracking-[0.15em] text-white/70 font-medium mb-1 block">Editor's pick</span>
                         <h3 class="text-lg font-bold">VoltX x Collection</h3>
-                        <p class="text-sm mt-1 max-w-xs">Limited drop - curated selections chosen by our team.</p>
-                        <div class="mt-3">
-                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-4 py-2 rounded-full text-sm font-semibold min-h-[44px] items-center">Shop now</a>
+                        <p class="text-sm mt-1 max-w-xs text-white/80 leading-relaxed">Limited drop — curated selections chosen by our team.</p>
+                        <div class="mt-4">
+                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider min-h-[44px] items-center hover:bg-black hover:text-white transition-colors duration-200">Shop now</a>
                         </div>
                     </div>
                 </div>
 
-                <div data-aos="fade-up" data-aos-delay="150" class="relative rounded-lg overflow-hidden shadow-lg md:flex-1">
-                    <img src="https://images.unsplash.com/photo-1593152167544-085d3b9c4938?q=80&w=600&auto=format&fit=crop" alt="Best selling keyboards and mice" class="mobile-safe-media w-full h-56 max-w-full object-cover" loading="lazy" width="600" height="400">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent"></div>
+                <div data-aos="fade-up" data-aos-delay="150" class="relative rounded-2xl overflow-hidden md:flex-1 group">
+                    <img src="https://images.unsplash.com/photo-1593152167544-085d3b9c4938?q=80&w=600&auto=format&fit=crop" alt="Best selling keyboards and mice" class="mobile-safe-media w-full h-64 md:h-72 max-w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" width="600" height="400">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent"></div>
                     <div class="absolute left-6 bottom-6 text-white">
-                        <div class="text-xs uppercase bg-white bg-opacity-10 px-2 py-1 rounded-full mb-2">Best sellers</div>
+                        <span class="text-[11px] uppercase tracking-[0.15em] text-white/70 font-medium mb-1 block">Best sellers</span>
                         <h3 class="text-lg font-bold">Most loved gear</h3>
-                        <p class="text-sm mt-1 max-w-xs">Top-rated keyboards, mice, and headsets favored by the community.</p>
-                        <div class="mt-3">
-                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-4 py-2 rounded-full text-sm font-semibold min-h-[44px] items-center">Browse</a>
+                        <p class="text-sm mt-1 max-w-xs text-white/80 leading-relaxed">Top-rated keyboards, mice, and headsets favored by the community.</p>
+                        <div class="mt-4">
+                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider min-h-[44px] items-center hover:bg-black hover:text-white transition-colors duration-200">Browse</a>
                         </div>
                     </div>
                 </div>
 
-                <div data-aos="fade-up" data-aos-delay="300" class="relative rounded-lg overflow-hidden shadow-lg md:flex-1">
-                    <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=600&auto=format&fit=crop" alt="Limited edition seasonal keyboard drops" class="mobile-safe-media w-full h-56 max-w-full object-cover" loading="lazy" width="600" height="400">
-                    <div class="absolute inset-0 bg-black bg-opacity-25"></div>
+                <div data-aos="fade-up" data-aos-delay="300" class="relative rounded-2xl overflow-hidden md:flex-1 group">
+                    <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=600&auto=format&fit=crop" alt="Limited edition seasonal keyboard drops" class="mobile-safe-media w-full h-64 md:h-72 max-w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy" width="600" height="400">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent"></div>
                     <div class="absolute left-6 bottom-6 text-white">
-                        <div class="text-xs uppercase bg-white bg-opacity-10 px-2 py-1 rounded-full mb-2">Limited</div>
+                        <span class="text-[11px] uppercase tracking-[0.15em] text-white/70 font-medium mb-1 block">Limited</span>
                         <h3 class="text-lg font-bold">Seasonal drops</h3>
-                        <p class="text-sm mt-1 max-w-xs">Grab seasonal pieces before they're gone - limited stock available.</p>
-                        <div class="mt-3">
-                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-4 py-2 rounded-full text-sm font-semibold min-h-[44px] items-center">Explore</a>
+                        <p class="text-sm mt-1 max-w-xs text-white/80 leading-relaxed">Grab seasonal pieces before they're gone — limited stock available.</p>
+                        <div class="mt-4">
+                            <a href="#Store" class="feature-cta inline-flex bg-white text-black px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider min-h-[44px] items-center hover:bg-black hover:text-white transition-colors duration-200">Explore</a>
                         </div>
                     </div>
                 </div>
@@ -290,204 +291,123 @@
     </section>
 
     <!-- What defines our gear - feature grid -->
-    <section class="bg-white py-16 md:py-24">
+    <section class="section-spacing">
         <div class="container mx-auto px-6">
             <!-- Section header -->
             <div class="text-center mb-14" data-aos="fade-up">
-                <div class="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-1.5 mb-5">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <span class="text-xs font-medium text-gray-600 tracking-wide">What defines our gear</span>
-                </div>
-                <h2 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4">Built for your setup</h2>
-                <p class="text-gray-500 text-sm md:text-base max-w-lg mx-auto font-normal">Curated peripherals and accessories designed for performance, comfort, and clean aesthetics.</p>
+                <span class="text-xs uppercase tracking-[0.2em] text-gray-400 mb-3 block font-medium">What defines our gear</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">Built for your setup</h2>
+                <p class="text-gray-400 text-sm md:text-base max-w-lg mx-auto font-normal leading-relaxed">Curated peripherals and accessories designed for performance, comfort, and clean aesthetics.</p>
             </div>
 
-            <!-- 6-card grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-
-                <!-- Card 1 - Mechanical Keyboard -->
-                <div data-aos="fade-up" data-aos-delay="0" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
-                    <div class="flex justify-center -mt-10 mb-6">
-                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
-                            <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=400&auto=format&fit=crop" alt="Mechanical Keyboard" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=400&auto=format&fit=crop" alt="Keyboard detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
-                        </div>
+            <!-- 2-card minimal grid (matching product grid style) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                <!-- Card 1 -->
+                <div data-aos="fade-up" class="group cursor-pointer">
+                    <div class="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-50">
+                        <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?q=80&w=800&auto=format&fit=crop" alt="Mechanical Keyboard" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy">
                     </div>
-                    <h3 class="text-base font-bold text-gray-900 mb-1.5">Mechanical Keyboard</h3>
-                    <p class="text-sm text-gray-500 mb-4 leading-relaxed">Premium switches with satisfying feel and clean, minimal design for everyday typing.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Tactile</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Silent</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Hot-swap</span>
+                    <div class="px-1">
+                        <span class="inline-block text-[10px] uppercase tracking-[0.15em] text-gray-500 font-medium mb-2">Featured</span>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 tracking-tight group-hover:text-gray-600 transition-colors">Mechanical Keyboards</h3>
+                        <p class="text-gray-500 leading-relaxed text-sm mb-4">Premium switches with satisfying feel and clean, minimal design for everyday typing and gaming.</p>
+                        <a href="#Store" class="text-xs font-bold uppercase tracking-[0.1em] text-black flex items-center gap-2 hover:opacity-70 transition-opacity w-max">
+                            Shop Keyboards <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Card 2 - Gaming Mouse -->
-                <div data-aos="fade-up" data-aos-delay="100" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
-                    <div class="flex justify-center -mt-10 mb-6">
-                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
-                            <img src="https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=400&auto=format&fit=crop" alt="Gaming Mouse" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?q=80&w=400&auto=format&fit=crop" alt="Mouse detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
-                        </div>
+                <!-- Card 2 -->
+                <div data-aos="fade-up" data-aos-delay="100" class="group cursor-pointer">
+                    <div class="w-full aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-50">
+                        <img src="https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?q=80&w=800&auto=format&fit=crop" alt="Gaming Mouse" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" loading="lazy">
                     </div>
-                    <h3 class="text-base font-bold text-gray-900 mb-1.5">Gaming Mouse</h3>
-                    <p class="text-sm text-gray-500 mb-4 leading-relaxed">Lightweight, precise sensors built for fast-paced gaming and all-day comfort.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Precision</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Lightweight</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Ergonomic</span>
+                    <div class="px-1">
+                        <span class="inline-block text-[10px] uppercase tracking-[0.15em] text-gray-500 font-medium mb-2">Essentials</span>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 tracking-tight group-hover:text-gray-600 transition-colors">Precision Mice</h3>
+                        <p class="text-gray-500 leading-relaxed text-sm mb-4">Lightweight, precise sensors built for fast-paced gaming and all-day comfort.</p>
+                        <a href="#Store" class="text-xs font-bold uppercase tracking-[0.1em] text-black flex items-center gap-2 hover:opacity-70 transition-opacity w-max">
+                            Shop Mice <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
                     </div>
                 </div>
-
-                <!-- Card 3 - Gaming Headset -->
-                <div data-aos="fade-up" data-aos-delay="200" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
-                    <div class="flex justify-center -mt-10 mb-6">
-                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
-                            <img src="https://images.unsplash.com/photo-1599669454699-248893623440?q=80&w=400&auto=format&fit=crop" alt="Gaming Headset" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=400&auto=format&fit=crop" alt="Headset detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
-                        </div>
-                    </div>
-                    <h3 class="text-base font-bold text-gray-900 mb-1.5">Gaming Headset</h3>
-                    <p class="text-sm text-gray-500 mb-4 leading-relaxed">Immersive audio with plush cushions for long sessions and crystal-clear comms.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Surround</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Clear mic</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Comfort</span>
-                    </div>
-                </div>
-
-                <!-- Card 4 - Desk Setup -->
-                <div data-aos="fade-up" data-aos-delay="0" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
-                    <div class="flex justify-center -mt-10 mb-6">
-                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
-                            <img src="https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=400&auto=format&fit=crop" alt="Desk Setup" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=400&auto=format&fit=crop" alt="Setup detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
-                        </div>
-                    </div>
-                    <h3 class="text-base font-bold text-gray-900 mb-1.5">Desk Setup</h3>
-                    <p class="text-sm text-gray-500 mb-4 leading-relaxed">Clean, organized workspaces that blend productivity with minimalist aesthetics.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Minimal</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Organized</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Ambient</span>
-                    </div>
-                </div>
-
-                <!-- Card 5 - Deskmat / Mousepad -->
-                <div data-aos="fade-up" data-aos-delay="100" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
-                    <div class="flex justify-center -mt-10 mb-6">
-                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
-                            <img src="https://images.unsplash.com/photo-1616400619175-5beda3a17896?q=80&w=400&auto=format&fit=crop" alt="Deskmat" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-4deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?q=80&w=400&auto=format&fit=crop" alt="Mousepad detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(3deg); top: 0; left: 24px;">
-                        </div>
-                    </div>
-                    <h3 class="text-base font-bold text-gray-900 mb-1.5">Deskmat & Mousepad</h3>
-                    <p class="text-sm text-gray-500 mb-4 leading-relaxed">Extended surfaces with smooth glide and premium stitched edges for your entire setup.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Smooth</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Extended</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Stitched</span>
-                    </div>
-                </div>
-
-                <!-- Card 6 - Gaming Accessories -->
-                <div data-aos="fade-up" data-aos-delay="200" class="bg-gray-50 rounded-xl p-6 pt-16 relative overflow-visible">
-                    <div class="flex justify-center -mt-10 mb-6">
-                        <div class="setup-card-stack relative w-full max-w-[11rem] h-32">
-                            <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=400&auto=format&fit=crop" alt="Accessories" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(-3deg); top: 4px; left: 0;">
-                            <img src="https://images.unsplash.com/photo-1625842268584-8f3296236761?q=80&w=400&auto=format&fit=crop" alt="Accessory detail" class="mobile-safe-media absolute w-36 h-28 max-w-full object-cover rounded-xl shadow-md" style="transform: rotate(4deg); top: 0; left: 24px;">
-                        </div>
-                    </div>
-                    <h3 class="text-base font-bold text-gray-900 mb-1.5">Clean Accessories</h3>
-                    <p class="text-sm text-gray-500 mb-4 leading-relaxed">Cable management, wrist rests, and small additions that complete a tidy setup.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Cable tidy</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Wrist rest</span>
-                        <span class="inline-flex items-center gap-1 bg-white rounded-full px-3 py-1 text-xs text-gray-600 border border-gray-200">Finishing</span>
-                    </div>
-                </div>
-
             </div>
         </div>
     </section>
 
-    <section class="bg-white py-3" id="About">
-        <div class="container py-8 px-6 mx-auto">
-            <h2 data-aos="fade-right" class="uppercase tracking-wide font-bold text-gray-800 text-xl mb-8">
-                About
-            </h2>
-            <p data-aos="fade-up" data-aos-delay="150" class="mb-8 py-2">VoltX adalah tempat terbaik untuk menemukan rekomendasi aksesoris PC dan gaming
-                yang teruji kualitas dan performanya. Kami mengkurasi berbagai produk seperti keyboard, mouse, headset,
-                mousepad, cooling, hingga gear setup berdasarkan review dan pengalaman nyata para gamer dan pengguna
-                profesional.
-
-                Kami bukan toko biasa di VoltX, kamu tidak perlu bingung memilih. Kami hanya menampilkan
-                produk-produk terbaik pilihan VoltX, lengkap dengan deskripsi, keunggulan, dan review ringkas.
-
-                Mau beli? Klik saja gambar produknya, dan kamu akan langsung diarahkan ke toko penjual terpercaya di
-                e-commerce favoritmu. Praktis, cepat, dan aman!
-
-                VoltX hadir untuk membantumu level up setup gaming-mu, tanpa ribet.
-            </p>
+    <section class="section-spacing" id="About">
+        <div class="container mx-auto px-6 max-w-5xl">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+                <!-- Left Side: Title -->
+                <div class="md:col-span-4" data-aos="fade-right">
+                    <span class="text-xs uppercase tracking-[0.2em] text-gray-400 mb-3 block font-medium">About</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+                        Why VoltX?
+                    </h2>
+                </div>
+                
+                <!-- Right Side: Content -->
+                <div class="md:col-span-8 space-y-6 text-gray-500 leading-relaxed text-sm md:text-base" data-aos="fade-up" data-aos-delay="150">
+                    <p class="text-base md:text-lg text-gray-800 font-medium leading-relaxed">VoltX adalah tempat terbaik untuk menemukan rekomendasi aksesoris PC dan gaming yang teruji kualitas dan performanya.</p>
+                    <p>Kami mengkurasi berbagai produk seperti keyboard, mouse, headset, mousepad, cooling, hingga gear setup berdasarkan review dan pengalaman nyata para gamer dan pengguna profesional.</p>
+                    <p>Kami bukan toko biasa — di VoltX, kamu tidak perlu bingung memilih. Kami hanya menampilkan produk-produk terbaik pilihan VoltX, lengkap dengan deskripsi, keunggulan, dan review ringkas.</p>
+                    <p>Mau beli? Klik saja gambar produknya, dan kamu akan langsung diarahkan ke toko penjual terpercaya di e-commerce favoritmu. Praktis, cepat, dan aman!</p>
+                    <p class="font-medium text-gray-800">VoltX hadir untuk membantumu level up setup gaming-mu, tanpa ribet.</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer data-aos="fade-up" class="container mx-auto bg-black py-8 border-t border-gray-400">
-        <div class="container flex px-3 py-2 ">
-            <div class="w-full mx-auto flex flex-wrap">
-                <div class="flex w-full lg:w-1/2 ">
-                    <div class="px-3 md:px-0">
-                        <h3 class="font-bold text-white">Contact Us</h3>
-                        <p class="py-1 text-white">
-                            Email: contact@voltxstore.com
-                        </p>
-                        <p class="text-white">
-                            Mon - Fri: 9AM - 4PM WIB
-                        </p>
-                        <p class="text-white">
-                            Sat:9AM - 1PM WIB
-                        </p>
-                        <p class="text-white">
-                            Slow response on holidays and non-working hours.
-                        </p>
-                    </div>
+    <footer data-aos="fade-up" class="bg-black py-12 md:py-16 mt-12">
+        <div class="container mx-auto px-6 max-w-5xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+                <!-- Column 1: Brand -->
+                <div>
+                    <h3 class="font-bold text-white tracking-[0.1em] text-lg mb-4">VOLTX</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                        Premium gear for your setup. Curated peripherals designed for performance and clean aesthetics.
+                    </p>
                 </div>
-                <div class="flex w-full lg:w-1/2 lg:justify-end lg:text-right mt-6 md:mt-0">
-                    <div class="px-3 md:px-0">
-                        <h3 class="text-left font-bold text-white">Social</h3>
 
-                        <div class="w-full flex items-center py-4 mt-0 ">
-                            <button type="button" class="mx-2 text-white" aria-label="X profile coming soon">
-                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                                    <path
-                                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z">
-                                    </path>
-                                </svg>
-                            </button>
-                            <button type="button" class="mx-2 text-white" aria-label="Facebook page coming soon">
-                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                                    <path
-                                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z">
-                                    </path>
-                                </svg>
-                            </button>
-                            <button type="button" class="mx-2 text-white" aria-label="Instagram page coming soon">
-                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                                    <path
-                                        d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z">
-                                    </path>
-                                </svg>
-                            </button>
-                            <button type="button" class="mx-2 text-white" aria-label="TikTok page coming soon">
-                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                                    <path
-                                        d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </div>
+                <!-- Column 2: Contact -->
+                <div>
+                    <h3 class="font-bold text-white text-xs uppercase tracking-wider mb-4">Contact</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="mailto:contact@voltxstore.com" class="hover:text-white transition-colors">contact@voltxstore.com</a></li>
+                        <li>Mon - Fri: 9AM - 4PM WIB</li>
+                        <li>Sat: 9AM - 1PM WIB</li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Social -->
+                <div class="md:text-right">
+                    <h3 class="font-bold text-white text-xs uppercase tracking-wider mb-4">Follow Us</h3>
+                    <div class="flex items-center gap-3 md:justify-end">
+                        <button type="button" class="social-icon" aria-label="X profile">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="social-icon" aria-label="Facebook">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="social-icon" aria-label="Instagram">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="social-icon" aria-label="TikTok">
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-white/10 text-center text-gray-500 text-xs">
+                &copy; 2026 VoltX Store. All rights reserved.
             </div>
         </div>
     </footer>
