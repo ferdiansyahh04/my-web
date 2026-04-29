@@ -514,6 +514,20 @@
         qs('postalCode').value = shipping.postalCode || '';
     }
 
+    function scrollActiveStepIntoView(step) {
+        const scroller = document.querySelector('.checkout-steps-scroll');
+        const activeStep = qs('step-indicator-' + step);
+        if (!scroller || !activeStep || scroller.scrollWidth <= scroller.clientWidth) return;
+
+        window.requestAnimationFrame(function() {
+            const targetLeft = activeStep.offsetLeft - ((scroller.clientWidth - activeStep.offsetWidth) / 2);
+            scroller.scrollTo({
+                left: Math.max(0, targetLeft),
+                behavior: 'smooth'
+            });
+        });
+    }
+
     function showStep(step) {
         if (step < 1) step = 1;
         if (step > maxStep) step = maxStep;
@@ -554,6 +568,7 @@
         if (fill) fill.style.width = (step * 25) + '%';
         var currentStepDisplay = qs('current-step-display');
         if (currentStepDisplay) currentStepDisplay.textContent = String(step);
+        scrollActiveStepIntoView(step);
 
         const prev = qs('prev-btn');
         const next = qs('next-btn');

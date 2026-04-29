@@ -359,5 +359,9 @@
     });
 
     window.addEventListener('pageshow', syncBodyLocksFromDom);
-    window.addEventListener('resize', syncBodyLocksFromDom);
+    window.addEventListener('resize', function () {
+        if (bodyLockApplied || activeBodyLocks.size > 0) {
+            syncBodyLocksFromDom();
+        }
+    });
 })();
